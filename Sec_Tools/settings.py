@@ -143,8 +143,8 @@ SIMPLEUI_DEFAULT_THEME = 'simpleui.css'  # 默认主题 https://simpleui.88cto.c
 SIMPLEUI_HOME_QUICK = True  # 后台页面是否显示最近动作
 
 # AWVS URL和API key  服务器版本
-API_URL = 'https://192.168.31.6:3443'
-API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936c17c36bdc059f4d809172740790c316a5'
+API_URL = 'https://127.0.0.1:3443'
+API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936ccfe31a0c1dcb4a7ba45d54d3b16cbd9b'
 
 # 重设密码功能邮箱配置
 EMAIL_HOST = '***your**'
