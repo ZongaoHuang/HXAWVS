@@ -30,19 +30,21 @@
                 <div class="card-body">
                     <div class="card-title" style="font-size: 1.2em">URL:</div>
                     <pre style="background-color: #EDF1F2;font-size: 1em" >{{ data.affects_url }}</pre>
-                    <div class="card-title" style="font-size: 1.2em">Vulnerability:</div>
-                    <pre style="background-color: #EDF1F2;font-size: 1em" >{{ data.vt_name }}</pre>
-                    <div class="card-title" style="font-size: 1.2em">Time:</div>
+                    <div class="card-title" style="font-size: 1.2em">时间:</div>
                     <pre style="background-color: #EDF1F2;font-size: 1em" >{{ data.last_seen }}</pre>
-                    <div class="card-title" style="font-size: 1.2em">Parameter:</div>
-                    <pre style="background-color: #EDF1F2;font-size: 1em"> {{ data.parameter_name }}={{ data.parameter_data }}</pre>
-                    <div class="card-title" style="font-size: 1.2em">Attack details:</div>
+                    <div class="card-title" style="font-size: 1.2em">脆弱性:</div>
+                    <pre style="background-color: #EDF1F2;font-size: 1em" >{{ data.vt_name }}</pre>
+                    <div class="card-title" style="font-size: 1.2em">漏洞描述:</div>
+                    <pre style="background-color: #EDF1F2;font-size: 1em" >{{ data.description }}</pre>
+{#                    <div class="card-title" style="font-size: 1.2em">Parameter:</div>#}
+{#                    <pre style="background-color: #EDF1F2;font-size: 1em"> {{ data.parameter_name }}={{ data.parameter_data }}</pre>#}
+                    <div class="card-title" style="font-size: 1.2em">漏洞细节:</div>
                     {% autoescape off %}
                         <pre style="background-color: #EDF1F2;font-size: 1em">{{ data.details }}</pre>
                     {% endautoescape %}
-                    <div class="card-title" style="font-size: 1.2em">Request:</div>
+                    <div class="card-title" style="font-size: 1.2em">请求内容:</div>
                     <pre style="background-color: #EDF1F2;font-size: 1em">{{ data.request }}</pre>
-                    <div class="card-title" style="font-size: 1.2em">Recommendation:</div>
+                    <div class="card-title" style="font-size: 1.2em">修复建议:</div>
                     <pre style="background-color: #EDF1F2;font-size: 1em">{{ data.recommendation }}</pre>
                 </div>
               </div>
