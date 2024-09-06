@@ -100,7 +100,8 @@ def vuln_detail(request,vuln_id):
         'vt_name': data['vt_name'],
         'details': data['details'].replace("  ",'').replace('</p>',''),
         'request': data['request'],
-        'recommendation': data['recommendation'].replace('<br/>','\n')
+        'recommendation': data['recommendation'].replace('<br/>','\n'),
+        'description': data['description'],
     }
     try:
         data_dict['parameter_name'] = parameter_list[0].contents[0]
