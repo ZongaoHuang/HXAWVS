@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'webscan_backend.apps.WebscanBackendConfig',
     'dirscan.apps.DirscanConfig',
     'vulnscan.apps.VulnscanConfig',
+    'reports.apps.ReportsConfig',
 ]
 
 MIDDLEWARE = [
@@ -214,7 +215,7 @@ SIMPLEUI_CONFIG = {
         'name': '网页预览',
         'icon': 'fas fa-paper-plane',
         'models': [{
-            'name': 'Sec-Tools',
+            'name': 'HxScan',
             'url': 'http://127.0.0.1:8002/',
             'icon': 'fas fa-user-secret'
         }, {

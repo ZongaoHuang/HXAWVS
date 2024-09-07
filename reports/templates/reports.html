@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block title %} 漏洞报告 {% endblock %}
+{% block css %}
+    <!--Bootsrap Table-->
+    <style>
+        #toolbar {
+          margin: 0;
+        }
+        /*修复分页next按钮布局*/
+       .page-item.page-next, .page-item.page-prev{
+           flex: 0 0 auto;
+       }
+    </style>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
+
+{% endblock %}
+
+{% block contents %}
+    <div class="container-xl " >
+        <div class="row row-deck" >
+            <div class="col-lg-12">
+              <div class="card" >
+                <div class="card-header ">
+                  <h3 class="card-title text-muted" >漏洞报告</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" id="refresh">
+                    <table class="table text-center" id="table"
+                      data-toggle="table"
+                      data-show-export="true"
+                      data-click-to-select="true"
+                      data-toolbar="#toolbar"
+                      data-search="true"
+                      data-show-refresh="true"
+                      data-auto-refresh="true"
+                      data-show-toggle="true"
+                      data-show-fullscreen="true"
+                      data-show-columns="true"
+                      data-show-columns-toggle-all="true"
+                      data-minimum-count-columns="2"
+                      data-show-pagination-switch="true"
+                      data-pagination="true"
+                      data-id-field="id"
+                      data-page-list="[10, 25, 50, 100, all]"
+                      data-response-handler="responseHandler">
+                        <thead class="table-primary">
+                            <tr>
+                                <th data-sortable="true" data-field="id">ID</th>
+{#                                <th data-sortable="true" data-field="status">等级</th>#}
+                                <th data-sortable="true" data-field="target">扫描目标</th>
+{#                                <th data-sortable="true" data-field="vuln_name">漏洞类型</th>#}
+                                <th data-sortable="true" data-field="time">创建时间</th>
+{#                                <th data-sortable="true" data-field="vuln">漏洞</th>#}
+                                <th data-sortable="true" data-field="status">状态</th>
+                                <th data-sortable="true" data-field="download_pdf">pdf文件下载</th>
+                                <th data-sortable="true" data-field="delete">删除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in data %}
+                                <tr>
+                                    <td >{{ item.id }}</td>
+                                    <td ><a class="btn bg-blue-lt btn-block">{{ item.target }}</a></td>
+                                    <td ><span class="text-muted" >{{ item.time }}</span></td>
+                                    <td >{{ item.status }}</td>
+                                    <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td>
+                                    <td ><button>删除</button></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <!--Bootsrap Table-->
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+
+    <!-- 消息弹层组件 依赖jquery -->
+    <script src="{% static 'layer/layer.js' %}"></script>
+    <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
+    <script type="text/javascript">
+        jQuery(document).ready(function($){
+            $('.scan-btn').click(function(){$('html,body').animate({scrollTop:$('.footer').offset().top}, 100);}); //100ms
+        });
+    </script>
+    <!-- 回车键查询按钮触发 依赖jquery -->
+    <script type="text/javascript">
+            $(document).keydown(function(event) {
+                    if (event.keyCode == 13) {
+                        $(".scan-btn").click();
+                    }
+                });
+        </script>
+{% endblock %}

@@ -11,8 +11,8 @@ from .forms import RegisterForm
 
 def login(request):
     msg = {
-        'site_title': "Sec-tools",
-        'site_header': "Sec-tools 登录",
+        'site_title': "HxScan",
+        'site_header': "HxScan 登录",
         'error': '',
         'color': 'transparent',
     }
