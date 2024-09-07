@@ -11,7 +11,7 @@ urlpatterns = [
     path('get_vuln_value',views.get_vuln_value, name='get_vuln_value'),
     path('Middleware_scan', views.Middleware_scan, name='Middleware_scan'),
     path('start_Middleware_scan', views.start_Middleware_scan, name='start_Middleware_scan'),
-    path('test2',views.test2, name='test2')
+    path('test2',views.test2, name='test2'),
 
 ]
 
