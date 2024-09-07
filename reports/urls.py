@@ -13,6 +13,7 @@ urlpatterns = [
     # path('start_Middleware_scan', views.start_Middleware_scan, name='start_Middleware_scan'),
     # path('test2',views.test2, name='test2'),
     path('reports', views.reports, name='reports'),
+    path('reports_delete', views.delete_report, name='delete_report'),
 
 ]
 

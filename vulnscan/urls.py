@@ -12,6 +12,7 @@ urlpatterns = [
     path('Middleware_scan', views.Middleware_scan, name='Middleware_scan'),
     path('start_Middleware_scan', views.start_Middleware_scan, name='start_Middleware_scan'),
     path('test2',views.test2, name='test2'),
+    path("generate_report",views.generate_report, name="generate_report"),
 
 ]
 
@@ -22,4 +23,5 @@ for target_id in target_ids:
 for vuln_id in vuln_ids:
     urlpatterns.append(url(r'^vuln_detail/(?P<vuln_id>.*)$', views.vuln_detail, name='vuln_detail/' + vuln_id))
 
+# 这里加scan_result。
 

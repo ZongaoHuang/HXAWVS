@@ -26,18 +26,41 @@ def reports(request):
     id = 1
     reports_detail = r.get_all()
     for target in reports_detail["reports"]:
-        item = {
-            "id": id,
-            "target":target["source"]["description"].split(";")[0],
-            "time":re.sub(r'T|\..*$', " ", target["generation_date"]),
-            "status":target["status"],
-            "download_html":target["download"][0],
-            "download_pdf":target["download"][1],
-            # "delete"
-        }
+        if target["status"] == "completed":
+            item = {
+                "id": id,
+                "report_id": target["report_id"],
+                "target": target["source"]["description"].split(";")[0],
+                "time": re.sub(r'T|\..*$', " ", target["generation_date"]),
+                "status": target["status"],
+                "download_html": target["download"][0],
+                "download_pdf": target["download"][1],
+                # "delete"
+            }
+        else:
+            item = {
+                "id": id,
+                "report_id": target["report_id"],
+                "target":target["source"]["description"].split(";")[0],
+                "time":re.sub(r'T|\..*$', " ", target["generation_date"]),
+                "status":target["status"],
+                "download_html":None,
+                "download_pdf":None,
+                # "delete"
+            }
         data.append(item)
         id = id + 1
     return render(request, "reports.html", {"data": data,"api_url":API_URL})
+
+@login_required
+@csrf_exempt
+def delete_report(request):
+    r = Report(API_URL, API_KEY)
+    report_id = request.POST.get('report_id')
+    status = r.delete(report_id)
+    if status:
+        return success()
+    return error()
 
 
 @login_required
