@@ -28,6 +28,7 @@ def reports(request):
     for target in reports_detail["reports"]:
         item = {
             "id": id,
+            "report_id": target["report_id"],
             "target":target["source"]["description"].split(";")[0],
             "time":re.sub(r'T|\..*$', " ", target["generation_date"]),
             "status":target["status"],
@@ -38,6 +39,16 @@ def reports(request):
         data.append(item)
         id = id + 1
     return render(request, "reports.html", {"data": data,"api_url":API_URL})
+
+@login_required
+@csrf_exempt
+def delete_report(request):
+    r = Report(API_URL, API_KEY)
+    report_id = request.POST.get('report_id')
+    status = r.delete(report_id)
+    if status:
+        return success()
+    return error()
 
 
 @login_required

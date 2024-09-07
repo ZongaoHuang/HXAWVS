@@ -31,3 +31,11 @@ class Report(Base):
         except Exception:
             self.logger.error('Generate Report Failed......', exc_info=True)
             return False
+
+    def delete(self, report_id):
+        try:
+            response = requests.delete(f'{self.report_api}/{report_id}', headers=self.auth_headers, verify=False)
+            return True
+        except Exception:
+            self.logger.error('Delete Report Failed......', exc_info=True)
+            return False

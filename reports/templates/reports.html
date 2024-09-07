@@ -12,6 +12,20 @@
        .page-item.page-next, .page-item.page-prev{
            flex: 0 0 auto;
        }
+       /* 自定义按钮样式 */
+        .delete-btn {
+            background-color: transparent; /* 白色背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 16px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .delete-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 
@@ -48,6 +62,7 @@
                         <thead class="table-primary">
                             <tr>
                                 <th data-sortable="true" data-field="id">ID</th>
+{#                                <th data-sortable="true" data-field="report_id">report_id</th>#}
 {#                                <th data-sortable="true" data-field="status">等级</th>#}
                                 <th data-sortable="true" data-field="target">扫描目标</th>
 {#                                <th data-sortable="true" data-field="vuln_name">漏洞类型</th>#}
@@ -62,11 +77,12 @@
                             {% for item in data %}
                                 <tr>
                                     <td >{{ item.id }}</td>
+{#                                    <td style="display: none">{{ item.report_id }}</td>#}
                                     <td ><a class="btn bg-blue-lt btn-block">{{ item.target }}</a></td>
                                     <td ><span class="text-muted" >{{ item.time }}</span></td>
                                     <td >{{ item.status }}</td>
                                     <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td>
-                                    <td ><button>删除</button></td>
+                                    <td ><button class="delete-btn" data-report-id="{{ item.report_id }}" data-api-url="{{ api_url }}/api/v1/reports/"><i class="fas fa-trash delete-icon"></i></button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -88,18 +104,73 @@
 
     <!-- 消息弹层组件 依赖jquery -->
     <script src="{% static 'layer/layer.js' %}"></script>
-    <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
-    <script type="text/javascript">
-        jQuery(document).ready(function($){
-            $('.scan-btn').click(function(){$('html,body').animate({scrollTop:$('.footer').offset().top}, 100);}); //100ms
+{#    <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->#}
+{#    <script type="text/javascript">#}
+{#        jQuery(document).ready(function($){#}
+{#            $('.delete-btn').click(function(){$('html,body').animate({scrollTop:$('.footer').offset().top}, 100);}); //100ms#}
+{#        });#}
+{#    </script>#}
+{#    <!-- 回车键查询按钮触发 依赖jquery -->#}
+{#    <script type="text/javascript">#}
+{#            $(document).keydown(function(event) {#}
+{#                    if (event.keyCode == 13) {#}
+{#                        $(".scan-btn").click();#}
+{#                    }#}
+{#                });#}
+{#        </script>#}
+     <script>
+        $(function() {
+            $('#table').on('click', '.delete-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要删除吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var report_id = $(this).data("report-id");
+                    {#var api_url = $(this).data("api-url");#}
+                    {#var delete_url = api_url+report_id#}
+                    {#deleteItem(report_id);#}
+                    real_delete(report_id);
+                } else {
+                    // 用户点击了取消
+                    console.log('删除操作已取消');
+                }
+            });
+
+            function deleteItem(report_id) {
+                $.post("/reports_delete",{report_id:report_id},function (response){
+                    if (response.success){
+                        alert("删除成功");
+                    }
+                    else {
+                        alert("删除失败");
+                    }
+                }).fail(function (){
+                    alert("请求失败");
+                })
+            }
+            function real_delete(report_id){
+                $.ajax({
+                    url: "/reports_delete",
+                    type: "POST",
+                    data: {report_id: report_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                        alert("删除成功");
+                        window.location.reload(true);
+                    }
+                    else {
+                        alert("删除失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
         });
     </script>
-    <!-- 回车键查询按钮触发 依赖jquery -->
-    <script type="text/javascript">
-            $(document).keydown(function(event) {
-                    if (event.keyCode == 13) {
-                        $(".scan-btn").click();
-                    }
-                });
-        </script>
 {% endblock %}
