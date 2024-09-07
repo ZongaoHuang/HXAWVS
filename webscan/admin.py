@@ -7,8 +7,8 @@ from django.forms import TextInput
 # Register your models here.
 
 #修改后台管理页面头部显示内容和后台名称
-admin.site.site_header = 'Sec-tools 后台'
-admin.site.site_title = 'Sec-tools | 后台'
+admin.site.site_header = 'HxScan 后台'
+admin.site.site_title = 'HxScan | 后台'
 
 
 # 导航分类
