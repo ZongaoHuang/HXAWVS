@@ -13,6 +13,20 @@
        .page-item.page-next, .page-item.page-prev{
            flex: 0 0 auto;
        }
+       /* 自定义按钮样式 */
+        .generate-btn {
+            background-color: transparent; /* 透明背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 16px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .generate-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
@@ -202,6 +216,7 @@
                                 <th data-sortable="true" data-field="scan_type">扫描类型</th>
                                 <th data-sortable="true" data-field="vuln">漏洞</th>
                                 <th data-sortable="true" data-field="plan">添加时间</th>
+                                <th data-sortable="true" data-field="report_generate">报告生成</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -238,6 +253,7 @@
                                     <td ><span class="badge bg-azure " >{{ i.scan_type }}</span></td>
                                     <td><span class="avatar avatar-rounded text-white" style="background-color: #fa755a">{{ i.vuln.high }}</span><span class="avatar avatar-rounded text-white" style="background-color: #FFDC60" >{{ i.vuln.medium }}</span><span class="avatar avatar-rounded text-white" style="background-color: #23B7E5" >{{ i.vuln.low }}</span><span class="avatar avatar-rounded text-white" style="background-color: #3ecf8e" >{{ i.vuln.info }}</span></td>
                                     <td class="text-secondary">{{ i.plan }}</td>
+                                    <td><button class="generate-btn" data-scan-session-id="{{ i.scan_session_id }}">Generate</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -465,6 +481,45 @@
                 }
                 start_Middleware_scan(domain, CVE_id);
             });
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#table').on('click', '.generate-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要生成报告吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var scan_session_id = $(this).data("scan-session-id");
+                    console.log(scan_session_id)
+                    generate_report(scan_session_id)
+                } else {
+                    // 用户点击了取消
+                    console.log('删除操作已取消');
+                }
+            });
+            function generate_report(scan_session_id){
+                $.ajax({
+                    url: "/generate_report",
+                    type: "POST",
+                    data: {scan_session_id: scan_session_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            alert("报告生成成功");
+                    }
+                    else {
+                        alert("报告生成失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
         });
     </script>
 {% endblock %}

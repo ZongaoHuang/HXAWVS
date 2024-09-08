@@ -81,7 +81,11 @@
                                     <td ><a class="btn bg-blue-lt btn-block">{{ item.target }}</a></td>
                                     <td ><span class="text-muted" >{{ item.time }}</span></td>
                                     <td >{{ item.status }}</td>
-                                    <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td>
+                                    {% if item.status == "completed" %}
+                                        <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td>
+                                    {% else %}
+                                        <td >正在生成</td>
+                                    {% endif %}
                                     <td ><button class="delete-btn" data-report-id="{{ item.report_id }}" data-api-url="{{ api_url }}/api/v1/reports/"><i class="fas fa-trash delete-icon"></i></button></td>
                                 </tr>
                             {% endfor %}

@@ -25,6 +25,7 @@ class Report(Base):
                 'id_list': id_list
             }
         }
+        print(data)
         try:
             response = requests.post(self.report_api, json=data, headers=self.auth_headers, verify=False)
             return True
