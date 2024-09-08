@@ -13,6 +13,7 @@ urlpatterns = [
     path('start_Middleware_scan', views.start_Middleware_scan, name='start_Middleware_scan'),
     path('test2',views.test2, name='test2'),
     path("generate_report",views.generate_report, name="generate_report"),
+    path("abort_scan",views.abort_scan, name="abort_scan"),
 
 ]
 
