@@ -20,6 +20,16 @@ from vulnscan.API.Report import Report
 # API_URL = 'https://127.0.0.1:3443'
 # API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936cc23a5d4737044dc18935d8a6f0199a50'
 
+@csrf_exempt
+@login_required
+def abort_scan(request):
+    s = Scan(API_URL, API_KEY)
+    scan_id = request.POST.get('scan_id')
+    status = s.abort_scan(scan_id)
+    if status:
+        return success()
+    return error()
+
 
 @csrf_exempt
 @login_required
@@ -65,6 +75,7 @@ def vulnscan(request):
             'vuln': msg['current_session']['severity_counts'],
             'plan': re.sub(r'T|\..*$', " ", msg['current_session']['start_date']),
             "scan_session_id":msg["current_session"]["scan_session_id"],
+            "scan_id":msg["scan_id"]
         }
         s_list.append(table_data)
         count += 1
