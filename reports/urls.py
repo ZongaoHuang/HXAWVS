@@ -13,14 +13,15 @@ urlpatterns = [
     # path('start_Middleware_scan', views.start_Middleware_scan, name='start_Middleware_scan'),
     # path('test2',views.test2, name='test2'),
     path('reports', views.reports, name='reports'),
+    path('reports_delete', views.delete_report, name='delete_report'),
 
 ]
 
-target_ids = views.get_target_id()
-vuln_ids = views.get_vuln_id()
-for target_id in target_ids:
-    urlpatterns.append(url(r'^vuln_result/(?P<target_id>.*)$', views.vuln_result, name = 'vuln_result/'+target_id))
-for vuln_id in vuln_ids:
-    urlpatterns.append(url(r'^vuln_detail/(?P<vuln_id>.*)$', views.vuln_detail, name='vuln_detail/' + vuln_id))
+# target_ids = views.get_target_id()
+# vuln_ids = views.get_vuln_id()
+# for target_id in target_ids:
+#     urlpatterns.append(url(r'^vuln_result/(?P<target_id>.*)$', views.vuln_result, name = 'vuln_result/'+target_id))
+# for vuln_id in vuln_ids:
+#     urlpatterns.append(url(r'^vuln_detail/(?P<vuln_id>.*)$', views.vuln_detail, name='vuln_detail/' + vuln_id))
 
 

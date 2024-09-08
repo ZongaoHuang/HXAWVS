@@ -4,6 +4,7 @@ from django.shortcuts import render
 from vulnscan.API.Scan import *
 from vulnscan.API.Target import *
 from vulnscan.API.Vuln import *
+from vulnscan.API.Report import *
 from vulnscan.API.Group import *
 from vulnscan.API.Dashboard import *
 from django.views.decorators.csrf import csrf_exempt
@@ -13,14 +14,41 @@ from urllib.parse import urlparse
 from vulnscan.models import Middleware_vuln
 from Sec_Tools.settings import API_KEY, API_URL
 import time
+
 # Create your views here.
 # API_URL = 'https://127.0.0.1:3443'
 # API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936cc23a5d4737044dc18935d8a6f0199a50'
 
 @login_required
 def reports(request):
-    data = {}
-    return render(request, "reports.html", {"data": data})
+    r = Report(API_URL, API_KEY)
+    data = []
+    id = 1
+    reports_detail = r.get_all()
+    for target in reports_detail["reports"]:
+        item = {
+            "id": id,
+            "report_id": target["report_id"],
+            "target":target["source"]["description"].split(";")[0],
+            "time":re.sub(r'T|\..*$', " ", target["generation_date"]),
+            "status":target["status"],
+            "download_html":target["download"][0],
+            "download_pdf":target["download"][1],
+            # "delete"
+        }
+        data.append(item)
+        id = id + 1
+    return render(request, "reports.html", {"data": data,"api_url":API_URL})
+
+@login_required
+@csrf_exempt
+def delete_report(request):
+    r = Report(API_URL, API_KEY)
+    report_id = request.POST.get('report_id')
+    status = r.delete(report_id)
+    if status:
+        return success()
+    return error()
 
 
 @login_required
