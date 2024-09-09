@@ -13,6 +13,34 @@
        .page-item.page-next, .page-item.page-prev{
            flex: 0 0 auto;
        }
+       /* 自定义按钮样式 */
+        .generate-btn {
+            background-color: transparent; /* 透明背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 16px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .generate-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
+
+        .abort-btn {
+            background-color: transparent; /* 透明背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 12px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .abort-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
@@ -198,23 +226,26 @@
                             <tr>
                                 <th data-sortable="true" data-field="id">ID</th>
                                 <th data-sortable="true" data-field="status">扫描状态</th>
+                                <th data-sortable="true" data-field="abort">操作</th>
                                 <th data-sortable="true" data-field="target">扫描目标</th>
                                 <th data-sortable="true" data-field="scan_type">扫描类型</th>
                                 <th data-sortable="true" data-field="vuln">漏洞</th>
                                 <th data-sortable="true" data-field="plan">添加时间</th>
+                                <th data-sortable="true" data-field="report_generate">报告生成</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in data %}
                                 <tr>
                                     <td >{{ i.id }}</td>
-                                    {% if i.status == 'failed' %}
+                                    {% if i.status == 'failed' or i.status == "aborted" %}
                                         <td>
                                             <a class="btn bg-red-lt btn-block">
                                                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>
                                                 {{ i.status }}
                                              </a>
                                         </td>
+                                        <td>失败/终止</td>
                                     {% elif i.status == 'completed' %}
                                            <td>
                                             <a class="btn bg-green-lt btn-block">
@@ -222,6 +253,7 @@
                                                 {{ i.status }}
                                              </a>
                                         </td>
+                                        <td>已完成</td>
                                     {% else %}
                                          <td>
                                              <a class="btn bg-azure-lt btn-block">
@@ -229,6 +261,7 @@
                                                 {{ i.status }}
                                              </a>
                                          </td>
+                                        <td><button class="abort-btn" data-scan-id="{{ i.scan_id }}">停止扫描</button></td>
                                     {% endif %}
                                 {% if i.target_id == None %}
                                     <td><a href="#"> {{ i.target }}</a></td>
@@ -238,6 +271,7 @@
                                     <td ><span class="badge bg-azure " >{{ i.scan_type }}</span></td>
                                     <td><span class="avatar avatar-rounded text-white" style="background-color: #fa755a">{{ i.vuln.high }}</span><span class="avatar avatar-rounded text-white" style="background-color: #FFDC60" >{{ i.vuln.medium }}</span><span class="avatar avatar-rounded text-white" style="background-color: #23B7E5" >{{ i.vuln.low }}</span><span class="avatar avatar-rounded text-white" style="background-color: #3ecf8e" >{{ i.vuln.info }}</span></td>
                                     <td class="text-secondary">{{ i.plan }}</td>
+                                    <td><button class="generate-btn" data-scan-session-id="{{ i.scan_session_id }}">Generate</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -406,6 +440,9 @@
                         layer.msg('添加失败',{icon: 1,offset: '100px',area: ['70px', '70px']});
                     } else {
                         layer.msg('添加成功',{icon: 1,offset: '100px',area: ['70px', '70px']});
+                        setTimeout(function() {
+                            window.location.reload(true);
+                        }, 2000);
                     }
                     $(".btn-scan").text('重新扫描');
                     $('.btn-scan').attr('disabled', false);
@@ -465,6 +502,87 @@
                 }
                 start_Middleware_scan(domain, CVE_id);
             });
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#table').on('click', '.generate-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要生成报告吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var scan_session_id = $(this).data("scan-session-id");
+                    console.log(scan_session_id)
+                    generate_report(scan_session_id)
+                } else {
+                    // 用户点击了取消
+                    console.log('删除操作已取消');
+                }
+            });
+            function generate_report(scan_session_id){
+                $.ajax({
+                    url: "/generate_report",
+                    type: "POST",
+                    data: {scan_session_id: scan_session_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            alert("报告生成成功");
+                    }
+                    else {
+                        alert("报告生成失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#table').on('click', '.abort-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要停止该扫描吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var scan_id = $(this).data("scan-id");
+                    console.log(scan_id)
+                    abort_scan(scan_id)
+                } else {
+                    // 用户点击了取消
+                    console.log('停止扫描操作已取消');
+                }
+            });
+            function abort_scan(scan_id){
+                $.ajax({
+                    url: "/abort_scan",
+                    type: "POST",
+                    data: {scan_id: scan_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            alert("停止扫描成功");
+                            setTimeout(function() {
+                            window.location.reload(true);
+                        }, 4000);
+                    }
+                    else {
+                        alert("停止扫描失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
         });
     </script>
 {% endblock %}

@@ -3,6 +3,7 @@
 
 import requests
 
+from webscan_backend.plugins.common.common import success
 from .Base import Base
 
 
@@ -126,3 +127,13 @@ class Scan(Base):
         except Exception:
             self.logger.error('Get Scan Result Failed......', exc_info=True)
             return None
+
+    def abort_scan(self,scan_id):
+        abort_scan_api = f'{self.scan_api}/{scan_id}/abort'
+        data = {}
+        try:
+            response = requests.post(abort_scan_api, json=data, headers=self.auth_headers, verify=False)
+            return True
+        except Exception:
+            self.logger.error('Abort Scan Failed......', exc_info=True)
+            return False

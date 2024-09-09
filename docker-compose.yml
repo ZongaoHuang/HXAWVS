@@ -1,8 +1,6 @@
-version: '2'
 services:
  web:
    image: vulhub/wordpress:4.6
-   platform: linux/amd64
    depends_on:
     - mysql
    environment: 
@@ -11,9 +9,8 @@ services:
     - WORDPRESS_DB_PASSWORD=root
     - WORDPRESS_DB_NAME=wordpress
    ports:
-    - "8080:80"
+    - "8081:80"
  mysql:
    image: mysql:5
-   platform: linux/amd64
    environment: 
     - MYSQL_ROOT_PASSWORD=root

@@ -7,7 +7,7 @@
 			    <div class="navbar-header">
 			      <a class="navbar-brand" href="{% url 'index' %}">
 			        <img alt="Brand" style="margin-bottom: auto;" height="35px" width="35px"  src="{% static '/img/favicon.ico' %}"><strong>
-                      <h2 style="color: #206bc4; font-size: 30px; "><i>Sec-Tools</i></h2></strong>
+                      <h2 style="color: #206bc4; font-size: 30px; "><i>HxScan</i></h2></strong>
 			      </a>
 			    </div>
 			  </div>
@@ -43,10 +43,10 @@
                     <a class="dropdown-item" href="{% url 'login' %}">
                         <i class="fas fa-user-circle" style="zoom: 1.0;padding: 5px;"></i>登录
                     </a>
-                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{% url 'register' %}">
-                       <i class="fas fa-id-card" style="zoom: 1.0;padding: 5px;"></i>注册
-                    </a>
+{#                     <div class="dropdown-divider"></div>#}
+{#                    <a class="dropdown-item" href="{% url 'register' %}">#}
+{#                       <i class="fas fa-id-card" style="zoom: 1.0;padding: 5px;"></i>注册#}
+{#                    </a>#}
                   </div>
                 {% endif %}
                 </div>
@@ -65,6 +65,12 @@
                   <a class="nav-link " href="{% url 'vulnscan' %}" >
                     <span class="d-md-none d-lg-inline-block"><i class="fa fa-bug" style="zoom: 1.0;padding: 5px;"></i></span>
                     <span class="nav-link-title">漏洞扫描</span>
+                  </a>
+                </li>
+                  <li class="nav-item">
+                  <a class="nav-link " href="{% url 'reports' %}" >
+                    <span class="d-md-none d-lg-inline-block"><i class="fa fa-book" style="zoom: 1.0;padding: 5px;"></i></span>
+                    <span class="nav-link-title">漏洞报告</span>
                   </a>
                 </li>
                 <li class="nav-item dropdown">
@@ -99,18 +105,18 @@
                     <span class="nav-link-title">资产收集</span>
                   </a>
                   <ul class="dropdown-menu">
-                      <li >
-                      <a class="dropdown-item" href="{% url 'subdomain' %}" >
-                          <span class="d-md-none d-lg-inline-block"><i class="fas fa-project-diagram" style="zoom: 1.0;padding: 5px;"></i></span>
-                          <span class="nav-link-title">域名探测</span>
-                      </a>
-                    </li>
-                      <li>
-                          <a class="dropdown-item" href="{% url 'webside' %}" >
-                              <span class="d-md-none d-lg-inline-block"><i class="fas fa-network-wired" style="zoom: 1.0;padding: 5px;"></i></span>
-                              <span class="nav-link-title">旁站探测</span>
-                          </a>
-                      </li>
+{#                      <li >#}
+{#                      <a class="dropdown-item" href="{% url 'subdomain' %}" >#}
+{#                          <span class="d-md-none d-lg-inline-block"><i class="fas fa-project-diagram" style="zoom: 1.0;padding: 5px;"></i></span>#}
+{#                          <span class="nav-link-title">域名探测</span>#}
+{#                      </a>#}
+{#                    </li>#}
+{#                      <li>#}
+{#                          <a class="dropdown-item" href="{% url 'webside' %}" >#}
+{#                              <span class="d-md-none d-lg-inline-block"><i class="fas fa-network-wired" style="zoom: 1.0;padding: 5px;"></i></span>#}
+{#                              <span class="nav-link-title">旁站探测</span>#}
+{#                          </a>#}
+{#                      </li>#}
                       <li >
                           <a class="dropdown-item" href="{% url 'infoleak' %}" >
                               <span class="d-md-none d-lg-inline-block"><i class="fas fa-compass" style="zoom: 1.0;padding: 5px;"></i></span>

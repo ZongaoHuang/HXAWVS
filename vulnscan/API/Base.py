@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import os
 from logging.config import fileConfig
 import requests
 import logging
@@ -15,8 +15,10 @@ class Base(object):
     def __init__(self, api_base_url, api_key):
         self.api_base_url = api_base_url
         self._api_key = api_key
+        # self._api_key = None
 
-        api_base_url = api_base_url.strip('/')
+        # api_base_url = api_base_url.strip('/')
+        api_base_url = self.api_base_url.strip('/')
         self.targets_api = f'{api_base_url}/api/v1/targets'
         self.scan_api = f'{api_base_url}/api/v1/scans'
         self.vuln_api = f'{api_base_url}/api/v1/vulnerabilities'
@@ -37,7 +39,8 @@ class Base(object):
             'sarbanes_oxley': '11111111-1111-1111-1111-111111111121',
             'scan_comparison': '11111111-1111-1111-1111-111111111124',
             'stig_disa': '11111111-1111-1111-1111-111111111122',
-            'wasc_threat_classification': '11111111-1111-1111-1111-111111111123'
+            'wasc_threat_classification': '11111111-1111-1111-1111-111111111123',
+            'comprehensive':'11111111-1111-1111-1111-111111111126'
         }
 
         # 禁用https证书相关警告

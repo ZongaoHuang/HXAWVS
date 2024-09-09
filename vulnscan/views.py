@@ -1,3 +1,5 @@
+from tempfile import template
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -13,9 +15,34 @@ from urllib.parse import urlparse
 from vulnscan.models import Middleware_vuln
 from Sec_Tools.settings import API_KEY, API_URL
 import time
+from vulnscan.API.Report import Report
 # Create your views here.
 # API_URL = 'https://127.0.0.1:3443'
 # API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936cc23a5d4737044dc18935d8a6f0199a50'
+
+@csrf_exempt
+@login_required
+def abort_scan(request):
+    s = Scan(API_URL, API_KEY)
+    scan_id = request.POST.get('scan_id')
+    status = s.abort_scan(scan_id)
+    if status:
+        return success()
+    return error()
+
+
+@csrf_exempt
+@login_required
+def generate_report(request):
+    r = Report(API_URL,API_KEY)
+    template_id = "comprehensive"
+    list_type = "scan_result"
+    scan_session_id = request.POST.get('scan_session_id')
+    id_list = [scan_session_id]
+    status = r.generate(template_id, list_type, id_list)
+    if status:
+        return success()
+    return error()
 
 @login_required
 def vulnscan(request):
@@ -46,7 +73,9 @@ def vulnscan(request):
             'target': msg['target']['address'],
             'scan_type': msg["profile_name"],
             'vuln': msg['current_session']['severity_counts'],
-            'plan': re.sub(r'T|\..*$', " ", msg['current_session']['start_date'])
+            'plan': re.sub(r'T|\..*$', " ", msg['current_session']['start_date']),
+            "scan_session_id":msg["current_session"]["scan_session_id"],
+            "scan_id":msg["scan_id"]
         }
         s_list.append(table_data)
         count += 1
@@ -100,7 +129,8 @@ def vuln_detail(request,vuln_id):
         'vt_name': data['vt_name'],
         'details': data['details'].replace("  ",'').replace('</p>',''),
         'request': data['request'],
-        'recommendation': data['recommendation'].replace('<br/>','\n')
+        'recommendation': data['recommendation'].replace('<br/>','\n'),
+        'description': data['description'],
     }
     try:
         data_dict['parameter_name'] = parameter_list[0].contents[0]

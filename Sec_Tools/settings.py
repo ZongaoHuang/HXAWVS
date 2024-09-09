@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+from logging import exception
 from pathlib import Path
+from vulnscan.API.Key_Auto_Get import Key_Auto_Get
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'webscan_backend.apps.WebscanBackendConfig',
     'dirscan.apps.DirscanConfig',
     'vulnscan.apps.VulnscanConfig',
+    'reports.apps.ReportsConfig',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +135,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # SimpleUi后台设置
-# SIMPLEUI_LOGO = 'https://jwt1399.top//medias/logo.png' #登录页和后台logo
 SIMPLEUI_LOGO = 'media/icons/favicon.ico'  # 登录页和后台logo
 SIMPLEUI_ANALYSIS = False  # 是否向SimpleUi收集分析信息
 SIMPLEUI_LOADING = False  # 是否打开Loading遮罩层
@@ -143,8 +145,14 @@ SIMPLEUI_DEFAULT_THEME = 'simpleui.css'  # 默认主题 https://simpleui.88cto.c
 SIMPLEUI_HOME_QUICK = True  # 后台页面是否显示最近动作
 
 # AWVS URL和API key  服务器版本
-API_URL = 'https://192.168.31.6:3443'
-API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936c17c36bdc059f4d809172740790c316a5'
+API_URL = os.getenv("API_URL") if os.getenv("API_URL") else "https://127.0.0.1:3443"
+kag = Key_Auto_Get()
+API_KEY = None
+if kag._api_key is not None:
+    API_KEY = kag._api_key
+else:
+    raise exception("No API key found")
+print(API_KEY)
 
 # 重设密码功能邮箱配置
 EMAIL_HOST = '***your**'
@@ -207,7 +215,7 @@ SIMPLEUI_CONFIG = {
         'name': '网页预览',
         'icon': 'fas fa-paper-plane',
         'models': [{
-            'name': 'Sec-Tools',
+            'name': 'HxScan',
             'url': 'http://127.0.0.1:8002/',
             'icon': 'fas fa-user-secret'
         }, {
