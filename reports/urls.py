@@ -14,7 +14,7 @@ urlpatterns = [
     # path('test2',views.test2, name='test2'),
     path('reports', views.reports, name='reports'),
     path('reports_delete', views.delete_report, name='delete_report'),
-
+    path('download_modified/<str:report_id>/', views.download_modified_report, name='download_modified_report'),
 ]
 
 # target_ids = views.get_target_id()

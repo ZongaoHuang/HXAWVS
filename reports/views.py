@@ -62,6 +62,16 @@ def delete_report(request):
         return success()
     return error()
 
+@login_required
+def download_modified_report(request, report_id):
+    r = Report(API_URL, API_KEY)
+    modified_pdf = r.get_modified_report(report_id)
+    if modified_pdf:
+        response = HttpResponse(modified_pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="modified_report_{report_id}.pdf"'
+        return response
+    return HttpResponse("Failed to generate modified PDF", status=500)
+
 
 @login_required
 def vulnscan(request):
