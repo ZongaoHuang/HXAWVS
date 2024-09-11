@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from tkinter import Image
 from .Base import Base
 import requests
+import PyPDF2
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from PyPDF2 import PdfReader, PdfWriter
+import io
+from PIL import Image
+from reportlab.lib.utils import ImageReader
 
 class Report(Base):
     def __init__(self, api_base_url, api_key):
@@ -40,3 +49,73 @@ class Report(Base):
         except Exception:
             self.logger.error('Delete Report Failed......', exc_info=True)
             return False
+        
+    def get_modified_report(self, report_id):
+        try:
+            # First, get the report details to obtain the download descriptor
+            response = requests.get(f'{self.report_api}/{report_id}', headers=self.auth_headers, verify=False)
+            response.raise_for_status()
+            report_details = response.json()
+            
+            # Get the download descriptor for the PDF
+            pdf_descriptor = next((download for download in report_details.get('download', []) if download.endswith('.pdf')), None)
+            
+            if not pdf_descriptor:
+                self.logger.error(f'No PDF download descriptor found for report {report_id}')
+                return None
+            
+            # Download the PDF using the correct endpoint
+            response = requests.get(f'{self.api_base_url}{pdf_descriptor}', headers=self.auth_headers, verify=False)
+            response.raise_for_status()
+            pdf_content = io.BytesIO(response.content)
+            
+            pdf_reader = PdfReader(pdf_content)
+            pdf_writer = PdfWriter()
+
+            # Modify the first page
+            first_page = pdf_reader.pages[0]
+            modified_first_page = self.modify_first_page(first_page)
+            pdf_writer.add_page(modified_first_page)
+
+            # Add remaining pages unchanged
+            for page in pdf_reader.pages[1:]:
+                pdf_writer.add_page(page)
+
+            output = io.BytesIO()
+            pdf_writer.write(output)
+            output.seek(0)
+            return output.getvalue()
+        except requests.RequestException as e:
+            self.logger.error(f'Failed to download report {report_id}: {str(e)}')
+        except PyPDF2.errors.PdfReadError as e:
+            self.logger.error(f'Failed to read PDF for report {report_id}: {str(e)}')
+        except Exception as e:
+            self.logger.error(f'Unexpected error in get_modified_report for {report_id}: {str(e)}')
+        return None
+    
+    def modify_first_page(self, original_page):
+        try:
+            # Create a new PDF page
+            packet = io.BytesIO()
+            can = canvas.Canvas(packet, pagesize=letter)
+            
+            # Draw a white rectangle to cover the top 160px of the page
+            can.setFillColorRGB(1, 1, 1)  # White color
+            can.rect(0, 750, letter[0], 100 , fill=1)
+            
+            # Add new header
+            can.setFont("Helvetica", 10)  # Set the font and size
+            can.setFillColorRGB(0, 0, 0)  # Black color
+            can.drawString(30, 780, "New Header")  # Adjust the coordinates as needed
+
+            can.showPage()  # This is necessary to save the modifications
+            can.save()
+            packet.seek(0)
+            new_page = PdfReader(packet).pages[0]
+
+            # Merge the new page with the original page
+            original_page.merge_page(new_page)
+            return original_page
+        except Exception as e:
+            self.logger.error(f'Failed to modify first page: {str(e)}')
+            return original_page
