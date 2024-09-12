@@ -12,7 +12,7 @@ from PyPDF2 import PdfReader, PdfWriter
 import io
 from PIL import Image
 from reportlab.lib.utils import ImageReader
-
+import fitz
 class Report(Base):
     def __init__(self, api_base_url, api_key):
         super().__init__(api_base_url, api_key)
@@ -92,30 +92,38 @@ class Report(Base):
         except Exception as e:
             self.logger.error(f'Unexpected error in get_modified_report for {report_id}: {str(e)}')
         return None
-    
+        
     def modify_first_page(self, original_page):
         try:
-            # Create a new PDF page
-            packet = io.BytesIO()
-            can = canvas.Canvas(packet, pagesize=letter)
+            # Convert PyPDF2 page to fitz page
+            pdf_bytes = io.BytesIO()
+            writer = PdfWriter()
+            writer.add_page(original_page)
+            writer.write(pdf_bytes)
+            pdf_bytes.seek(0)
             
-            # Draw a white rectangle to cover the top 160px of the page
-            can.setFillColorRGB(1, 1, 1)  # White color
-            can.rect(0, 750, letter[0], 100 , fill=1)
-            
-            # Add new header
-            can.setFont("Helvetica", 10)  # Set the font and size
-            can.setFillColorRGB(0, 0, 0)  # Black color
-            can.drawString(30, 780, "New Header")  # Adjust the coordinates as needed
+            doc = fitz.open("pdf", pdf_bytes)
+            page = doc[0]
 
-            can.showPage()  # This is necessary to save the modifications
-            can.save()
-            packet.seek(0)
-            new_page = PdfReader(packet).pages[0]
+            # Define the rectangle to cover the top part of the page
+            rect = fitz.Rect(0, -50, page.rect.width, 100)
 
-            # Merge the new page with the original page
-            original_page.merge_page(new_page)
-            return original_page
+            # Draw a white rectangle to cover the top part of the page
+            page.draw_rect(rect, color=(1, 1, 1), fill=True)
+
+            # Search for "Acunetix" instances and cover them
+            text_instances = page.search_for("Acunetix")
+            for inst in text_instances:
+                page.draw_rect(inst, color=(1, 1, 1), fill=True)
+
+            # Save the modified page
+            modified_pdf_bytes = io.BytesIO()
+            doc.save(modified_pdf_bytes)
+            modified_pdf_bytes.seek(0)
+
+            # Convert back to PyPDF2 page
+            reader = PdfReader(modified_pdf_bytes)
+            return reader.pages[0]
         except Exception as e:
             self.logger.error(f'Failed to modify first page: {str(e)}')
             return original_page
