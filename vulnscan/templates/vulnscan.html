@@ -445,23 +445,30 @@
     </script>
     <!--按钮事件-->
     <script>
-        function get_scan_info(ip , scan_type) {
-                $.post('/vuln_scan', {
-                    ip: ip ,
-                    scan_type: scan_type
-                }, function (data) {
-                    if (data.code !== 200) {
-                        layer.msg('添加失败',{icon: 1,offset: '100px',area: ['70px', '70px']});
-                    } else {
-                        layer.msg('添加成功',{icon: 1,offset: '100px',area: ['70px', '70px']});
-                        setTimeout(function() {
-                            window.location.reload(true);
-                        }, 2000);
-                    }
-                    $(".btn-scan").text('重新扫描');
-                    $('.btn-scan').attr('disabled', false);
-                });
+        function get_scan_info(ip, scan_type, loginEnabled, username, password) {
+            var data = {
+                ip: ip,
+                scan_type: scan_type
+            };
+
+            if (loginEnabled) {
+                data.username = username;
+                data.password = password;
             }
+
+            $.post('/vuln_scan', data, function (response) {
+                if (response.code !== 200) {
+                    layer.msg('添加失败', {icon: 1, offset: '100px', area: ['70px', '70px']});
+                } else {
+                    layer.msg('添加成功', {icon: 1, offset: '100px', area: ['70px', '70px']});
+                    setTimeout(function() {
+                        window.location.reload(true);
+                    }, 2000);
+                }
+                $(".btn-scan").text('重新扫描');
+                $('.btn-scan').attr('disabled', false);
+            });
+        }
          function get_Middleware_scan(ip , CVE_id) {
                 $.post('/Middleware_scan', {
                     ip: ip ,
@@ -488,7 +495,7 @@
                 }
             });
         }
-        $(function() {
+$(function() {
     $('#enableLoginSettings').change(function() {
         if ($(this).is(':checked')) {
             $('#loginUsername').prop('disabled', false);
@@ -508,39 +515,18 @@
         var password = $('#loginPassword').val();
 
         if (loginEnabled) {
-            // Set login credentials before starting the scan
-            $.ajax({
-                url: '/set_login_credentials',
-                type: 'POST',
-                data: {
-                    target_url: domain,
-                    username: username,
-                    password: password
-                },
-                success: function(response) {
-                    if (response.code === 200) {
-                        console.log('Login credentials set successfully');
-                        // Start the scan after setting login credentials
-                        startScan(domain, scan_type, CVE_id);
-                    } else {
-                        layer.msg('登录设置失败: ' + response.message, {icon: 2, offset: '100px', area: ['200px', '70px']});
-                    }
-                },
-                error: function() {
-                    layer.msg('登录设置失败', {icon: 2, offset: '100px', area: ['140px', '70px']});
-                }
-            });
-        } else {
-            // Start the scan without setting login credentials
-            startScan(domain, scan_type, CVE_id);
+            // If login is enabled, force scan_type to 'full_scan'
+            scan_type = 'full_scan';
         }
+
+        startScan(domain, scan_type, CVE_id, loginEnabled, username, password);
     });
 
-    function startScan(domain, scan_type, CVE_id) {
+    function startScan(domain, scan_type, CVE_id, loginEnabled, username, password) {
         if (CVE_id && domain) {
             get_Middleware_scan(domain, CVE_id);
         } else if (domain) {
-            get_scan_info(domain, scan_type);
+            get_scan_info(domain, scan_type, loginEnabled, username, password);
         } else {
             $('input[name=scan_url]').val('');
             layer.msg('请输入正确的URL，\n例如：http://example.com');

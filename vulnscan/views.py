@@ -25,23 +25,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
 
 @csrf_exempt
-def set_login_credentials(request):
-    if request.method == 'POST':
-        target_url = request.POST.get('target_url')
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        target_option = TargetOption(API_URL, API_KEY)
-        success = target_option.set_site_login(target_url, 'automatic', {'username': username, 'password': password})
-
-        if success:
-            return JsonResponse({'code': 200, 'message': 'Login credentials set successfully'})
-        else:
-            return JsonResponse({'code': 400, 'message': 'Failed to set login credentials'})
-    else:
-        return JsonResponse({'code': 405, 'message': 'Method not allowed'})
-
-@csrf_exempt
 @login_required
 def abort_scan(request):
     s = Scan(API_URL, API_KEY)
@@ -105,15 +88,25 @@ def vulnscan(request):
 
 
 @csrf_exempt
+@login_required
 def vuln_scan(request):
+    t = Target(API_URL, API_KEY)
+    s = Scan(API_URL, API_KEY)
     url = request.POST.get('ip')
     scan_type = request.POST.get('scan_type')
-    t = Target(API_URL, API_KEY)
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+
     target_id = t.add(url)
-    if target_id is not None:
-        s = Scan(API_URL, API_KEY)
-        status_code = s.add(target_id, scan_type)
-        if status_code == 200:
+    if target_id:
+        if username and password:
+            target_option = TargetOption(API_URL, API_KEY)
+            login_success = target_option.set_site_login(target_id, 'automatic', {'username': username, 'password': password})
+            if not login_success:
+                return error()
+        
+        scan_id = s.add(target_id, scan_type)
+        if scan_id:
             return success()
     return error()
 

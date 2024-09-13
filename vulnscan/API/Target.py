@@ -73,3 +73,28 @@ class Target(Base):
                 return False
         except Exception:
             self.logger.error('Delete Target Failed......', exc_info=True)
+
+    def set_login_credentials(self, target_id, username, password):
+        set_login_api = f'{self.targets_api}/{target_id}/configuration'
+        data = {
+            "login": {
+                "kind": "automatic",
+                "credentials": {
+                    "enabled": True,
+                    "username": username,
+                    "password": password
+                }
+            },
+            "ssh_credentials": {"kind": "none"},
+            "sensor": False
+        }
+        try:
+            response = requests.patch(set_login_api, headers=self.auth_headers, json=data, verify=False)
+            if response.status_code == 204:
+                return True
+            else:
+                self.logger.error(f'Set Login Credentials Failed......\n{response.text}')
+                return False
+        except Exception:
+            self.logger.error('Set Login Credentials Failed......', exc_info=True)
+            return False
