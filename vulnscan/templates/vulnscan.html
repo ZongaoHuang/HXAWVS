@@ -66,11 +66,11 @@
                     <br>
                 </div>
                 <p class="text-center">扫描Web应用程序中的漏洞，如SQL注入、跨站脚本攻击、身份验证页上的弱口令长度等！
-                    <!-- 提示框 -->
+                    {% comment %} <!-- 提示框 -->
                     <span class="form-help" data-trigger="hover click" data-container="body" data-toggle="popover" data-placement="right" data-html="true"
                           data-content="<p>端口扫描是指某些别有用心的人发送一组端口扫描消息，试图以此侵入某台计算机，并了解其提供的计算机网络服务类型。攻击者可以通过它了解到从哪里可探寻到攻击弱点。</p>
                           <p class='mb-0'><a href='https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F/11056182?fr=aladdin'>详情</a></p>">?
-                    </span>
+                    </span> {% endcomment %}
                 </p>
             </div>
         </div>
@@ -98,6 +98,24 @@
                     漏洞检测
                 </button>
                 <br><br><br><br>
+<!--登录设置-->
+<div class="col-lg-12">
+    <div class="hr-text text-blue">登录设置</div>
+    <div class="form-group row">
+        <div class="col-sm-3">
+            <label class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableLoginSettings">
+                <span class="form-check-label">是否进行登录设置</span>
+            </label>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="loginUsername" placeholder="用户名" disabled>
+        </div>
+        <div class="col-sm-4">
+            <input type="password" class="form-control" id="loginPassword" placeholder="密码" disabled>
+        </div>
+    </div>
+</div>
                 <!--检测类型-->
                 <div class="col-lg-12">
                  <div class="hr-text text-blue">扫描类型</div>
@@ -106,10 +124,6 @@
                       <input type="radio" name="scan_type" value="full_scan" class="form-selectgroup-input" checked="">
                       <span class="form-selectgroup-label">全扫描</span>
                     </label>
-{#                    <label class="col-sm-2 form-selectgroup-item">#}
-{#                      <input type="radio" name="scan_type" value="high_risk_vuln" class="form-selectgroup-input">#}
-{#                      <span class="form-selectgroup-label">高风险漏洞扫描</span>#}
-{#                    </label>#}
                     <label class="col-sm-2 form-selectgroup-item">
                       <input type="radio" name="scan_type" value="xss_vuln" class="form-selectgroup-input">
                       <span class="form-selectgroup-label">XSS漏洞扫描</span>
@@ -474,35 +488,68 @@
                 }
             });
         }
-        $(function () {
-            $(".scan-btn").click(function () {
-                var domain = $('input[name=scan_url]').val();
-                    {#= document.getElementsByName("scan_type")[0].value;#}
-                for (var i = 0; i < document.getElementsByName("scan_type").length; i++) {
-                    if (document.getElementsByName("scan_type")[i].checked) {
-                        var scan_type = document.getElementsByName("scan_type")[i].value;
-                    }
-                }
-                var CVE_id = $('#Middleware option:selected').val();
-                console.log(CVE_id);
-                console.log(domain);
-                {#console.log(scan_type);#}
-                if(CVE_id && domain){
-                    get_Middleware_scan(domain, CVE_id);
+        $(function() {
+    $('#enableLoginSettings').change(function() {
+        if ($(this).is(':checked')) {
+            $('#loginUsername').prop('disabled', false);
+            $('#loginPassword').prop('disabled', false);
+        } else {
+            $('#loginUsername').prop('disabled', true);
+            $('#loginPassword').prop('disabled', true);
+        }
+    });
 
-                }else{
-                    if (domain) {
-                        get_scan_info(domain, scan_type);
+    $(".scan-btn").click(function () {
+        var domain = $('input[name=scan_url]').val();
+        var scan_type = $('input[name=scan_type]:checked').val();
+        var CVE_id = $('#Middleware option:selected').val();
+        var loginEnabled = $('#enableLoginSettings').is(':checked');
+        var username = $('#loginUsername').val();
+        var password = $('#loginPassword').val();
+
+        if (loginEnabled) {
+            // Set login credentials before starting the scan
+            $.ajax({
+                url: '/set_login_credentials',
+                type: 'POST',
+                data: {
+                    target_url: domain,
+                    username: username,
+                    password: password
+                },
+                success: function(response) {
+                    if (response.code === 200) {
+                        console.log('Login credentials set successfully');
+                        // Start the scan after setting login credentials
+                        startScan(domain, scan_type, CVE_id);
                     } else {
-                        $('input[name=scan_url]').val('');
-                        layer.msg('请输入正确的URL，\n例如：http://example.com');
-                        $(".scan-btn").text('查询');
-                        $(".scan-btn").attr('disabled', false);
+                        layer.msg('登录设置失败: ' + response.message, {icon: 2, offset: '100px', area: ['200px', '70px']});
                     }
+                },
+                error: function() {
+                    layer.msg('登录设置失败', {icon: 2, offset: '100px', area: ['140px', '70px']});
                 }
-                start_Middleware_scan(domain, CVE_id);
             });
-        });
+        } else {
+            // Start the scan without setting login credentials
+            startScan(domain, scan_type, CVE_id);
+        }
+    });
+
+    function startScan(domain, scan_type, CVE_id) {
+        if (CVE_id && domain) {
+            get_Middleware_scan(domain, CVE_id);
+        } else if (domain) {
+            get_scan_info(domain, scan_type);
+        } else {
+            $('input[name=scan_url]').val('');
+            layer.msg('请输入正确的URL，\n例如：http://example.com');
+            $(".scan-btn").text('查询');
+            $(".scan-btn").attr('disabled', false);
+        }
+        start_Middleware_scan(domain, CVE_id);
+    }
+});
     </script>
     <script>
         $(function() {
