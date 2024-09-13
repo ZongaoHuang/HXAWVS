@@ -62,7 +62,7 @@
             </div>
             </div>
             <!--安全导航-->
-            <div class="col-md-6 col-xl-6">
+            {% comment %} <div class="col-md-6 col-xl-6">
                 <div class="card">
                   <div class="card-body">
                     <div id="item_num1" style="height:450px;"></div>
@@ -75,8 +75,8 @@
                    <div id="item_num2" style="height:450px;"></div>
                   </div>
                 </div>
-                </div>
-            <!--图片展示-->
+                </div> {% endcomment %}
+            {% comment %} <!--图片展示-->
             <div class="col-sm-6 col-lg-6">
                 <div class="row row-cards">
                     <div class="col-12">
@@ -97,8 +97,8 @@
                     </div>
 
                 </div>
-            </div>
-            <div class="col-sm-6 col-lg-6" >
+            </div> {% endcomment %}
+            {% comment %} <div class="col-sm-6 col-lg-6" >
                 <div class="row row-cards">
                     <div class="col-12">
                         <div class="card">
@@ -118,9 +118,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> {% endcomment %}
         </div>
-
         </div>
     </div>
 
@@ -459,7 +458,7 @@
         })).render();
       });
     </script>
-    <!--安全导航-->
+    {% comment %} <!--安全导航-->
     <script>
         // 基于准备好的dom，初始化echarts实例
         var myChart1 = echarts.init(document.getElementById('item_num1'),'macarons');
@@ -554,7 +553,7 @@
             myChart1.resize();
             myChart2.resize();
         });
-</script>
+</script> {% endcomment %}
 {% endblock %}
 
 

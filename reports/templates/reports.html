@@ -82,8 +82,8 @@
                                     <td ><span class="text-muted" >{{ item.time }}</span></td>
                                     <td >{{ item.status }}</td>
                                     {% if item.status == "completed" %}
-                                        <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td>
-                                        <td><a href="{% url 'download_modified_report' item.report_id %}">修改后PDF</a></td>
+                                        {% comment %} <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td> {% endcomment %}
+                                        <td><a href="{% url 'download_modified_report' item.report_id %}">PDF</a></td>
                                     {% else %}
                                         <td >正在生成</td>
                                     {% endif %}
