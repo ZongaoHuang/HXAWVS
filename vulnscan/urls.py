@@ -14,7 +14,6 @@ urlpatterns = [
     path('test2',views.test2, name='test2'),
     path("generate_report",views.generate_report, name="generate_report"),
     path("abort_scan",views.abort_scan, name="abort_scan"),
-    path('set_login_credentials', views.set_login_credentials, name='set_login_credentials'),
 
 ]
 
