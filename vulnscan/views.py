@@ -20,6 +20,27 @@ from vulnscan.API.Report import Report
 # API_URL = 'https://127.0.0.1:3443'
 # API_KEY = '1986ad8c0a5b3df4d7028d5f3c06e936cc23a5d4737044dc18935d8a6f0199a50'
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .API.TargetOption import TargetOption
+
+@csrf_exempt
+def set_login_credentials(request):
+    if request.method == 'POST':
+        target_url = request.POST.get('target_url')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        target_option = TargetOption(API_URL, API_KEY)
+        success = target_option.set_site_login(target_url, 'automatic', {'username': username, 'password': password})
+
+        if success:
+            return JsonResponse({'code': 200, 'message': 'Login credentials set successfully'})
+        else:
+            return JsonResponse({'code': 400, 'message': 'Failed to set login credentials'})
+    else:
+        return JsonResponse({'code': 405, 'message': 'Method not allowed'})
+
 @csrf_exempt
 @login_required
 def abort_scan(request):
