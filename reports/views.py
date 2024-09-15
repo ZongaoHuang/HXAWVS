@@ -68,7 +68,7 @@ def download_modified_report(request, report_id):
     modified_pdf = r.get_modified_report(report_id)
     if modified_pdf:
         response = HttpResponse(modified_pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="modified_report_{report_id}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="final_report_{report_id}.pdf"'
         return response
     return HttpResponse("Failed to generate modified PDF", status=500)
 

@@ -62,7 +62,7 @@
             </div>
             </div>
             <!--安全导航-->
-            {% comment %} <div class="col-md-6 col-xl-6">
+            <div class="col-md-6 col-xl-6">
                 <div class="card">
                   <div class="card-body">
                     <div id="item_num1" style="height:450px;"></div>
@@ -75,53 +75,53 @@
                    <div id="item_num2" style="height:450px;"></div>
                   </div>
                 </div>
-                </div> {% endcomment %}
-            {% comment %} <!--图片展示-->
-            <div class="col-sm-6 col-lg-6">
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body" >
-                                <h3 class="text-center"><i class="fas fa-fingerprint" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'fingerprint' %}">指纹识别页面</a></h3>
-                                <img class="border shadow" src="{% static 'img/index_show/finger.png' %}">
-                            </div>
-                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body" >
-                                <h3 class="text-center"><i class="fa fa-bug" style="zoom: 1.0;padding: 5px;"></i>漏洞检测页面</h3>
-                                <img class="border shadow" src="{% static 'img/index_show/vuln.png' %}">
-                            </div>
-                         </div>
-                    </div>
-
                 </div>
-            </div> {% endcomment %}
-            {% comment %} <div class="col-sm-6 col-lg-6" >
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                        <div class="card-body" >
-                            <h3 class="text-center"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'portscan' %}">端口扫描页面</a></h3>
-                            <img class="border shadow" src="{% static 'img/index_show/port.png' %}">
-                        </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="card">
-                        <div class="card-body" >
-                            <h3 class="text-center"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i>目录识别页面</h3>
-                            <img class="border shadow" src="{% static 'img/index_show/dir.png' %}">
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div> {% endcomment %}
-        </div>
-        </div>
-    </div>
+            <!--图片展示-->
+{#            <div class="col-sm-6 col-lg-6">#}
+{#                <div class="row row-cards">#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body" >#}
+{#                                <h3 class="text-center"><i class="fas fa-fingerprint" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'fingerprint' %}">指纹识别页面</a></h3>#}
+{#                                <img class="border shadow" src="{% static 'img/index_show/finger.png' %}">#}
+{#                            </div>#}
+{#                         </div>#}
+{#                    </div>#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body" >#}
+{#                                <h3 class="text-center"><i class="fa fa-bug" style="zoom: 1.0;padding: 5px;"></i>漏洞检测页面</h3>#}
+{#                                <img class="border shadow" src="{% static 'img/index_show/vuln.png' %}">#}
+{#                            </div>#}
+{#                         </div>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="col-sm-6 col-lg-6" >#}
+{#                <div class="row row-cards">#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                        <div class="card-body" >#}
+{#                            <h3 class="text-center"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'portscan' %}">端口扫描页面</a></h3>#}
+{#                            <img class="border shadow" src="{% static 'img/index_show/port.png' %}">#}
+{#                        </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                        <div class="card-body" >#}
+{#                            <h3 class="text-center"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i>目录识别页面</h3>#}
+{#                            <img class="border shadow" src="{% static 'img/index_show/dir.png' %}">#}
+{#                        </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        </div>#}
+{#    </div>#}
 
 {% endblock %}
 
@@ -458,7 +458,7 @@
         })).render();
       });
     </script>
-    {% comment %} <!--安全导航-->
+    <!--安全导航-->
     <script>
         // 基于准备好的dom，初始化echarts实例
         var myChart1 = echarts.init(document.getElementById('item_num1'),'macarons');
@@ -530,7 +530,7 @@
             },
             series: [
                 {
-                    {#color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],#}
+                    color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
                     name: '分类',
                     type: 'pie',
                     radius: '50%',
@@ -553,7 +553,7 @@
             myChart1.resize();
             myChart2.resize();
         });
-</script> {% endcomment %}
+</script>
 {% endblock %}
 
 
