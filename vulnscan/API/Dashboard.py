@@ -13,7 +13,7 @@ class Dashboard(Base):
 
     def stats(self):
         dashboard_stats_api = f'{self.api_base_url}/api/v1/me/stats'
-        print(dashboard_stats_api)
+        # print(dashboard_stats_api)
         try:
             response = requests.get(dashboard_stats_api, headers=self.auth_headers, verify=False)
             return response.text
