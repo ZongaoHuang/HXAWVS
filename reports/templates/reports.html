@@ -131,28 +131,12 @@
                 if (confirmDelete) {
                     // 用户点击了确认
                     var report_id = $(this).data("report-id");
-                    {#var api_url = $(this).data("api-url");#}
-                    {#var delete_url = api_url+report_id#}
-                    {#deleteItem(report_id);#}
                     real_delete(report_id);
                 } else {
                     // 用户点击了取消
                     console.log('删除操作已取消');
                 }
             });
-
-            function deleteItem(report_id) {
-                $.post("/reports_delete",{report_id:report_id},function (response){
-                    if (response.success){
-                        alert("删除成功");
-                    }
-                    else {
-                        alert("删除失败");
-                    }
-                }).fail(function (){
-                    alert("请求失败");
-                })
-            }
             function real_delete(report_id){
                 $.ajax({
                     url: "/reports_delete",

@@ -804,7 +804,7 @@ DEFAULT_FROM_EMAIL = 'xxx'    # 你的邮箱账号
 
 5.创建超级管理员 `python manage.py createsuperuser`
 
-6.默认账户：sectools/password..!!
+6.默认账户：admin/password..!!
 
 ### 服务器部署
 

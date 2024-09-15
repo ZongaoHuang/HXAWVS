@@ -41,6 +41,22 @@
         .abort-btn:hover {
             background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
         }
+
+    {#    删除按钮#}
+        .delete-btn {
+            background-color: transparent; /* 白色背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 16px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .delete-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
+
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
@@ -246,6 +262,7 @@
                                 <th data-sortable="true" data-field="vuln">漏洞</th>
                                 <th data-sortable="true" data-field="plan">添加时间</th>
                                 <th data-sortable="true" data-field="report_generate">报告生成</th>
+                                <th data-sortable="true" data-field="delete">删除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -286,7 +303,9 @@
                                     <td><span class="avatar avatar-rounded text-white" style="background-color: #fa755a">{{ i.vuln.high }}</span><span class="avatar avatar-rounded text-white" style="background-color: #FFDC60" >{{ i.vuln.medium }}</span><span class="avatar avatar-rounded text-white" style="background-color: #23B7E5" >{{ i.vuln.low }}</span><span class="avatar avatar-rounded text-white" style="background-color: #3ecf8e" >{{ i.vuln.info }}</span></td>
                                     <td class="text-secondary">{{ i.plan }}</td>
                                     <td><button class="generate-btn" data-scan-session-id="{{ i.scan_session_id }}">Generate</button></td>
+                                    <td ><button class="delete-btn" data-scan-id="{{ i.scan_id }}"><i class="fas fa-trash delete-icon"></i></button></td>
                                 </tr>
+
                             {% endfor %}
                         </tbody>
                     </table>
@@ -608,6 +627,45 @@ $(function() {
                     }
                     else {
                         alert("停止扫描失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#table').on('click', '.delete-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要删除该扫描吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var scan_id = $(this).data("scan-id");
+                    real_delete(scan_id);
+                } else {
+                    // 用户点击了取消
+                    console.log('删除操作已取消');
+                }
+            });
+            function real_delete(scan_id){
+                $.ajax({
+                    url: "/delete_scan",
+                    type: "POST",
+                    data: {scan_id: scan_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                        alert("删除成功");
+                        window.location.reload(true);
+                    }
+                    else {
+                        alert("删除失败");
                     }
                     },
                     error: function (){
