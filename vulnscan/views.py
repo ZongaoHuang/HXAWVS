@@ -24,6 +24,17 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
 
+
+@csrf_exempt
+@login_required
+def delete_scan(request):
+    s = Scan(API_URL, API_KEY)
+    scan_id = request.POST.get('scan_id')
+    status = s.delete(scan_id)
+    if status:
+        return success()
+    return error()
+
 @csrf_exempt
 @login_required
 def abort_scan(request):
