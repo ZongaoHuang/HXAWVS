@@ -22,15 +22,23 @@
         <div class="container-xl">
             <div class="row row-cards">
             <!--漏洞数-->
-            <div class="col-md-4 col-xl-4">
+            <div class="col-md-3 col-xl-3">
                 <div class="card">
                     <div class="card-body">
-                        <div id="chart"></div>
+                        <div id="chart11"></div>
+                        <div class="text-center">Critical Severity Vulnerabilities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="chart1"></div>
                         <div class="text-center">High Severity Vulnerabilities</div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-xl-4 ">
+            <div class="col-md-3 col-xl-3 ">
                 <div class="card">
                   <div class="card-body">
                     <div id="chart2"></div>
@@ -38,7 +46,7 @@
                   </div>
                 </div>
             </div>
-            <div class="col-md-4 col-xl-4 ">
+            <div class="col-md-3 col-xl-3 ">
                 <div class="card">
                   <div class="card-body">
                     <div  id="chart3"></div>
@@ -129,10 +137,10 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/echarts.min.js' %}"></script>
     <script src="{% static 'theme/macarons.js' %}"></script>
-    <!--高危-->
+    <!--严重-->
     <script>
         var options = {
-         series: [30],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -195,20 +203,98 @@
         stroke: {
           lineCap: 'round'
         },
+        labels: ['严重漏洞'],
+        };
+        var chart11 = new ApexCharts(document.querySelector("#chart11"), options);
+        chart11.render();
+        $.post('/get_vuln_value', function (data) {
+                chart11.updateOptions({
+                 {#series: [data['normal'][0]],#}
+                 series: [data['normal']["crit"]],
+                });
+        });
+    </script>
+    <!--高危-->
+    <script>
+        var options = {
+         series: [0],
+          chart: {
+          height: 250,
+          type: 'radialBar',
+        },
+          plotOptions: {
+          radialBar: {
+            startAngle: -135,
+            endAngle: 225,
+             hollow: {
+              margin: 0,
+              size: '70%',
+              background: '#fff',
+              image: undefined,
+              imageOffsetX: 0,
+              imageOffsetY: 0,
+              position: 'front',
+              dropShadow: {
+                enabled: true,
+                top: 3,
+                left: 0,
+                blur: 4,
+                opacity: 0.24
+              }
+            },
+            track: {
+              background: '#fff',
+              strokeWidth: '67%',
+              margin: 0, // margin is in pixels
+              dropShadow: {
+                enabled: true,
+                top: -3,
+                left: 0,
+                blur: 4,
+                opacity: 0.35
+              }
+            },
+
+            dataLabels: {
+              show: true,
+              name: {
+                offsetY: -10,
+                show: true,
+                color: '#888',
+                fontSize: '17px'
+              },
+              value: {
+                formatter: function(val) {
+                  return parseInt(val);
+                },
+                color: '#111',
+                fontSize: '36px',
+                show: true,
+              }
+            }
+          }
+        },
+        fill: {
+          colors: ['#F44fff',],
+        },
+        stroke: {
+          lineCap: 'round'
+        },
         labels: ['高危漏洞'],
         };
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        var chart = new ApexCharts(document.querySelector("#chart1"), options);
         chart.render();
         $.post('/get_vuln_value', function (data) {
                 chart.updateOptions({
-                 series: [data['normal'][0]],
+                 {#series: [data['normal'][1]],#}
+                 series: [data['normal']["high"]],
                 });
         });
     </script>
     <!--中危-->
     <script>
         var options = {
-         series: [50],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -277,14 +363,15 @@
         chart2.render();
         $.post('/get_vuln_value', function (data) {
                 chart2.updateOptions({
-                 series: [data['normal'][2]],
+                 {#series: [data['normal'][2]],#}
+                 series: [data['normal']["med"]],
                 })
         });
     </script>
     <!--低危-->
     <script>
         var options = {
-         series: [60],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -353,7 +440,8 @@
         chart3.render();
         $.post('/get_vuln_value', function (data) {
                 chart3.updateOptions({
-                 series: [data['normal'][1]],
+                 {#series: [data['normal'][3]],#}
+                 series: [data['normal']["low"]],
                 });
         });
     </script>

@@ -3,6 +3,7 @@
 
 import requests
 
+from dirscan.dirsearch.thirdparty.requests import request
 from webscan_backend.plugins.common.common import success
 from .Base import Base
 
@@ -81,6 +82,7 @@ class Scan(Base):
         scan_delete_api = f'{self.scan_api}/{scan_id}'
         try:
             response = requests.delete(scan_delete_api, headers=self.auth_headers, verify=False)
+            requests.get(self.api_base_url+"#/targets",headers=self.auth_headers, verify=False)
             return True
         except Exception:
             self.logger.error('Delete Scan Failed......', exc_info=True)

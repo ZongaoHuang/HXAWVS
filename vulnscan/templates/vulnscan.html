@@ -361,7 +361,7 @@
             },
             yAxis: {
                 type: 'category',
-                data: ['低危漏洞','中危漏洞','高危漏洞']
+                data: ['低危漏洞','中危漏洞','高危漏洞',"严重漏洞"]
             },
             series: [
                 {
@@ -387,7 +387,7 @@
             {
                 name: '一般业务',
                 type: 'bar',
-                data: [{value: data['normal'][1], itemStyle: {color: '#3ecf8e'}},{value: data['normal'][2], itemStyle: {color: '#FFDC60'}},{value: data['normal'][0], itemStyle: {color: '#fa755a'}}],
+                data: [{value: data['normal']["low"], itemStyle: {color: '#fa755a'}},{value: data['normal']["med"], itemStyle: {color: '#FFDC60'}},{value: data['normal']["high"], itemStyle: {color: '#3ecf8e'}},{value: data['normal']["crit"], itemStyle: {color: '#F44336'}}],
                 markPoint: {
                     data: [
                         {type: 'max', name: '最大值',itemStyle: {color: ['#FFDC60']},},

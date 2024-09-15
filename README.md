@@ -1,17 +1,17 @@
-<h1 align="center" >🍉Sec-Tools</h1>
+<h1 align="center" >🍉HxScan</h1>
 <p align="center">
-	<a href="https://github.com/jwt1399/Sec-Tools"><img alt="Sec-Tools" src="https://img.shields.io/github/stars/jwt1399/Sec-Tools.svg"></a>
-	<a href="https://github.com/jwt1399/Sec-Tools"><img alt="Sec-Tools" src="https://img.shields.io/github/forks/jwt1399/Sec-Tools.svg"></a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS"><img alt="Sec-Tools" src="https://img.shields.io/github/stars/jwt1399/Sec-Tools.svg"></a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS"><img alt="Sec-Tools" src="https://img.shields.io/github/forks/jwt1399/Sec-Tools.svg"></a>
 </p>
 <p align="center"><span>如果你觉得本项目还不错的话，请给一个❤️Star❤️吧，感谢感谢🤝</span></p>
 <h5 align="center"> Gitee:https://gitee.com/jwt1399/Sec-Tools</h5>
 <h4 align="center" >
-	<a href="https://github.com/jwt1399/Sec-Tools#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍 -</a>
-	<a href="https://github.com/jwt1399/Sec-Tools#%E9%A1%B9%E7%9B%AE%E9%A6%96%E9%A1%B5">详细介绍 -</a>
-	<a href="https://github.com/jwt1399/Sec-Tools#%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E8%AE%B0%E5%BD%95">版本记录 -</a>
-	<a href="https://github.com/jwt1399/Sec-Tools#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2">项目部署 -</a>
-	<a href="https://github.com/jwt1399/Sec-Tools#to-do">TODO - </a>
-	<a href="https://github.com/jwt1399/Sec-Tools#%E8%B5%9E%E5%8A%A9">赞助</a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍 -</a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#%E9%A1%B9%E7%9B%AE%E9%A6%96%E9%A1%B5">详细介绍 -</a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E8%AE%B0%E5%BD%95">版本记录 -</a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2">项目部署 -</a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#to-do">TODO - </a>
+	<a href="https://github.com/ZongaoHuang/HXAWVS#%E8%B5%9E%E5%8A%A9">赞助</a>
 </h4>
 
 
@@ -19,7 +19,7 @@
 
 ### 系统简介
 
-本项目命名为**Sec-Tools**，是一款基于 **Python-Django** 的**多功能 Web 应用渗透测试系统**，包含**漏洞检测、目录识别、端口扫描、指纹识别、域名探测、旁站探测、信息泄露检测**等功能。
+本项目命名为**HxScan**，是一款基于 **Python-Django** 的**多功能 Web 应用渗透测试系统**，包含**漏洞检测、目录识别、端口扫描、指纹识别、域名探测、旁站探测、信息泄露检测**等功能。
 
 
 ### 项目功能
