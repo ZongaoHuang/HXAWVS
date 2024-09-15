@@ -107,13 +107,23 @@ def vuln_scan(request):
     scan_type = request.POST.get('scan_type')
     username = request.POST.get('username')
     password = request.POST.get('password')
+    cookie_header = request.POST.get('cookie_header')
+    # print(cookie_header)
 
     # 先添加target目标
     target_id = t.add(url)
     if target_id:
+        # 1. 设置账号密码
         if username and password:
             target_option = TargetOption(API_URL, API_KEY)
             login_success = target_option.set_site_login(target_id, 'automatic', {'username': username, 'password': password})
+            if not login_success:
+                return error()
+
+        # 2. 设置cookie
+        elif cookie_header:
+            target_option = TargetOption(API_URL, API_KEY)
+            login_success = target_option.set_cookie_login(target_id, cookie_header)
             if not login_success:
                 return error()
 
