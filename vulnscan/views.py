@@ -94,6 +94,7 @@ def vulnscan(request):
         }
         s_list.append(table_data)
         count += 1
+        print(msg['current_session']['severity_counts'])
     data = s_list
     return render(request, "vulnscan.html", {"data": data })
 
