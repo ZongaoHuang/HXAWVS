@@ -1,0 +1,43 @@
+import fitz  # PyMuPDF
+
+# 打开PDF文件
+file_path = '../modified_report_588e4e04-e069-4a2a-922b-f9ef8e15ba04.pdf'
+output_path = './modified_output.pdf'
+doc = fitz.open(file_path)
+
+# 选择第一页
+page = doc[0]
+
+# 定义覆盖区域的矩形框（适应实际内容的位置）
+# 参数为左上角的x, y坐标，右下角的x, y坐标，需调整坐标以覆盖目标文字
+# 调整覆盖区域，尝试将顶部的Y坐标设置为负值
+rect = fitz.Rect(0, -50, page.rect.width, 100)  # 从负的Y轴坐标开始
+
+# 使用白色矩形覆盖
+page.draw_rect(rect, color=(1, 1, 1), fill=True)
+
+
+text_instances = page.search_for("Acunetix")
+
+# 遍历找到的所有"Acunetix"实例，使用矩形覆盖它们
+for inst in text_instances:
+    page.draw_rect(inst, color=(1, 1, 1), fill=True)  # 使用白色矩形覆盖文本
+    
+
+# 保存修改后的PDF
+doc.save(output_path)
+
+print(f"PDF修改完成，已保存至 {output_path}")
+
+
+
+
+
+
+
+
+
+
+
+
+
