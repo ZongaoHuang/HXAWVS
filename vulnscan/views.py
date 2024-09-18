@@ -24,6 +24,17 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
 
+
+@csrf_exempt
+@login_required
+def delete_scan(request):
+    s = Scan(API_URL, API_KEY)
+    scan_id = request.POST.get('scan_id')
+    status = s.delete(scan_id)
+    if status:
+        return success()
+    return error()
+
 @csrf_exempt
 @login_required
 def abort_scan(request):
@@ -96,15 +107,27 @@ def vuln_scan(request):
     scan_type = request.POST.get('scan_type')
     username = request.POST.get('username')
     password = request.POST.get('password')
+    cookie_header = request.POST.get('cookie_header')
+    # print(cookie_header)
 
+    # 先添加target目标
     target_id = t.add(url)
     if target_id:
+        # 1. 设置账号密码
         if username and password:
             target_option = TargetOption(API_URL, API_KEY)
             login_success = target_option.set_site_login(target_id, 'automatic', {'username': username, 'password': password})
             if not login_success:
                 return error()
-        
+
+        # 2. 设置cookie
+        elif cookie_header:
+            target_option = TargetOption(API_URL, API_KEY)
+            login_success = target_option.set_cookie_login(target_id, cookie_header)
+            if not login_success:
+                return error()
+
+        # 再添加scan扫描
         scan_id = s.add(target_id, scan_type)
         if scan_id:
             return success()
@@ -208,14 +231,17 @@ def get_vuln_rank(request):
 @login_required
 def get_vuln_value(request):
     d = Dashboard(API_URL, API_KEY)
-    data = json.loads(d.stats())["vuln_count_by_criticality"]
+    # data = json.loads(d.stats())["vuln_count_by_criticality"]
+    data = json.loads(d.stats())
+    # print(data)
     result = {}
-    if data['high'] is not None:
-        vuln_high_count = [i for i in data['high'].values()]
-        result['high'] = vuln_high_count
-    if data['normal'] is not None:
-        vuln_normal_count = [i for i in data['normal'].values()]
-        result['normal'] = vuln_normal_count
+    # if data['high'] is not None:
+    #     vuln_high_count = [i for i in data['high'].values()]
+    #     result['high'] = vuln_high_count
+    # if data['normal'] is not None:
+    #     vuln_normal_count = data["normal"]
+    #     result['normal'] = vuln_normal_count
+    result["normal"] = data["vuln_count"]
     return HttpResponse(json.dumps(result), content_type='application/json')
 
 

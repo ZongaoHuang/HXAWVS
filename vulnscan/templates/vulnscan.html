@@ -41,6 +41,22 @@
         .abort-btn:hover {
             background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
         }
+
+    {#    删除按钮#}
+        .delete-btn {
+            background-color: transparent; /* 白色背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #cccccc; /* 灰色边框 */
+            padding: 4px 8px; /* 内边距 */
+            font-size: 16px; /* 文字大小 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标光标变为指针 */
+            transition: background-color 0.3s ease; /* 过渡动画 */
+        }
+        .delete-btn:hover {
+            background-color: #f2f2f2; /* 鼠标悬停时的背景颜色 */
+        }
+
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
@@ -100,12 +116,28 @@
                 <br><br><br><br>
 <!--登录设置-->
 <div class="col-lg-12">
-    <div class="hr-text text-blue">登录设置</div>
+{#    <div class="hr-text text-blue">登录设置</div>#}
+{#    <div class="form-group row">#}
+{#        <div class="col-sm-3">#}
+{#            <label class="form-check form-switch">#}
+{#                <input class="form-check-input" type="checkbox" id="enableLoginSettings">#}
+{#                <span class="form-check-label">是否进行登录设置</span>#}
+{#            </label>#}
+{#        </div>#}
+{#        <div class="col-sm-4">#}
+{#            <input type="text" class="form-control" id="loginUsername" placeholder="用户名" disabled>#}
+{#        </div>#}
+{#        <div class="col-sm-4">#}
+{#            <input type="password" class="form-control" id="loginPassword" placeholder="密码" disabled>#}
+{#        </div>#}
+{#    </div>#}
+    <div class="col-lg-12">
+    <div class="hr-text text-blue">登录选项设置</div>
     <div class="form-group row">
         <div class="col-sm-3">
             <label class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="enableLoginSettings">
-                <span class="form-check-label">是否进行登录设置</span>
+                <input class="form-check-input" type="checkbox" id="enableLoginSettings" onclick="toggleSettings(this, 'login')">
+                <span class="form-check-label">设置账号密码</span>
             </label>
         </div>
         <div class="col-sm-4">
@@ -115,6 +147,52 @@
             <input type="password" class="form-control" id="loginPassword" placeholder="密码" disabled>
         </div>
     </div>
+        <p></p>
+    <div class="form-group row">
+        <div class="col-sm-3">
+            <label class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableHeaderSettings" onclick="toggleSettings(this, 'header')">
+                <span class="form-check-label">设置cookie</span>
+            </label>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="headerValue" placeholder="Header值" disabled>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSettings(checkbox, type) {
+    var loginCheckbox = document.getElementById('enableLoginSettings');
+    var headerCheckbox = document.getElementById('enableHeaderSettings');
+    var loginUsername = document.getElementById('loginUsername');
+    var loginPassword = document.getElementById('loginPassword');
+    var headerValue = document.getElementById('headerValue');
+
+    if (type === 'login') {
+        if (checkbox.checked) {
+            loginCheckbox.checked = true;
+            headerCheckbox.checked = false;
+            loginUsername.disabled = false;
+            loginPassword.disabled = false;
+            headerValue.disabled = true;
+        } else {
+            loginUsername.disabled = true;
+            loginPassword.disabled = true;
+        }
+    } else if (type === 'header') {
+        if (checkbox.checked) {
+            headerCheckbox.checked = true;
+            loginCheckbox.checked = false;
+            headerValue.disabled = false;
+            loginUsername.disabled = true;
+            loginPassword.disabled = true;
+        } else {
+            headerValue.disabled = true;
+        }
+    }
+}
+</script>
 </div>
                 <!--检测类型-->
                 <div class="col-lg-12">
@@ -246,6 +324,7 @@
                                 <th data-sortable="true" data-field="vuln">漏洞</th>
                                 <th data-sortable="true" data-field="plan">添加时间</th>
                                 <th data-sortable="true" data-field="report_generate">报告生成</th>
+                                <th data-sortable="true" data-field="delete">删除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -286,7 +365,9 @@
                                     <td><span class="avatar avatar-rounded text-white" style="background-color: #fa755a">{{ i.vuln.high }}</span><span class="avatar avatar-rounded text-white" style="background-color: #FFDC60" >{{ i.vuln.medium }}</span><span class="avatar avatar-rounded text-white" style="background-color: #23B7E5" >{{ i.vuln.low }}</span><span class="avatar avatar-rounded text-white" style="background-color: #3ecf8e" >{{ i.vuln.info }}</span></td>
                                     <td class="text-secondary">{{ i.plan }}</td>
                                     <td><button class="generate-btn" data-scan-session-id="{{ i.scan_session_id }}">Generate</button></td>
+                                    <td ><button class="delete-btn" data-scan-id="{{ i.scan_id }}"><i class="fas fa-trash delete-icon"></i></button></td>
                                 </tr>
+
                             {% endfor %}
                         </tbody>
                     </table>
@@ -342,7 +423,7 @@
             },
             yAxis: {
                 type: 'category',
-                data: ['低危漏洞','中危漏洞','高危漏洞']
+                data: ['低危漏洞','中危漏洞','高危漏洞',"严重漏洞"]
             },
             series: [
                 {
@@ -368,7 +449,7 @@
             {
                 name: '一般业务',
                 type: 'bar',
-                data: [{value: data['normal'][1], itemStyle: {color: '#3ecf8e'}},{value: data['normal'][2], itemStyle: {color: '#FFDC60'}},{value: data['normal'][0], itemStyle: {color: '#fa755a'}}],
+                data: [{value: data['normal']["low"], itemStyle: {color: '#fa755a'}},{value: data['normal']["med"], itemStyle: {color: '#FFDC60'}},{value: data['normal']["high"], itemStyle: {color: '#3ecf8e'}},{value: data['normal']["crit"], itemStyle: {color: '#F44336'}}],
                 markPoint: {
                     data: [
                         {type: 'max', name: '最大值',itemStyle: {color: ['#FFDC60']},},
@@ -445,7 +526,7 @@
     </script>
     <!--按钮事件-->
     <script>
-        function get_scan_info(ip, scan_type, loginEnabled, username, password) {
+        function get_scan_info(ip, scan_type, loginEnabled, username, password, cookieEnabled, cookie_header) {
             var data = {
                 ip: ip,
                 scan_type: scan_type
@@ -455,6 +536,10 @@
                 data.username = username;
                 data.password = password;
             }
+            else if (cookieEnabled){
+                data.cookie_header = cookie_header
+            }
+
 
             $.post('/vuln_scan', data, function (response) {
                 if (response.code !== 200) {
@@ -513,20 +598,22 @@ $(function() {
         var loginEnabled = $('#enableLoginSettings').is(':checked');
         var username = $('#loginUsername').val();
         var password = $('#loginPassword').val();
+        var cookieEnabled = $('#enableHeaderSettings').is(":checked")
+        var cookie_header = $('#headerValue').val()
 
-        if (loginEnabled) {
+        if (loginEnabled || cookieEnabled) {
             // If login is enabled, force scan_type to 'full_scan'
             scan_type = 'full_scan';
         }
 
-        startScan(domain, scan_type, CVE_id, loginEnabled, username, password);
+        startScan(domain, scan_type, CVE_id, loginEnabled, username, password, cookieEnabled, cookie_header);
     });
 
-    function startScan(domain, scan_type, CVE_id, loginEnabled, username, password) {
+    function startScan(domain, scan_type, CVE_id, loginEnabled, username, password, cookieEnabled, cookie_header) {
         if (CVE_id && domain) {
             get_Middleware_scan(domain, CVE_id);
         } else if (domain) {
-            get_scan_info(domain, scan_type, loginEnabled, username, password);
+            get_scan_info(domain, scan_type, loginEnabled, username, password, cookieEnabled, cookie_header);
         } else {
             $('input[name=scan_url]').val('');
             layer.msg('请输入正确的URL，\n例如：http://example.com');
@@ -608,6 +695,45 @@ $(function() {
                     }
                     else {
                         alert("停止扫描失败");
+                    }
+                    },
+                    error: function (){
+                        alert("请求失败")
+                    }
+                    }
+                )
+            }
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#table').on('click', '.delete-btn', function() {
+                // 弹出确认对话框
+                var confirmDelete = confirm('确定要删除该扫描吗?');
+                if (confirmDelete) {
+                    // 用户点击了确认
+                    var scan_id = $(this).data("scan-id");
+                    real_delete(scan_id);
+                } else {
+                    // 用户点击了取消
+                    console.log('删除操作已取消');
+                }
+            });
+            function real_delete(scan_id){
+                $.ajax({
+                    url: "/delete_scan",
+                    type: "POST",
+                    data: {scan_id: scan_id},
+                    xhrFileds: {
+                        withCredentials: true
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                        alert("删除成功");
+                        window.location.reload(true);
+                    }
+                    else {
+                        alert("删除失败");
                     }
                     },
                     error: function (){

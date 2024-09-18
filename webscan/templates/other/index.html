@@ -22,15 +22,23 @@
         <div class="container-xl">
             <div class="row row-cards">
             <!--漏洞数-->
-            <div class="col-md-4 col-xl-4">
+            <div class="col-md-3 col-xl-3">
                 <div class="card">
                     <div class="card-body">
-                        <div id="chart"></div>
+                        <div id="chart11"></div>
+                        <div class="text-center">Critical Severity Vulnerabilities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="chart1"></div>
                         <div class="text-center">High Severity Vulnerabilities</div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-xl-4 ">
+            <div class="col-md-3 col-xl-3 ">
                 <div class="card">
                   <div class="card-body">
                     <div id="chart2"></div>
@@ -38,7 +46,7 @@
                   </div>
                 </div>
             </div>
-            <div class="col-md-4 col-xl-4 ">
+            <div class="col-md-3 col-xl-3 ">
                 <div class="card">
                   <div class="card-body">
                     <div  id="chart3"></div>
@@ -62,66 +70,66 @@
             </div>
             </div>
             <!--安全导航-->
-            {% comment %} <div class="col-md-6 col-xl-6">
-                <div class="card">
-                  <div class="card-body">
-                    <div id="item_num1" style="height:450px;"></div>
-                  </div>
-                </div>
-                </div>
-            <div class="col-md-6 col-xl-6">
-                <div class="card">
-                  <div class="card-body">
-                   <div id="item_num2" style="height:450px;"></div>
-                  </div>
-                </div>
-                </div> {% endcomment %}
-            {% comment %} <!--图片展示-->
-            <div class="col-sm-6 col-lg-6">
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body" >
-                                <h3 class="text-center"><i class="fas fa-fingerprint" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'fingerprint' %}">指纹识别页面</a></h3>
-                                <img class="border shadow" src="{% static 'img/index_show/finger.png' %}">
-                            </div>
-                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body" >
-                                <h3 class="text-center"><i class="fa fa-bug" style="zoom: 1.0;padding: 5px;"></i>漏洞检测页面</h3>
-                                <img class="border shadow" src="{% static 'img/index_show/vuln.png' %}">
-                            </div>
-                         </div>
-                    </div>
-
-                </div>
-            </div> {% endcomment %}
-            {% comment %} <div class="col-sm-6 col-lg-6" >
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                        <div class="card-body" >
-                            <h3 class="text-center"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'portscan' %}">端口扫描页面</a></h3>
-                            <img class="border shadow" src="{% static 'img/index_show/port.png' %}">
-                        </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="card">
-                        <div class="card-body" >
-                            <h3 class="text-center"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i>目录识别页面</h3>
-                            <img class="border shadow" src="{% static 'img/index_show/dir.png' %}">
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div> {% endcomment %}
-        </div>
-        </div>
-    </div>
+{#            <div class="col-md-6 col-xl-6">#}
+{#                <div class="card">#}
+{#                  <div class="card-body">#}
+{#                    <div id="item_num1" style="height:450px;"></div>#}
+{#                  </div>#}
+{#                </div>#}
+{#                </div>#}
+{#            <div class="col-md-6 col-xl-6">#}
+{#                <div class="card">#}
+{#                  <div class="card-body">#}
+{#                   <div id="item_num2" style="height:450px;"></div>#}
+{#                  </div>#}
+{#                </div>#}
+{#                </div>#}
+            <!--图片展示-->
+{#            <div class="col-sm-6 col-lg-6">#}
+{#                <div class="row row-cards">#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body" >#}
+{#                                <h3 class="text-center"><i class="fas fa-fingerprint" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'fingerprint' %}">指纹识别页面</a></h3>#}
+{#                                <img class="border shadow" src="{% static 'img/index_show/finger.png' %}">#}
+{#                            </div>#}
+{#                         </div>#}
+{#                    </div>#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body" >#}
+{#                                <h3 class="text-center"><i class="fa fa-bug" style="zoom: 1.0;padding: 5px;"></i>漏洞检测页面</h3>#}
+{#                                <img class="border shadow" src="{% static 'img/index_show/vuln.png' %}">#}
+{#                            </div>#}
+{#                         </div>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="col-sm-6 col-lg-6" >#}
+{#                <div class="row row-cards">#}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                        <div class="card-body" >#}
+{#                            <h3 class="text-center"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i><a href="{% url 'portscan' %}">端口扫描页面</a></h3>#}
+{#                            <img class="border shadow" src="{% static 'img/index_show/port.png' %}">#}
+{#                        </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <div class="col-12">#}
+{#                        <div class="card">#}
+{#                        <div class="card-body" >#}
+{#                            <h3 class="text-center"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i>目录识别页面</h3>#}
+{#                            <img class="border shadow" src="{% static 'img/index_show/dir.png' %}">#}
+{#                        </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        </div>#}
+{#    </div>#}
 
 {% endblock %}
 
@@ -129,10 +137,10 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/echarts.min.js' %}"></script>
     <script src="{% static 'theme/macarons.js' %}"></script>
-    <!--高危-->
+    <!--严重-->
     <script>
         var options = {
-         series: [30],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -195,20 +203,98 @@
         stroke: {
           lineCap: 'round'
         },
+        labels: ['严重漏洞'],
+        };
+        var chart11 = new ApexCharts(document.querySelector("#chart11"), options);
+        chart11.render();
+        $.post('/get_vuln_value', function (data) {
+                chart11.updateOptions({
+                 {#series: [data['normal'][0]],#}
+                 series: [data['normal']["crit"]],
+                });
+        });
+    </script>
+    <!--高危-->
+    <script>
+        var options = {
+         series: [0],
+          chart: {
+          height: 250,
+          type: 'radialBar',
+        },
+          plotOptions: {
+          radialBar: {
+            startAngle: -135,
+            endAngle: 225,
+             hollow: {
+              margin: 0,
+              size: '70%',
+              background: '#fff',
+              image: undefined,
+              imageOffsetX: 0,
+              imageOffsetY: 0,
+              position: 'front',
+              dropShadow: {
+                enabled: true,
+                top: 3,
+                left: 0,
+                blur: 4,
+                opacity: 0.24
+              }
+            },
+            track: {
+              background: '#fff',
+              strokeWidth: '67%',
+              margin: 0, // margin is in pixels
+              dropShadow: {
+                enabled: true,
+                top: -3,
+                left: 0,
+                blur: 4,
+                opacity: 0.35
+              }
+            },
+
+            dataLabels: {
+              show: true,
+              name: {
+                offsetY: -10,
+                show: true,
+                color: '#888',
+                fontSize: '17px'
+              },
+              value: {
+                formatter: function(val) {
+                  return parseInt(val);
+                },
+                color: '#111',
+                fontSize: '36px',
+                show: true,
+              }
+            }
+          }
+        },
+        fill: {
+          colors: ['#F44fff',],
+        },
+        stroke: {
+          lineCap: 'round'
+        },
         labels: ['高危漏洞'],
         };
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        var chart = new ApexCharts(document.querySelector("#chart1"), options);
         chart.render();
         $.post('/get_vuln_value', function (data) {
                 chart.updateOptions({
-                 series: [data['normal'][0]],
+                 {#series: [data['normal'][1]],#}
+                 series: [data['normal']["high"]],
                 });
         });
     </script>
     <!--中危-->
     <script>
         var options = {
-         series: [50],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -277,14 +363,15 @@
         chart2.render();
         $.post('/get_vuln_value', function (data) {
                 chart2.updateOptions({
-                 series: [data['normal'][2]],
+                 {#series: [data['normal'][2]],#}
+                 series: [data['normal']["med"]],
                 })
         });
     </script>
     <!--低危-->
     <script>
         var options = {
-         series: [60],
+         series: [0],
           chart: {
           height: 250,
           type: 'radialBar',
@@ -353,7 +440,8 @@
         chart3.render();
         $.post('/get_vuln_value', function (data) {
                 chart3.updateOptions({
-                 series: [data['normal'][1]],
+                 {#series: [data['normal'][3]],#}
+                 series: [data['normal']["low"]],
                 });
         });
     </script>
@@ -458,7 +546,7 @@
         })).render();
       });
     </script>
-    {% comment %} <!--安全导航-->
+    <!--安全导航-->
     <script>
         // 基于准备好的dom，初始化echarts实例
         var myChart1 = echarts.init(document.getElementById('item_num1'),'macarons');
@@ -530,7 +618,7 @@
             },
             series: [
                 {
-                    {#color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],#}
+                    color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
                     name: '分类',
                     type: 'pie',
                     radius: '50%',
@@ -553,7 +641,7 @@
             myChart1.resize();
             myChart2.resize();
         });
-</script> {% endcomment %}
+</script>
 {% endblock %}
 
 

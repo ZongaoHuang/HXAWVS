@@ -133,6 +133,24 @@ class TargetOption(Base):
             self.logger.error('Set Site Login Failed......', exc_info=True)
             return False
 
+    def set_cookie_login(self,target_id,cookie_header):
+        set_cookie_api = f'{self.targets_api}/{target_id}/configuration'
+        try:
+            data = {
+                "custom_headers": [cookie_header]
+            }
+            response = requests.patch(set_cookie_api, json=data, headers=self.auth_headers, verify=False)
+            print(response.text)
+            if not response.text:
+                return True
+            else:
+                self.logger.error(f'Set Cookie Login Failed......\n{response.text}')
+                return False
+        except Exception:
+            self.logger.error('Set Cookie Login Failed......', exc_info=True)
+            return False
+
+
     def set_crawler(self, target_id, user_agent, case_sensitive, excluded_paths, limit_crawler_scope):
         """设置爬虫信息
 

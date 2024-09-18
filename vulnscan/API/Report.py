@@ -106,7 +106,7 @@ class Report(Base):
             page = doc[0]
 
             # Define the rectangle to cover the top part of the page
-            rect = fitz.Rect(0, -50, page.rect.width, 100)
+            rect = fitz.Rect(0, -50, page.rect.width, 73)
 
             # Draw a white rectangle to cover the top part of the page
             page.draw_rect(rect, color=(1, 1, 1), fill=True)

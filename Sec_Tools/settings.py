@@ -216,12 +216,14 @@ SIMPLEUI_CONFIG = {
         'icon': 'fas fa-paper-plane',
         'models': [{
             'name': 'HxScan',
-            'url': 'http://127.0.0.1:8002/',
+            'url': 'http://127.0.0.1:8003/',
             'icon': 'fas fa-user-secret'
-        }, {
-            'name': '简简',
-            'url': 'https://jwt1399.top',
-            'icon': 'fas fa-crown'
-        }]
+        },
+        #     {
+        #     'name': '简简',
+        #     'url': 'https://jwt1399.top',
+        #     'icon': 'fas fa-crown'
+        # }
+        ]
     }]
 }
