@@ -1,16 +1,34 @@
+version: '3'
+
 services:
- web:
-   image: vulhub/wordpress:4.6
-   depends_on:
-    - mysql
-   environment: 
-    - WORDPRESS_DB_HOST=mysql:3306
-    - WORDPRESS_DB_USER=root
-    - WORDPRESS_DB_PASSWORD=root
-    - WORDPRESS_DB_NAME=wordpress
-   ports:
-    - "8081:80"
- mysql:
-   image: mysql:5
-   environment: 
-    - MYSQL_ROOT_PASSWORD=root
+  hxscan-tool:
+    image: snow7/hxscan:tool
+    container_name: hxscan-tool
+    ports:
+      - "3443:3443"
+    cap_add:
+      - LINUX_IMMUTABLE
+    networks:
+      - hxscan-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:3443"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hxscan-app:
+    image: snow7/hxscan:app
+    container_name: hxscan-app
+    ports:
+      - "8000:8000"
+    environment:
+      - API_URL=https://hxscan-tool:3443
+    depends_on:
+      hxscan-tool:
+        condition: service_healthy
+    networks:
+      - hxscan-network
+
+networks:
+  hxscan-network:
+    name: hxscan-network
