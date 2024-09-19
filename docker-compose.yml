@@ -4,8 +4,6 @@ services:
   hxscan-tool:
     image: snow7/hxscan:tool
     container_name: hxscan-tool
-    ports:
-      - "3443:3443"
     cap_add:
       - LINUX_IMMUTABLE
     networks:
