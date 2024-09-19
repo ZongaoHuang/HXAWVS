@@ -10,11 +10,6 @@ services:
       - LINUX_IMMUTABLE
     networks:
       - hxscan-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:3443"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   hxscan-app:
     image: snow7/hxscan:app
@@ -24,8 +19,7 @@ services:
     environment:
       - API_URL=https://hxscan-tool:3443
     depends_on:
-      hxscan-tool:
-        condition: service_healthy
+      - hxscan-tool
     networks:
       - hxscan-network
 
