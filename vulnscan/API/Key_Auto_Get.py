@@ -56,7 +56,7 @@ class Key_Auto_Get(object):
         return res
 
     def update_me_profile(self):
-        update_profile_data = {"operationName":"updateProfile","variables":{"profile":{"firstName":"Administrator","lastName":"w1nd","language":"CN","timeZone":None,"notifications":{"scans":True,"targets":True,"reports":True,"attachments":False,"links":False,"mute":False,"workers":True}}},"query":"mutation updateProfile($profile: UserProfileUpdateInput!) {\n  updateProfile(profile: $profile)\n}"}
+        update_profile_data = {"operationName":"updateProfile","variables":{"profile":{"firstName":"Administrator","lastName":"w1nd","language":"CN","timeZone":480,"notifications":{"scans":True,"targets":True,"reports":True,"attachments":False,"links":False,"mute":False,"workers":True}}},"query":"mutation updateProfile($profile: UserProfileUpdateInput!) {\n  updateProfile(profile: $profile)\n}"}
         res = self.sess.post(self.graphql_url, json=update_profile_data,verify=False,headers=self.headers)
         # print(res.status_code)
         # print(res.text)
