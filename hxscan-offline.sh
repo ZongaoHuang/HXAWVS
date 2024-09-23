@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# 确保脚本在正确的目录中运行
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd "$SCRIPT_DIR"
-
 # 定义项目名称
 PROJECT_NAME="hxscan"
 
@@ -22,13 +18,23 @@ get_ip_addresses() {
 }
 
 # 定义函数以执行不同的操作
-start_services() {
-    echo "Starting services..."
+init_services() {
+    echo "Initializing services..."
+    
+    # 加载 Docker 镜像
+    echo "Loading Docker images..."
+    docker load -i hxscan-tool.tar
+    echo "hxscan-tool image loaded."
+    docker load -i hxscan-app.tar
+    echo "hxscan-app image loaded."
+    
     # 停止旧容器（如果存在）
     $DOCKER_COMPOSE down
+    echo "Old containers stopped and removed."
 
     # 启动 hxscan-tool 服务
     $DOCKER_COMPOSE up -d hxscan-tool
+    echo "hxscan-tool service started."
 
     # 等待一段时间，确保 hxscan-tool 有足够时间启动
     echo "Waiting for hxscan-tool to start..."
@@ -36,12 +42,33 @@ start_services() {
 
     # 启动 hxscan-app 服务
     $DOCKER_COMPOSE up -d hxscan-app
+    echo "hxscan-app service started."
+
+    echo "Initialization completed."
+}
+
+start_services() {
+    echo "Starting services..."
+    
+    # 启动 hxscan-tool 服务
+    $DOCKER_COMPOSE start hxscan-tool
+    echo "hxscan-tool service started."
+
+    # 等待一段时间，确保 hxscan-tool 有足够时间启动
+    echo "Waiting for hxscan-tool to start..."
+    sleep 20  # 可以根据实际情况调整等待时间
+
+    # 启动 hxscan-app 服务
+    $DOCKER_COMPOSE start hxscan-app
+    echo "hxscan-app service started."
+
+    echo "All services started."
 
     # 获取IP地址
     IPs=$(get_ip_addresses)
 
     # 输出访问URL
-    echo "Deployment completed. You can access the application at:"
+    echo "You can access the application at:"
     echo " - http://localhost:8000"
     for IP in $IPs; do
         echo " - http://$IP:8000"
@@ -51,35 +78,42 @@ start_services() {
 stop_services() {
     echo "Stopping services..."
     $DOCKER_COMPOSE stop
+    echo "All services stopped."
 }
 
 restart_services() {
     echo "Restarting services..."
     $DOCKER_COMPOSE restart hxscan-tool
+    echo "hxscan-tool restarted."
     echo "Waiting for hxscan-tool to restart..."
     sleep 20
     $DOCKER_COMPOSE restart hxscan-app
+    echo "hxscan-app restarted."
+    echo "All services restarted."
 }
 
 down_services() {
     echo "Stopping and removing services..."
     $DOCKER_COMPOSE down
+    echo "All services stopped and removed."
 }
 
 # 显示菜单并获取用户选择
 echo "Please choose an option:"
-echo "1) Start services"
-echo "2) Stop services"
-echo "3) Restart services"
-echo "4) Stop and remove services"
-read -p "Enter choice [1-4]: " choice
+echo "1) Initialize services"
+echo "2) Start services"
+echo "3) Stop services"
+echo "4) Restart services"
+echo "5) Stop and remove services"
+read -p "Enter choice [1-5]: " choice
 
 # 根据用户选择执行相应的函数
 case "$choice" in
-    1) start_services ;;
-    2) stop_services ;;
-    3) restart_services ;;
-    4) down_services ;;
+    1) init_services ;;
+    2) start_services ;;
+    3) stop_services ;;
+    4) restart_services ;;
+    5) down_services ;;
     *) echo "Invalid choice." ;;
 esac
 
