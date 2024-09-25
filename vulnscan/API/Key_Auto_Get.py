@@ -45,8 +45,8 @@ class Key_Auto_Get(object):
             "remember_me": self.remeberme
         }
         res = self.sess.post(self.login_url, json=login_data, verify=False)
-        # print(res.status_code)
-        # print(res.headers)
+        print(res.status_code)
+        print(res.headers)
         self.headers["X-Auth"] = res.headers["X-Auth"]
         self.headers["Cookie"] = res.headers["Set-Cookie"]
 

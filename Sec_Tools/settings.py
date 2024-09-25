@@ -146,12 +146,12 @@ SIMPLEUI_HOME_QUICK = True  # 后台页面是否显示最近动作
 
 # AWVS URL和API key  服务器版本
 API_URL = os.getenv("API_URL") if os.getenv("API_URL") else "https://127.0.0.1:3443"
-kag = Key_Auto_Get()
-API_KEY = None
-if kag._api_key is not None:
-    API_KEY = kag._api_key
-else:
-    raise exception("No API key found")
+# kag = Key_Auto_Get()
+API_KEY = "1986ad8c0a5b3df4d7028d5f3c06e936c53dfef12b2904b82843e1a65492399c7"
+# if kag._api_key is not None:
+#     API_KEY = kag._api_key
+# else:
+#     raise exception("No API key found")
 print(API_KEY)
 
 # 重设密码功能邮箱配置
