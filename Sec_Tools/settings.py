@@ -147,7 +147,7 @@ SIMPLEUI_HOME_QUICK = True  # 后台页面是否显示最近动作
 # AWVS URL和API key  服务器版本
 API_URL = os.getenv("API_URL") if os.getenv("API_URL") else "https://127.0.0.1:3443"
 # kag = Key_Auto_Get()
-API_KEY = "1986ad8c0a5b3df4d7028d5f3c06e936c53dfef12b2904b82843e1a65492399c7"
+API_KEY = "1986ad8c0a5b3df4d7028d5f3c06e936c5e3356d454944ec88d4166867733ff18"
 # if kag._api_key is not None:
 #     API_KEY = kag._api_key
 # else:
