@@ -132,8 +132,8 @@ def check_ip(ipaddr=''):
     # IP地址的长度范围(6, 16)
     if (6 < len(ipaddr)) and (len(ipaddr) < 16):
         # 判断是否在禁止IP
-        if re.search(FORBIDDEN_IP_RULE, ipaddr):
-            return False
+        # if re.search(FORBIDDEN_IP_RULE, ipaddr):
+        #     return False
         # ip地址都是（1~255）.（0~255）.（0~255）.（0~255）的格式
         rule = r'^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$'
         # 1\d{2}的意思就是100~199之间的任意一个数字

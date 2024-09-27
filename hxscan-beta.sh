@@ -21,16 +21,13 @@ get_ip_addresses() {
 init_services() {
     echo "Initializing services..."
 
-    # 删除旧的镜像
-#    echo "删除"
-
     # 加载 Docker 镜像
     echo "Loading Docker images..."
-    docker load -i hxscan-tool.tar
+    docker load -i hxscan-tool-beta.tar
     echo "hxscan-tool image loaded."
-    docker load -i hxscan-app.tar
+    docker load -i hxscan-app-beta.tar
     echo "hxscan-app image loaded."
-    
+
     # 停止旧容器（如果存在）
     $DOCKER_COMPOSE down
     echo "Old containers stopped and removed."
@@ -52,7 +49,7 @@ init_services() {
 
 start_services() {
     echo "Starting services..."
-    
+
     # 启动 hxscan-tool 服务
     $DOCKER_COMPOSE start hxscan-tool
     echo "hxscan-tool service started."
@@ -64,6 +61,7 @@ start_services() {
     # 启动 hxscan-app 服务
     $DOCKER_COMPOSE start hxscan-app
     echo "hxscan-app service started."
+    $DOCKER_COMPOSE restart hxscan-app
 
     echo "All services started."
 
