@@ -1,7 +1,6 @@
 
 <center><font size=6 >HxScan 使用文档 </font></center>
 <br>
-<center> 联系我们✉： <a target="_blank" href="mailto:Sec_Tools@163.com" rel="nofollow" >Sec_Tools@163.com </a></center>
 
 > 一款在线Web安全渗透工具
 
