@@ -43,6 +43,7 @@ init_services() {
     # 启动 hxscan-app 服务
     $DOCKER_COMPOSE up -d hxscan-app
     echo "hxscan-app service started."
+    $DOCKER_COMPOSE restart hxscan-app
 
     echo "Initialization completed."
 }
