@@ -2,7 +2,7 @@ version: '3'
 
 services:
   hxscan-tool:
-    image: snow7/hxscan:tool
+    image: sakura501/hxscan-tool:v1
     container_name: hxscan-tool
     cap_add:
       - LINUX_IMMUTABLE
@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   hxscan-app:
-    image: snow7/hxscan:app
+    image: sakura501/hxscan-app:v1
     container_name: hxscan-app
     ports:
       - "8000:8000"
