@@ -166,19 +166,21 @@ DEFAULT_FROM_EMAIL = '***your**'  # 你的邮箱账号
 # 自定义后台菜单
 SIMPLEUI_CONFIG = {
     'system_keep': False,  # 去除系统模块
-    'menus': [{
-        'name': '导航管理',
-        'icon': 'fas fa-book-open',
-        'models': [{
-            'name': '分类',
-            'icon': 'fas fa-list',
-            'url': '/admin/webscan/category/'
-        }, {
-            'name': '条目',
-            'icon': 'fas fa-tags',
-            'url': '/admin/webscan/item/'
-        }]
-    }, {
+    'menus': [
+    #     {
+    #     'name': '导航管理',
+    #     'icon': 'fas fa-book-open',
+    #     'models': [{
+    #         'name': '分类',
+    #         'icon': 'fas fa-list',
+    #         'url': '/admin/webscan/category/'
+    #     }, {
+    #         'name': '条目',
+    #         'icon': 'fas fa-tags',
+    #         'url': '/admin/webscan/item/'
+    #     }]
+    # }, 
+    {
         'name': '指纹组件',
         'icon': 'fas fa-fingerprint',
         'models': [{
@@ -194,11 +196,13 @@ SIMPLEUI_CONFIG = {
         'name': '端口列表',
         'icon': 'fab fa-battle-net',
         'url': '/admin/webscan/portlist/'
-    }, {
-        'name': '中间件扫描',
-        'icon': 'fab fa-battle-net',
-        'url': '/admin/vulnscan/middleware_vuln/'
-    }, {
+    }, 
+    # {
+    #     'name': '中间件扫描',
+    #     'icon': 'fab fa-battle-net',
+    #     'url': '/admin/vulnscan/middleware_vuln/'
+    # }, 
+    {
         'app': 'auth',
         'name': '用户和授权',
         'icon': 'fas fa-user-shield',
@@ -211,19 +215,26 @@ SIMPLEUI_CONFIG = {
             'icon': 'fas fa-users-cog',
             'url': 'auth/group/'
         }]
-    }, {
-        'name': '网页预览',
-        'icon': 'fas fa-paper-plane',
-        'models': [{
-            'name': 'HxScan',
-            'url': 'http://127.0.0.1:8003/',
-            'icon': 'fas fa-user-secret'
-        },
-        #     {
-        #     'name': '简简',
-        #     'url': 'https://jwt1399.top',
-        #     'icon': 'fas fa-crown'
-        # }
-        ]
-    }]
+    }, 
+    # {
+    #     'name': '网页预览',
+    #     'icon': 'fas fa-paper-plane',
+    #     'models': [{
+    #         'name': 'HxScan',
+    #         'url': 'http://127.0.0.1:8000/',
+    #         'icon': 'fas fa-user-secret'
+    #     },
+    #     #     {
+    #     #     'name': '简简',
+    #     #     'url': 'https://jwt1399.top',
+    #     #     'icon': 'fas fa-crown'
+    #     # }
+    #     ]
+    # }
+    {
+    'name': '操作日志',
+    'icon': 'fas fa-history',
+    'url': '/admin/webscan/log/'
+    },
+    ]
 }

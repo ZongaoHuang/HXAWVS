@@ -1,8 +1,9 @@
+import json
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Category, Item, FingerPrint, FpCategory, PortList
+from .models import Category, Item, FingerPrint, FpCategory, PortList, Log
 from django.contrib.auth.decorators import login_required
-
+from .utils import create_log_entry
 
 # Create your views here.
 
@@ -69,7 +70,6 @@ def testfp(request):
     }
     return render(request, 'other/testfp.html', context)
 
-
 @login_required
 def fingerprint(request):
     """指纹识别"""
@@ -78,36 +78,33 @@ def fingerprint(request):
     context = {
         'cms_items': cms_items,
         'categories': categories,
-
     }
+    create_log_entry(request.user, '访问指纹识别页面')
     return render(request, 'scan/scan_fingerprint.html', context)
-
 
 @login_required
 def portscan(request):
     """端口扫描"""
     portlists = PortList.objects.all()
     context = {'portlists': portlists}
+    create_log_entry(request.user, '访问端口扫描页面')
     return render(request, 'scan/scan_portscan.html', context)
-
 
 @login_required
 def infoleak(request):
-    """
-    信息泄露
-    """
+    """信息泄露"""
+    create_log_entry(request.user, '访问信息泄露页面')
     return render(request, 'scan/scan_infoleak.html')
-
 
 @login_required
 def webside(request):
-    """
-    旁站扫描
-    """
+    """旁站扫描"""
+    create_log_entry(request.user, '访问旁站扫描页面')
     return render(request, 'scan/scan_webside.html')
-
 
 @login_required
 def subdomain(request):
     """子域名扫描"""
+    create_log_entry(request.user, '访问子域名扫描页面')
     return render(request, 'scan/scan_subdomain.html')
+

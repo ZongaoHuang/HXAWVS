@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.html import format_html
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Category(models.Model):
@@ -74,3 +75,20 @@ class PortList(models.Model):
     status = models.CharField(max_length=10,verbose_name='状态',blank=True,default='未知')
     class Meta:
         verbose_name=verbose_name_plural='端口列表'
+        
+class Log(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    action = models.CharField(max_length=200, verbose_name='操作')
+    action_time = models.DateTimeField(auto_now_add=True, verbose_name='操作时间')
+
+    class Meta:
+        verbose_name = '操作日志'
+        verbose_name_plural = '操作日志'
+        ordering = ['-action_time']
+
+    def __str__(self):
+        return f"{self.user} - {self.action} - {self.action_time}"
+
+    def formatted_action_time(self):
+        return self.action_time.strftime("%Y-%m-%d %H:%M:%S")
+    formatted_action_time.short_description = '操作时间'

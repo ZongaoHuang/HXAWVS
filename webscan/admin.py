@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category,Item,PortList,FpCategory,FingerPrint
+from .models import Category,Item,PortList,FpCategory,FingerPrint, Log
 from import_export.admin import ImportExportModelAdmin
 from django.db import models
 from django.forms import TextInput
@@ -66,3 +66,29 @@ class PortListAdmin(ImportExportModelAdmin):
     list_filter = ('protocol','status')  # 过滤器，按字段进行筛选
     ordering = ('num', )#设置默认排序字段，负号表示降序排序
     list_per_page = 15
+
+@admin.register(Log)
+class LogAdmin(ImportExportModelAdmin):
+    list_display = ('user', 'action', 'formatted_action_time')
+    list_display_links = ('user',)
+    search_fields = ('user__username', 'action')
+    list_filter = ('user', 'action', 'action_time')
+    readonly_fields = ['user', 'action', 'action_time']
+    date_hierarchy = 'action_time'
+    ordering = ('-action_time',)
+    list_per_page = 20
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions

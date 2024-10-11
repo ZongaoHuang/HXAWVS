@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import UserCreationForm
 import json
 from .forms import RegisterForm
+from webscan.utils import create_log_entry
 
 # Create your views here.
 
@@ -20,14 +21,12 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
-        if user is None:
-            msg['error'] = "用户名或密码错误！"
-            msg['color'] = "#fef0f0"
-        else:
+        if user is not None:
             Login(request, user)
-            return redirect("/index")
-        # print(user)
-        # print(msg)
+            create_log_entry(user, '用户登录')
+            return redirect('/index')
+        else:
+            return render(request, 'login.html', {'error': '用户名或密码错误', 'color':'#fef0f0'})
     return render(request, "login.html", msg)
 
 
@@ -56,7 +55,9 @@ def register(request):
 
 
 def login_out(request):
-    logout(request)  # 注销
+    user = request.user
+    logout(request)
+    create_log_entry(user, '用户注销')
     return redirect("/index")  # 页面跳转
 
 
