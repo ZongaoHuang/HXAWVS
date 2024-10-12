@@ -23,7 +23,7 @@ from vulnscan.API.Report import Report
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
-
+from webscan.utils import create_log_entry
 
 @csrf_exempt
 @login_required
@@ -32,6 +32,7 @@ def delete_scan(request):
     scan_id = request.POST.get('scan_id')
     status = s.delete(scan_id)
     if status:
+        create_log_entry(request.user, '删除漏洞扫描任务')
         return success()
     return error()
 
@@ -42,6 +43,7 @@ def abort_scan(request):
     scan_id = request.POST.get('scan_id')
     status = s.abort_scan(scan_id)
     if status:
+        create_log_entry(request.user, '中止漏洞扫描任务')
         return success()
     return error()
 
@@ -56,6 +58,7 @@ def generate_report(request):
     id_list = [scan_session_id]
     status = r.generate(template_id, list_type, id_list)
     if status:
+        create_log_entry(request.user, '生成报告')
         return success()
     return error()
 
@@ -96,6 +99,7 @@ def vulnscan(request):
         count += 1
         print(msg['current_session']['severity_counts'])
     data = s_list
+    create_log_entry(request.user, '访问漏洞扫描页面')
     return render(request, "vulnscan.html", {"data": data })
 
 
@@ -131,6 +135,7 @@ def vuln_scan(request):
         # 再添加scan扫描
         scan_id = s.add(target_id, scan_type)
         if scan_id:
+            create_log_entry(request.user, '进行漏洞扫描任务')
             return success()
     return error()
 
@@ -152,6 +157,7 @@ def vuln_result(request, target_id):
         }
         id += 1
         data.append(item)
+    create_log_entry(request.user, '查看漏洞扫描结果')
     return render(request,'vuln-reslut.html',{'data': data})
 
 @login_required
@@ -186,6 +192,7 @@ def vuln_detail(request,vuln_id):
     data_dict['Tests_performed'] = Str
     data_dict['num'] = num
     data_dict['details'] = data_dict['details'].replace('class="bb-dark"','style="color: #ff0000"')
+    create_log_entry(request.user, '查看漏洞扫描详情页面')
     return render(request, "vuln-detail.html", {'data': data_dict})
 
 
@@ -256,6 +263,7 @@ def Middleware_scan(request):
         CVE_id = request.POST.get('CVE_id').replace('-',"_")
         Time = time.time()  # time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))时间戳转日期格式
         if insert_Middleware_data(url, CVE_id, Time):
+            
             return success()
     except:
         return error()
@@ -270,6 +278,7 @@ def start_Middleware_scan(request):
         time.sleep(5) #等待数据插入成功后在查询出来扫描
         msg = Middleware_vuln.objects.filter(url=url, status='runing', CVE_id=CVE_id, time=Time)
         print(msg)
+        create_log_entry(request.user, '进行中间件扫描任务')
         for target in msg:
             result = POC_Check(target.url, target.CVE_id)
             # print("result:", result)

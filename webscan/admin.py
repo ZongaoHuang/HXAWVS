@@ -67,6 +67,7 @@ class PortListAdmin(ImportExportModelAdmin):
     ordering = ('num', )#设置默认排序字段，负号表示降序排序
     list_per_page = 15
 
+# 操作日志
 @admin.register(Log)
 class LogAdmin(ImportExportModelAdmin):
     list_display = ('user', 'action', 'formatted_action_time')

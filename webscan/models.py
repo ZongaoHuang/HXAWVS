@@ -77,6 +77,7 @@ class PortList(models.Model):
         verbose_name=verbose_name_plural='端口列表'
         
 class Log(models.Model):
+    '''操作日志'''
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
     action = models.CharField(max_length=200, verbose_name='操作')
     action_time = models.DateTimeField(auto_now_add=True, verbose_name='操作时间')

@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from vulnscan.models import Middleware_vuln
 from Sec_Tools.settings import API_KEY, API_URL
+from webscan.utils import create_log_entry
 import time
 
 # Create your views here.
@@ -69,6 +70,7 @@ def download_modified_report(request, report_id):
     if modified_pdf:
         response = HttpResponse(modified_pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="final_report_{report_id}.pdf"'
+        create_log_entry(request.user, '下载检测报告')
         return response
     return HttpResponse("Failed to generate modified PDF", status=500)
 

@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
 import json
+from webscan.utils import create_log_entry
 
 base_file_path = 'dirscan/dirsearch/reports/target.json'
 
@@ -35,6 +36,7 @@ def dirresult(request):
             if num < n:
                 a = a + data[key]
         print({"a": a, "key_list": key_list})
+        create_log_entry(request.user, '查看目录识别结果')
         return render(request, "dir-result.html", {"a": a, "key_list": key_list})
     else:
         error = "暂无结果"
