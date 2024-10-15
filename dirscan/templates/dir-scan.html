@@ -23,6 +23,8 @@
             background-color: #f2f2f2;
         }
     </style>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 {% endblock %}
 
@@ -63,7 +65,7 @@
                       <line x1="21" y1="21" x2="15" y2="15" />
                     </svg>
                 </div>
-                <form action="{% url 'dir-search' %}" method="post">
+                <form id="scan-form" action="{% url 'dir-search' %}" method="post">
                     {% csrf_token %}
                     <!-- 输入框&提交按钮 -->
                     <div class="fixed_scan input-icon mb-3 float-left" style="width: 80%">
@@ -127,9 +129,6 @@
                                     <input class="form-check-input" type="radio" name="r_check" value="r_no" checked>
                                     <span class="form-check-label">否</span>
                                 </label>
-                            <!--查看结果 -->
-                            <!-- <br>
-                            <a href="{% url 'dir-result' %}" target="_blank" class="btn btn-pink btn-pill">查看扫描结果</a> -->
                         </div>
                         <!--自定义扫描选项 -->
                         <div class="col-md-4 text-center " >
@@ -212,38 +211,66 @@
                     </span>
                     <!--结果表格-->
                     <div class="table-responsive" id="refresh">
-                        <table id="table" class="table table-vcenter card-table">
-                            <thead>
+                        <table class="table text-center" id="table"
+                            data-toggle="table"
+                            data-show-export="true"
+                            data-click-to-select="true"
+                            data-toolbar="#toolbar"
+                            data-search="true"
+                            data-show-refresh="true"
+                            data-auto-refresh="true"
+                            data-show-toggle="true"
+                            data-show-fullscreen="true"
+                            data-show-columns="true"
+                            data-show-columns-toggle-all="true"
+                            data-minimum-count-columns="2"
+                            data-show-pagination-switch="true"
+                            data-pagination="true"
+                            data-id-field="id"
+                            data-page-list="[10, 25, 50, 100, all]"
+                            data-response-handler="responseHandler">
+                            <thead class="table-primary">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>目标</th>
-                                    <th>状态</th>
-                                    <th>扫描时间</th>
-                                    <th>操作</th>
+                                    <th data-sortable="true" data-field="id">ID</th>
+                                    <th data-sortable="true" data-field="target">扫描目标</th>
+                                    <th data-sortable="true" data-field="status">扫描状态</th>
+
+                                    <th data-sortable="true" data-field="scan_time">扫描时间</th>
+                                    <th data-sortable="true" data-field="result_path">识别结果</th>
+                                    <th data-sortable="true" data-field="operations">操作</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for scan in scans %}
-                                <tr id="scan-row-{{ scan.id }}">
+                                <tr>
                                     <td>{{ scan.id }}</td>
                                     <td>{{ scan.target }}</td>
-                                    <td id="scan-progress-{{ scan.id }}">
+                                    <td>
                                         {% if scan.status == 'process' %}
-                                        进行中
+                                            <a class="btn bg-azure-lt btn-block">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                处理中
+                                            </a>
                                         {% elif scan.status == 'finish' %}
-                                        完成
-                                        {% else %}
-                                        {{ scan.status }}
+                                            <a class="btn bg-green-lt btn-block">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>
+                                                已完成
+                                            </a>
                                         {% endif %}
                                     </td>
-                                    <td>{{ scan.scan_time }}</td>
-                                    <td id="scan-actions-{{ scan.id }}">
-                                        {% if scan.status == 'process' %}
-                                        <button class="abort-btn" data-scan-id="{{ scan.id }}">停止</button>
-                                        {% elif scan.status == 'finish' %}
-                                        <a href="{% url 'dir-result' scan_id=scan.id %}" class="btn btn-primary btn-sm">查看结果</a>
+                                    <td class="text-secondary">{{ scan.scan_time }}</td>
+                                    <td>
+                                        {% if scan.status == 'finish' and scan.result_path %}
+                                        <a href="{% url 'dir-result' scan_id=scan.id %}">查看结果</a>
+                                        {% else %}
+                                        -
                                         {% endif %}
-                                        <button class="delete-btn" data-scan-id="{{ scan.id }}">删除</button>
+                                    </td>
+                                    <td>
+                                        {% if scan.status == 'process' %}
+                                            <button class="abort-btn" data-scan-id="{{ scan.id }}">停止扫描</button>
+                                        {% endif %}
+                                        <button class="delete-btn" data-scan-id="{{ scan.id }}"><i class="fas fa-trash delete-icon"></i></button>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -257,6 +284,14 @@
 {% endblock %}
 
 {% block js %}
+    <!--Bootsrap Select-->
+    <script src="{% static 'plugins/bootstarp-select/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstarp-select/bootstrap-select.min.js' %}"></script>
+
+    <!--Bootsrap Table-->
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
+
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
     <script type="text/javascript">
@@ -314,30 +349,52 @@
     <!--按钮点击事件-->
     <script>
         $(document).ready(function(){
-            $("#scan-form").on('submit', function(e){
+            $('#scan-form').on('submit', function(e) {
                 e.preventDefault();
+                var formData = $(this).serialize();
+                var url = $('input[name="url"]').val();
+                if (url) {
+                    $.ajax({
+                        url: "{% url 'dir-create' %}",
+                        type: 'POST',
+                        data: formData,
+                        dataType: 'json',
+                        success: function(response){
+                            if(response.status === 'success'){
+                                layer.msg('扫描已创建', {icon: 1, offset: '220px', area: ['200px', '70px']});
+                                startScan(response.scan_id, formData);
+                            } else {
+                                layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
+                            }
+                        },
+                        error: function(){
+                            layer.msg('请求失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
+                        }
+                    });
+                } else {
+                    layer.msg('请输入URL', {icon: 2, offset: '220px', area: ['200px', '70px']});
+                }
+            });
+
+            function startScan(scanId, formData) {
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: "{% url 'dir-search' %}",
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: formData + '&scan_id=' + scanId,
                     dataType: 'json',
                     success: function(response){
                         if(response.status === 'success'){
-                            layer.msg('正在扫描，请稍后...', {icon: 1, offset: '220px', area: ['200px', '70px']});
-                            $('.jincheng').show();
-                            $('tbody').html('<tr><td colspan="5"><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
-                            setTimeout(function(){
-                                refreshScanList();
-                            }, 5000);
+                            layer.msg('扫描已开始', {icon: 1, offset: '220px', area: ['200px', '70px']});
+                            checkScanStatus(scanId);
                         } else {
                             layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
                         }
                     },
                     error: function(){
-                        layer.msg('请求失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
+                        layer.msg('开始扫描失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
                     }
                 });
-            });
+            }
 
             function refreshScanList() {
                 $.ajax({
@@ -397,7 +454,7 @@
 
             function delete_scan(scan_id) {
                 $.ajax({
-                    url: "/delete_dirscan",
+                    url: "{% url 'delete_dirscan' %}",
                     type: "POST",
                     data: {scan_id: scan_id},
                     xhrFields: {
@@ -415,6 +472,32 @@
                     },
                     error: function () {
                         layer.msg('请求失败', {icon: 2, offset: '100px', area: ['120px', '70px']});
+                    }
+                });
+            }
+
+            function checkScanStatus(scanId) {
+                $.ajax({
+                    url: "{% url 'check_scan_status' %}",
+                    type: "GET",
+                    data: { scan_id: scanId },
+                    success: function(response) {
+                        var scanRow = $('#scan-row-' + scanId);
+                        if (response.status === 'finish') {
+                            scanRow.find('td:eq(2)').html('<span class="badge bg-green">已完成</span>');
+                            scanRow.find('td:eq(4)').html('<a href="{% url "dir-result" scan_id=0 %}'.replace('0', scanId) + '">查看结果</a>');
+                            scanRow.find('td:eq(5)').html('<button class="delete-btn" data-scan-id="' + scanId + '"><i class="fas fa-trash delete-icon"></i></button>');
+                        } else if (response.status === 'process') {
+                            setTimeout(function() {
+                                checkScanStatus(scanId);
+                            }, 5000);
+                        } else {
+                            scanRow.find('td:eq(2)').html('<span class="badge bg-red">' + response.status + '</span>');
+                            scanRow.find('td:eq(5)').html('<button class="delete-btn" data-scan-id="' + scanId + '"><i class="fas fa-trash delete-icon"></i></button>');
+                        }
+                    },
+                    error: function() {
+                        console.log('检查扫描状态失败');
                     }
                 });
             }
