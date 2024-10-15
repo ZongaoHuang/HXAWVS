@@ -73,57 +73,29 @@
                     <span class="nav-link-title">漏洞报告</span>
                   </a>
                 </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false"  >
-                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-globe-asia" style="zoom: 1.0;padding: 5px;"></i></span>
-                    <span class="nav-link-title">信息收集</span>
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'portscan' %}" >
+                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i></span>
+                    <span class="nav-link-title">端口扫描</span>
                   </a>
-                  <ul class="dropdown-menu">
-                      <li >
-                      <a class="dropdown-item" href="{% url 'portscan' %}" >
-                          <span class="d-md-none d-lg-inline-block"><i class="fas fa-search" style="zoom: 1.0;padding: 5px;"></i></span>
-                          <span class="nav-link-title">端口扫描</span>
-                      </a>
-                    </li>
-                      <li >
-                      <a class="dropdown-item" href="{% url 'dir-search' %}" >
-                          <span class="d-md-none d-lg-inline-block"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i></span>
-                          <span class="nav-link-title">目录识别</span>
-                      </a>
-                    </li>
-                      <li>
-                      <a class="dropdown-item"  href="{% url 'fingerprint' %}" >
-                        <span class="d-md-none d-lg-inline-block"><i class="fas fa-fingerprint" style="zoom: 1.0;padding: 5px;"></i></span>
-                        <span class="nav-link-title">指纹识别</span>
-                      </a>
-                    </li>
-                  </ul>
                 </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false"  >
-                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-globe" style="zoom: 1.0;padding: 5px;"></i></span>
-                    <span class="nav-link-title">资产收集</span>
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'dir-scan' %}" >
+                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i></span>
+                    <span class="nav-link-title">目录识别</span>
                   </a>
-                  <ul class="dropdown-menu">
-{#                      <li >#}
-{#                      <a class="dropdown-item" href="{% url 'subdomain' %}" >#}
-{#                          <span class="d-md-none d-lg-inline-block"><i class="fas fa-project-diagram" style="zoom: 1.0;padding: 5px;"></i></span>#}
-{#                          <span class="nav-link-title">域名探测</span>#}
-{#                      </a>#}
-{#                    </li>#}
-{#                      <li>#}
-{#                          <a class="dropdown-item" href="{% url 'webside' %}" >#}
-{#                              <span class="d-md-none d-lg-inline-block"><i class="fas fa-network-wired" style="zoom: 1.0;padding: 5px;"></i></span>#}
-{#                              <span class="nav-link-title">旁站探测</span>#}
-{#                          </a>#}
-{#                      </li>#}
-                      <li >
-                          <a class="dropdown-item" href="{% url 'infoleak' %}" >
-                              <span class="d-md-none d-lg-inline-block"><i class="fas fa-compass" style="zoom: 1.0;padding: 5px;"></i></span>
-                              <span class="nav-link-title">信息泄露</span>
-                          </a>
-                      </li>
-                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'fingerprint' %}" >
+                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-stream" style="zoom: 1.0;padding: 5px;"></i></span>
+                    <span class="nav-link-title">指纹识别</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'infoleak' %}" >
+                    <span class="d-md-none d-lg-inline-block"><i class="fas fa-compass" style="zoom: 1.0;padding: 5px;"></i></span>
+                    <span class="nav-link-title">信息泄露</span>
+                  </a>
                 </li>
                 <li class="nav-item">
                     <div id="dark" onclick="switchDarkMode()" style="margin-left: 20px"></div>

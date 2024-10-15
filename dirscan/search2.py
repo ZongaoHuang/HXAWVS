@@ -1,91 +1,58 @@
 # -*- coding: utf-8 -*-
 import os
 
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators import csrf
 from django.contrib.auth.decorators import login_required
-
+from webscan.utils import create_log_entry
+from .models import DirectoryScan
 if not os.path.exists('./dirscan/dirsearch/logs'):
     os.mkdir('./dirscan/dirsearch/logs')
 
 
 # 接收POST请求数据
+# 接收POST请求数据
+@login_required
 @login_required
 def search_post(request):
-    parm = []  # 勾选参数列表
-    base_file_path = 'dirscan/dirsearch/reports/target.json'  # json文件地址
-    fixes = {}
-    if request.POST:
-        # 获取用户输入的url
-        enter_url = ' -u ' + request.POST.get('url') + ' '
-        # 获取用户选择的参数，存入列表
-        parm.append(request.POST.get('php'))
-        parm.append(request.POST.get('asp'))
-        parm.append(request.POST.get('jsp'))
-        parm.append(request.POST.get('txt'))
-        parm.append(request.POST.get('zip'))
-        parm.append(request.POST.get('html'))
-        parm.append(request.POST.get('js'))
+    if request.method == 'POST':
+        url = request.POST.get('url')
+        if url:
+            new_scan = DirectoryScan.objects.create(
+                user=request.user,
+                target=url,
+                status='process'
+            )
+            create_log_entry(request.user, f'开始目录扫描任务: {url}')
 
-        p = ''
-        for parm in parm:
-            if parm is not None:
-                parm = parm + ','
-                p = parm + p
-        options = ' -e ' + p[:-1]
+            # Get user-selected parameters
+            extensions = ','.join([ext for ext in ['php', 'asp', 'jsp', 'txt', 'zip', 'html', 'js'] if request.POST.get(ext)])
+            recursive = '-r' if request.POST.get('r_check') == "r_yes" else ''
+            prefixes = ','.join([request.POST.get(f'prefixe_{i}') for i in range(1, 10) if request.POST.get(f'prefixe_{i}')])
+            pre = f'--prefixes {prefixes}' if prefixes else ''
+            suffixes = ','.join([request.POST.get(f'suffixe_{i}') for i in range(1, 10) if request.POST.get(f'suffixe_{i}')])
+            suf = f'--suffixes {suffixes}' if suffixes else ''
+            subdirs = ','.join([request.POST.get(f'subdirs_{i}') for i in range(1, 10) if request.POST.get(f'subdirs_{i}')])
+            subdir = f'--subdirs {subdirs}' if subdirs else ''
 
-        # 递归扫描
-        recursive = ''
-        if request.POST.get('r_check') == "r_yes":
-            recursive = '-r' + ' '
+            output_file = f'dirscan/dirsearch/reports/{new_scan.id}.json'
+            new_scan.result_path = output_file
+            new_scan.save()
 
-        # 前后缀
-        # 前缀
-        pre_num = 1
-        pre = ''
-        while request.POST.get('prefixe_' + str(pre_num)) is not None and request.POST.get(
-                'prefixe_' + str(pre_num)) != '':
-            pre = request.POST.get('prefixe_' + str(pre_num)) + ',' + pre
-            pre_num = pre_num + 1
-        if pre != '' and pre != ',':
-            pre = '--prefixes ' + pre[:-1] + ' '
+            command = f'python dirscan/dirsearch/dirsearch.py -u {url}'
+            if extensions:
+                command += f' -e {extensions}'
+            command += f' {recursive} {pre} {suf} {subdir} --json-report {output_file}'
+
+            import subprocess
+            process = subprocess.Popen(command, shell=True)
+
+            new_scan.pid = process.pid
+            new_scan.save()
+
+            return JsonResponse({'status': 'success', 'scan_id': new_scan.id, 'message': '扫描已开始'})
         else:
-            pre = pre[:-1]
+            return JsonResponse({'status': 'error', 'message': 'URL is required'})
 
-        # 后缀
-        suf_num = 1
-        suf = ''
-        while request.POST.get('suffixe_' + str(suf_num)) is not None and request.POST.get(
-                'suffixe_' + str(suf_num)) != '':
-            suf = request.POST.get('suffixe_' + str(suf_num)) + ',' + suf
-            suf_num = suf_num + 1
-        if suf != '' and suf != ',':
-            suf = '--suffixes ' + suf[:-1] + ' '
-        else:
-            suf = suf[:-1]
-
-        # 指定子目录扫描
-        s_num = 1
-        subdir = ''
-        # print(request.POST.get('subdirs_' + str(s_num)))
-        # print(request.POST.get('subdirs_3'))
-        while request.POST.get('subdirs_' + str(s_num)) is not None and request.POST.get(
-                'subdirs_' + str(s_num)) != '':
-            subdir = request.POST.get('subdirs_' + str(s_num)) + '/,' + subdir
-            s_num = s_num + 1
-
-        if subdir != '/,' and subdir != '':
-            subdir = '--subdirs ' + subdir[:-1] + ' '
-        else:
-            subdir = subdir[:-2]
-
-        # 清空上次扫描数据
-        open(base_file_path, 'w').close()
-        # 基础命令拼接
-        c = 'python dirscan/dirsearch/dirsearch.py' + \
-            options + enter_url + recursive + pre + suf + subdir + \
-            '--json-report ' + base_file_path
-        print(c)
-        os.system(c)
-
-    return render(request, "dir-scan.html", fixes)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})

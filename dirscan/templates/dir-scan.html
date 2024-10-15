@@ -8,6 +8,22 @@
 {% block title %}目录识别{% endblock %}
 
 {% block css %}
+    <style>
+        .abort-btn, .delete-btn {
+            background-color: transparent;
+            color: #000000;
+            border: 1px solid #cccccc;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .abort-btn:hover, .delete-btn:hover {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 {% endblock %}
 
 {% block contents %}
@@ -56,7 +72,7 @@
                         </span>
                         <input type="text" name="url" placeholder="请输入正确的URL" minlength="11" maxlength="39" required=""  autocomplete="off" class="form-control  form-control-lg">
                     </div>
-                    <button  class="scan-btn btn btn-lg btn-indigo float-left" id="py1"  name="app" value="提交">目录识别</button>
+                    <button type="submit" class="scan-btn btn btn-lg btn-indigo float-left" id="py1"  name="app" value="提交">目录识别</button>
                     <br><br><br><br>
                     <!--扫描选项 -->
                     <div class="hr-text">扫描选项</div>
@@ -111,9 +127,9 @@
                                     <input class="form-check-input" type="radio" name="r_check" value="r_no" checked>
                                     <span class="form-check-label">否</span>
                                 </label>
-{#                            <!--查看结果 -->#}
-{#                            <br>#}
-{#                            <a href="{% url 'dir-result' %}" target="_blank" class="btn btn-pink btn-pill">查看扫描结果</a>#}
+                            <!--查看结果 -->
+                            <!-- <br>
+                            <a href="{% url 'dir-result' %}" target="_blank" class="btn btn-pink btn-pill">查看扫描结果</a> -->
                         </div>
                         <!--自定义扫描选项 -->
                         <div class="col-md-4 text-center " >
@@ -170,12 +186,73 @@
                         <table class="table table-bordered">
                             <tbody style="text-align: center;">
                             <tr style="text-align: center;">
-{#                                <div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div>#}
+                                <div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div>
                             </tr>
                             </tbody>
                         </table>
                 </div>
             </div>
+        </div>
+        <!--扫描列表卡片-->
+        <div class="container-xl">
+            <div class="card card-sm">
+                <div class="card-body">
+                    <!-- 卡片边缘缎带 -->
+                    <div class="ribbon ribbon-top ribbon-left bg-azure">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-comet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M15.5 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5z" />
+                            <line x1="4" y1="4" x2="11" y2="11" />
+                            <line x1="9" y1="4" x2="12.5" y2="7.5" />
+                            <line x1="4" y1="9" x2="7.5" y2="12.5" />
+                        </svg>
+                    </div>
+                    <span class="card-title text-center">
+                        目录识别列表
+                    </span>
+                    <!--结果表格-->
+                    <div class="table-responsive" id="refresh">
+                        <table id="table" class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>目标</th>
+                                    <th>状态</th>
+                                    <th>扫描时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for scan in scans %}
+                                <tr id="scan-row-{{ scan.id }}">
+                                    <td>{{ scan.id }}</td>
+                                    <td>{{ scan.target }}</td>
+                                    <td id="scan-progress-{{ scan.id }}">
+                                        {% if scan.status == 'process' %}
+                                        进行中
+                                        {% elif scan.status == 'finish' %}
+                                        完成
+                                        {% else %}
+                                        {{ scan.status }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ scan.scan_time }}</td>
+                                    <td id="scan-actions-{{ scan.id }}">
+                                        {% if scan.status == 'process' %}
+                                        <button class="abort-btn" data-scan-id="{{ scan.id }}">停止</button>
+                                        {% elif scan.status == 'finish' %}
+                                        <a href="{% url 'dir-result' scan_id=scan.id %}" class="btn btn-primary btn-sm">查看结果</a>
+                                        {% endif %}
+                                        <button class="delete-btn" data-scan-id="{{ scan.id }}">删除</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -237,13 +314,110 @@
     <!--按钮点击事件-->
     <script>
         $(document).ready(function(){
-            $(".scan-btn").click(function(){
-              layer.msg('正在扫描，请稍后...',{icon: 1,offset: '220px',area: ['200px', '70px']});
-                  {#function(){setTimeout(window.location.href="{% url 'dir-result' %}",2000);}#}
-                  window.setTimeout("window.location='{% url 'dir-result' %}'",30000);
-              $('.jincheng').show();
-              $('tbody').html('<tr><td><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
+            $("#scan-form").on('submit', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(response){
+                        if(response.status === 'success'){
+                            layer.msg('正在扫描，请稍后...', {icon: 1, offset: '220px', area: ['200px', '70px']});
+                            $('.jincheng').show();
+                            $('tbody').html('<tr><td colspan="5"><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
+                            setTimeout(function(){
+                                refreshScanList();
+                            }, 5000);
+                        } else {
+                            layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
+                        }
+                    },
+                    error: function(){
+                        layer.msg('请求失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
+                    }
+                });
             });
+
+            function refreshScanList() {
+                $.ajax({
+                    url: "{% url 'dir-scan' %}",
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function(response) {
+                        var newTable = $(response).find('#table tbody').html();
+                        $('#table tbody').html(newTable);
+                    },
+                    error: function() {
+                        layer.msg('刷新列表失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
+                    }
+                });
+            }
+
+            // Existing abort and delete functions
+            $('#table').on('click', '.abort-btn', function() {
+                var confirmAbort = confirm('确定要停止该扫描吗?');
+                if (confirmAbort) {
+                    var scan_id = $(this).data("scan-id");
+                    abort_scan(scan_id);
+                }
+            });
+
+            function abort_scan(scan_id) {
+                $.ajax({
+                    url: "{% url 'abort_dirscan' %}",
+                    type: "POST",
+                    data: {scan_id: scan_id},
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (response) {
+                        if (response.code == 200) {
+                            layer.msg('停止扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
+                            setTimeout(function() {
+                                refreshScanList();
+                            }, 1500);
+                        } else {
+                            layer.msg('停止扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
+                        }
+                    },
+                    error: function () {
+                        layer.msg('请求失败', {icon: 2, offset: '100px', area: ['120px', '70px']});
+                    }
+                });
+            }
+
+            $('#table').on('click', '.delete-btn', function() {
+                var confirmDelete = confirm('确定要删除该扫描记录吗?');
+                if (confirmDelete) {
+                    var scan_id = $(this).data("scan-id");
+                    delete_scan(scan_id);
+                }
+            });
+
+            function delete_scan(scan_id) {
+                $.ajax({
+                    url: "/delete_dirscan",
+                    type: "POST",
+                    data: {scan_id: scan_id},
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (response) {
+                        if (response.code == 200) {
+                            layer.msg('删除扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
+                            setTimeout(function() {
+                                refreshScanList();
+                            }, 1500);
+                        } else {
+                            layer.msg('删除扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
+                        }
+                    },
+                    error: function () {
+                        layer.msg('请求失败', {icon: 2, offset: '100px', area: ['120px', '70px']});
+                    }
+                });
+            }
         });
     </script>
 {% endblock %}

@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from .models import Category, Item, FingerPrint, FpCategory, PortList, Log
 from django.contrib.auth.decorators import login_required
 from .utils import create_log_entry
-
 # Create your views here.
 
 def welcome(request):
