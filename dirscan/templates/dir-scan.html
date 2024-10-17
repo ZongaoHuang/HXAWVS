@@ -65,7 +65,7 @@
                       <line x1="21" y1="21" x2="15" y2="15" />
                     </svg>
                 </div>
-                <form id="scan-form" action="{% url 'dir-search' %}" method="post">
+                <form id="scan-form" action="{% url 'dir-create' %}" method="post">
                     {% csrf_token %}
                     <!-- 输入框&提交按钮 -->
                     <div class="fixed_scan input-icon mb-3 float-left" style="width: 80%">
@@ -234,7 +234,6 @@
                                     <th data-sortable="true" data-field="id">ID</th>
                                     <th data-sortable="true" data-field="target">扫描目标</th>
                                     <th data-sortable="true" data-field="status">扫描状态</th>
-
                                     <th data-sortable="true" data-field="scan_time">扫描时间</th>
                                     <th data-sortable="true" data-field="result_path">识别结果</th>
                                     <th data-sortable="true" data-field="operations">操作</th>
@@ -255,6 +254,15 @@
                                             <a class="btn bg-green-lt btn-block">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>
                                                 已完成
+                                            </a>
+                                            {% elif scan.status == 'aborted' %}
+                                            <a class="btn bg-red-lt btn-block">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <circle cx="12" cy="12" r="9" />
+                                                    <path d="M10 10l4 4m0 -4l-4 4" />
+                                                </svg>
+                                                已终止
                                             </a>
                                         {% endif %}
                                     </td>
@@ -308,7 +316,7 @@
             });
     </script>
     <!-- 消息弹层组件 依赖jquery -->
-    <script src="{% static 'plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'layer/layer.js' %}"></script>
     <!--自定义扫描选项-->
     <script>
         {#前缀-动态添加输入框#}
@@ -354,15 +362,18 @@
                 var formData = $(this).serialize();
                 var url = $('input[name="url"]').val();
                 if (url) {
+                    
                     $.ajax({
                         url: "{% url 'dir-create' %}",
                         type: 'POST',
                         data: formData,
                         dataType: 'json',
                         success: function(response){
+                            location.reload();
                             if(response.status === 'success'){
                                 layer.msg('扫描已创建', {icon: 1, offset: '220px', area: ['200px', '70px']});
                                 startScan(response.scan_id, formData);
+                                
                             } else {
                                 layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
                             }
@@ -371,6 +382,7 @@
                             layer.msg('请求失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
                         }
                     });
+                    location.reload();
                 } else {
                     layer.msg('请输入URL', {icon: 2, offset: '220px', area: ['200px', '70px']});
                 }
@@ -385,28 +397,16 @@
                     success: function(response){
                         if(response.status === 'success'){
                             layer.msg('扫描已开始', {icon: 1, offset: '220px', area: ['200px', '70px']});
-                            checkScanStatus(scanId);
                         } else {
+                            // Change the status to aborted
+                            abort_scan(scanId);
                             layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
                         }
                     },
                     error: function(){
+                        // Change the status to aborted
+                        abort_scan(scanId);
                         layer.msg('开始扫描失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
-                    }
-                });
-            }
-
-            function refreshScanList() {
-                $.ajax({
-                    url: "{% url 'dir-scan' %}",
-                    type: 'GET',
-                    dataType: 'html',
-                    success: function(response) {
-                        var newTable = $(response).find('#table tbody').html();
-                        $('#table tbody').html(newTable);
-                    },
-                    error: function() {
-                        layer.msg('刷新列表失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
                     }
                 });
             }
@@ -429,11 +429,9 @@
                         withCredentials: true
                     },
                     success: function (response) {
+                        location.reload();
                         if (response.code == 200) {
                             layer.msg('停止扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
-                            setTimeout(function() {
-                                refreshScanList();
-                            }, 1500);
                         } else {
                             layer.msg('停止扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
                         }
@@ -461,11 +459,10 @@
                         withCredentials: true
                     },
                     success: function (response) {
+                        location.reload();
                         if (response.code == 200) {
                             layer.msg('删除扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
-                            setTimeout(function() {
-                                refreshScanList();
-                            }, 1500);
+                            
                         } else {
                             layer.msg('删除扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
                         }
@@ -476,31 +473,18 @@
                 });
             }
 
-            function checkScanStatus(scanId) {
-                $.ajax({
-                    url: "{% url 'check_scan_status' %}",
-                    type: "GET",
-                    data: { scan_id: scanId },
-                    success: function(response) {
-                        var scanRow = $('#scan-row-' + scanId);
-                        if (response.status === 'finish') {
-                            scanRow.find('td:eq(2)').html('<span class="badge bg-green">已完成</span>');
-                            scanRow.find('td:eq(4)').html('<a href="{% url "dir-result" scan_id=0 %}'.replace('0', scanId) + '">查看结果</a>');
-                            scanRow.find('td:eq(5)').html('<button class="delete-btn" data-scan-id="' + scanId + '"><i class="fas fa-trash delete-icon"></i></button>');
-                        } else if (response.status === 'process') {
-                            setTimeout(function() {
-                                checkScanStatus(scanId);
-                            }, 5000);
-                        } else {
-                            scanRow.find('td:eq(2)').html('<span class="badge bg-red">' + response.status + '</span>');
-                            scanRow.find('td:eq(5)').html('<button class="delete-btn" data-scan-id="' + scanId + '"><i class="fas fa-trash delete-icon"></i></button>');
-                        }
-                    },
-                    error: function() {
-                        console.log('检查扫描状态失败');
-                    }
-                });
-            }
+        });
+    </script>
+    <script>
+        function startAutoRefresh() {
+            setInterval(function() {
+                
+                location.reload();
+            }, 10000); // Refresh every 5 seconds
+        }
+
+        $(document).ready(function() {
+            startAutoRefresh();
         });
     </script>
 {% endblock %}

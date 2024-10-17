@@ -56,7 +56,6 @@ def dir_scan(request):
     }
     return render(request, "dir-scan.html", context)
 
-
 @csrf_exempt
 @login_required
 def abort_dirscan(request):
@@ -89,11 +88,3 @@ def delete_dirscan(request):
             return JsonResponse({'code': 404, 'message': 'Scan not found'})
     return JsonResponse({'code': 405, 'message': 'Method not allowed'})
 
-@login_required
-def check_scan_status(request):
-    scan_id = request.GET.get('scan_id')
-    try:
-        scan = DirectoryScan.objects.get(id=scan_id, user=request.user)
-        return JsonResponse({'status': scan.status})
-    except DirectoryScan.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Scan not found'}, status=404)
