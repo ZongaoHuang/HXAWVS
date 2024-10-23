@@ -210,6 +210,13 @@
                         目录识别列表
                     </span>
                     <!--结果表格-->
+                    <div id="toolbar" class="select">
+                        <select class="form-control">
+                          <option value="">导出当前页数据</option>
+                          <option value="all">导出所有数据</option>
+          {#                <option value="selected">导出选中数据</option>#}
+                        </select>
+                    </div>  
                     <div class="table-responsive" id="refresh">
                         <table class="table text-center" id="table"
                             data-toggle="table"
@@ -292,14 +299,43 @@
 {% endblock %}
 
 {% block js %}
-    <!--Bootsrap Select-->
-    <script src="{% static 'plugins/bootstarp-select/bootstrap.min.js' %}"></script>
-    <script src="{% static 'plugins/bootstarp-select/bootstrap-select.min.js' %}"></script>
-
     <!--Bootsrap Table-->
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
+    <!--Table export-->
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script src="//cdn.bootcss.com/bootstrap-table/1.15.3/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF/jspdf.min.js"></script>
+    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
 
+    <!--Table export-->
+    <script>
+        var $table = $('#table')
+        $(function() {
+    $('#toolbar').find('select').change(function () {
+      $table.bootstrapTable('destroy').bootstrapTable({
+        exportDataType: $(this).val(),
+        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+        {#columns: [#}
+        {#  {#}
+        {#    field: 'state',#}
+        {#    checkbox: true,#}
+        {#    visible: $(this).val() === 'selected'#}
+        {#  }#}
+        {#]#}
+      })
+    }).trigger('change')
+  })
+    </script>
+    
+{#    <script>#}
+    {#        $(function () {#}
+    {#        setInterval(function () {#}
+    {#            $("#refresh").load(location.href + " #refresh")#}
+                {#$.getScript("https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js");#}
+    {#        },1000)#}
+    {#        })#}
+    {#    </script>#}
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
     <script type="text/javascript">

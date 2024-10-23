@@ -1,4 +1,6 @@
-from django.shortcuts import render
+import json
+import os
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -9,7 +11,7 @@ from .plugins.common.common import success, error, addslashes, getdomain, getdom
 import time
 from .plugins.common.common import getuserip
 from .plugins.loginfo.loginfo import LogHandler
-
+from .models import PortScan, InfoLeak, FingerPrint
 MYLOGGER = LogHandler(time.strftime("%Y-%m-%d", time.localtime()) + 'log')
 
 
@@ -22,15 +24,67 @@ def port_scan(request):
     from .plugins.portscan.portscan import ScanPort
     ip = request.POST.get('ip')
     if check_ip(ip):
+        scan = PortScan.objects.create(
+            user=request.user,
+            target=ip,
+            status='process'
+        )
         result = ScanPort(ip).pool()
+        
+        # Save the result to a file
+        result_path = f'port_scan_results/port_scan_{scan.id}.json'
+        os.makedirs(os.path.dirname(result_path), exist_ok=True)
+        with open(result_path, 'w') as f:
+            json.dump(result, f)
+        
+        scan.result_path = result_path
+        scan.status = 'finish'
+        scan.save()
+        
         MYLOGGER.info(
             'M:' + request.method + ' P:' + request.path + ' UPOST:' + str(request.POST) + ' SC:200 UIP:' + getuserip(
                 request) + ' RDATA:' + str(result))
         return success(200, result, 'ok!')
     return error(400, '请填写正确的IP地址', 'error')
-
+@csrf_exempt 
+@login_required
+def port_scan_result(request, scan_id):
+    scan = get_object_or_404(PortScan, id=scan_id, user=request.user)
+    with open(scan.result_path, 'r') as f:
+        result = json.load(f)
+    return render(request, 'scan/port_scan_result.html', {'scan': scan, 'result': result})
 
 @csrf_exempt
+@login_required
+def get_port_scans(request):
+    scans = PortScan.objects.filter(user=request.user).order_by('-scan_time')
+    scan_data = []
+    for scan in scans:
+        scan_data.append({
+            'id': scan.id,
+            'target': scan.target,
+            'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': scan.status,
+            'result_path': scan.result_path
+        })
+    return success(200, scan_data, 'ok')
+
+@csrf_exempt
+@login_required
+def delete_port_scan(request):
+    scan_id = request.POST.get('scan_id')
+    try:
+        scan = PortScan.objects.get(id=scan_id, user=request.user)
+        if scan.result_path:
+            if os.path.exists(scan.result_path):
+                os.remove(scan.result_path)
+        scan.delete()
+        return success(200, {'success': True}, 'Scan deleted successfully')
+    except PortScan.DoesNotExist:
+        return error(404, {'success': False}, 'Scan not found')
+
+@csrf_exempt
+@login_required
 def info_leak(request):
     """
     信息泄漏检测
@@ -38,12 +92,68 @@ def info_leak(request):
     from .plugins.infoleak.infoleak import get_infoleak
     url = check_url(request.POST.get('url'))
     if url:
+        scan = InfoLeak.objects.create(
+            user=request.user,
+            target=url,
+            status='process'
+        )
         result = get_infoleak(url)
+        
+        # Save the result to a file
+        result_path = f'info_leak_results/info_leak_{scan.id}.json'
+        os.makedirs(os.path.dirname(result_path), exist_ok=True)
+        with open(result_path, 'w') as f:
+            json.dump(result, f)
+        
+        scan.result_path = result_path
+        scan.status = 'finish'
+        scan.save()
+        
         MYLOGGER.info(
             'M:' + request.method + ' P:' + request.path + ' UPOST:' + str(request.POST) + ' SC:200 UIP:' + getuserip(
                 request) + ' RDATA:' + str(result))
-        return success(200, result, 'ok')
+        return success(200, {'scan_id': scan.id}, 'ok')
     return error(400, '请填写正确的URL地址', 'error')
+
+@csrf_exempt
+@login_required
+def info_leak_result(request, scan_id):
+    scan = get_object_or_404(InfoLeak, id=scan_id, user=request.user)
+    with open(scan.result_path, 'r') as f:
+        result = json.load(f)
+    return render(request, 'scan/info_leak_result.html', {'scan': scan, 'result': result})
+
+@csrf_exempt
+@login_required
+def get_info_leak(request):
+    scans = InfoLeak.objects.filter(user=request.user).order_by('-scan_time')
+    scan_data = []
+    for scan in scans:
+        scan_data.append({
+            'id': scan.id,
+            'target': scan.target,
+            'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': scan.status,
+            'result_path': scan.result_path
+        })
+    return success(200, scan_data, 'ok')
+
+@csrf_exempt
+@login_required
+def delete_info_leak(request):
+    scan_id = request.POST.get('scan_id')
+    try:
+        scan = InfoLeak.objects.get(id=scan_id, user=request.user)
+        if scan.result_path:
+            if os.path.exists(scan.result_path):
+                os.remove(scan.result_path)
+        scan.delete()
+        return success(200, {'success': True}, 'Scan deleted successfully')
+    except InfoLeak.DoesNotExist:
+        return error(404, {'success': False}, 'Scan not found')
+   
+
+
 
 
 @csrf_exempt
@@ -149,6 +259,89 @@ def what_cms(request):
             request.POST) + ' SC:200 UIP:' + getuserip(request) + ' RDATA:' + str(result))
         return success(200, result, 'ok')
     return error(400, '请填写正确的URL地址', 'error')
+
+
+@csrf_exempt
+@login_required
+def finger_print(request):
+    """
+    指纹识别
+    """
+    from .plugins.whatcms.whatcms import getwhatcms
+    from .plugins.waf.waf import getwaf
+    from .plugins.cdnexist.cdnexist import iscdn
+    from .plugins.webweight.webweight import get_web_weight
+    from .plugins.baseinfo.baseinfo import getbaseinfo
+    
+    url = check_url(request.POST.get('url'))
+    if url:
+        scan = FingerPrint.objects.create(
+            user=request.user,
+            target=url,
+            status='process'
+        )
+        
+        result = {
+            'whatcms': getwhatcms(url),
+            'waf': getwaf(url),
+            'cdn': iscdn(url),
+            'weight': get_web_weight(url),
+            'baseinfo': getbaseinfo(url)
+        }
+        
+        # Save the result to a file
+        result_path = f'finger_print_results/finger_print_{scan.id}.json'
+        os.makedirs(os.path.dirname(result_path), exist_ok=True)
+        with open(result_path, 'w') as f:
+            json.dump(result, f)
+        
+        scan.result_path = result_path
+        scan.status = 'finish'
+        scan.save()
+        
+        MYLOGGER.info(
+            'M:' + request.method + ' P:' + request.path + ' UPOST:' + str(request.POST) + ' SC:200 UIP:' + getuserip(
+                request) + ' RDATA:' + str(result))
+        return success(200, {'scan_id': scan.id}, 'ok')
+    return error(400, '请填写正确的URL地址', 'error')
+
+@csrf_exempt
+@login_required
+def finger_print_result(request, scan_id):
+    scan = get_object_or_404(FingerPrint, id=scan_id, user=request.user)
+    with open(scan.result_path, 'r') as f:
+        result = json.load(f)
+    return render(request, 'scan/finger_print_result.html', {'scan': scan, 'result': result})
+
+@csrf_exempt
+@login_required
+def get_finger_print(request):
+    scans = FingerPrint.objects.filter(user=request.user).order_by('-scan_time')
+    scan_data = []
+    for scan in scans:
+        scan_data.append({
+            'id': scan.id,
+            'target': scan.target,
+            'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': scan.status,
+            'result_path': scan.result_path
+        })
+    return success(200, scan_data, 'ok')
+
+@csrf_exempt
+@login_required
+def delete_finger_print(request):
+    scan_id = request.POST.get('scan_id')
+    try:
+        scan = FingerPrint.objects.get(id=scan_id, user=request.user)
+        if scan.result_path:
+            if os.path.exists(scan.result_path):
+                os.remove(scan.result_path)
+        scan.delete()
+        return success(200, {'success': True}, 'Scan deleted successfully')
+    except FingerPrint.DoesNotExist:
+        return error(404, {'success': False}, 'Scan not found')
+
 
 
 @csrf_exempt
