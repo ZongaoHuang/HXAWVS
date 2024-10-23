@@ -93,3 +93,13 @@ class Log(models.Model):
     def formatted_action_time(self):
         return self.action_time.strftime("%Y-%m-%d %H:%M:%S")
     formatted_action_time.short_description = '操作时间'
+
+class VulnList(models.Model):
+    '''漏洞列表'''
+    # ID = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID')
+    vuln_name = models.CharField(max_length=200, verbose_name='漏洞名称')
+    vuln_details = models.CharField(max_length=200,verbose_name='漏洞描述',blank=True,default='未知')
+    vuln_type = models.CharField(max_length=200, verbose_name='漏洞分类', blank=True, default='未知')
+    class Meta:
+        verbose_name = '漏洞列表'
+        verbose_name_plural = '漏洞列表'

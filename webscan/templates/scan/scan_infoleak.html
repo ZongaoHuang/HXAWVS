@@ -7,6 +7,16 @@
 {% block title %} 信息泄露 {% endblock %}
 
 {% block css %}
+        <style>
+        #toolbar {
+          margin: 0;
+        }
+        /*修复分页next按钮布局*/
+       .page-item.page-next, .page-item.page-prev{
+           flex: 0 0 auto;
+       }
+    </style>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 {% endblock %}
 
 {% block contents %}
@@ -27,11 +37,6 @@
                     <br>
                 </div>
                 <p class="text-center">通过批量扫描检查网站是否存在信息泄漏问题！
-                    {% comment %} <!-- 提示框 -->
-                    <span class="form-help" data-trigger="hover" data-container="body" data-toggle="popover" data-placement="right" data-html="true"
-                          data-content="<p>端口扫描是指某些别有用心的人发送一组端口扫描消息，试图以此侵入某台计算机，并了解其提供的计算机网络服务类型。攻击者可以通过它了解到从哪里可探寻到攻击弱点。</p>
-                          <p class='mb-0'><a href='https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F/11056182?fr=aladdin'>详情</a></p>">?
-                    </span> {% endcomment %}
                 </p>
             </div>
         </div>
@@ -85,6 +90,80 @@
                 </div>
             </div>
         </div>
+        
+<!-- 扫描列表清单卡片 -->
+        <div class="container-xl" >
+          <div class="card card-sm">
+              <div class="card-body">
+                  <!-- 卡片边缘缎带 -->
+                  <div class="ribbon ribbon-top ribbon-left  bg-azure">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-comet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M15.5 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5z" />
+                        <line x1="4" y1="4" x2="11" y2="11" />
+                        <line x1="9" y1="4" x2="12.5" y2="7.5" />
+                        <line x1="4" y1="9" x2="7.5" y2="12.5" />
+                      </svg>
+                  </div>
+                  <span class="card-title text-center">
+                    扫描列表
+                  </span>
+                  <!--结果表格-->
+                  <div class="table-responsive" id="refresh">
+                      <table class="table text-center" id="infoleak_table"
+                        data-toggle="table"
+                        data-show-export="true"
+                        data-click-to-select="true"
+                        data-toolbar="#toolbar"
+                        data-search="true"
+                        data-show-refresh="true"
+                        data-auto-refresh="true"
+                        data-show-toggle="true"
+                        data-show-fullscreen="true"
+                        data-show-columns="true"
+                        data-show-columns-toggle-all="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-pagination="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, all]"
+                        data-response-handler="responseHandler">
+                          <thead class="table-primary">
+                              <tr>
+                                  <th data-sortable="true" data-field="id">ID</th>
+                                  <th data-sortable="true" data-field="target">扫描目标</th>
+                                  <th data-sortable="true" data-field="scan_time">扫描时间</th>
+                                  <th data-sortable="true" data-field="result_path">扫描结果</th>
+                                  <th data-sortable="true" data-field="delete">删除</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for scan in scans %}
+                                  <tr>
+                                      <td >{{ scan.id }}</td>
+                                      <td >{{scan.target}}</td>
+                                      <td class="text-secondary">{{ scan.scan_time }}</td>
+                                      <td>
+                                          {% if scan.status == 'finish' and scan.result_path %}
+                                          <a href="{% url 'info_leak_result' scan_id=scan.id %}">查看结果</a>
+                                          {% else %}
+                                          -
+                                          {% endif %}
+                                      </td>
+                                      <td>
+                                          {% if scan.status == 'process' %}
+                                              <button class="abort-btn" data-scan-id="{{ scan.id }}">停止扫描</button>
+                                          {% endif %}
+                                          <button class="delete-btn" data-scan-id="{{ scan.id }}"><i class="fas fa-trash delete-icon"></i></button>
+                                      </td>
+      
+                                  </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
 
         <div class="card">
             <div class="card-header">
@@ -211,6 +290,10 @@
 {% endblock %}
 
 {% block js %}
+    <!--Bootsrap Table-->
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
+    <!-- jquery-->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- 消息弹层组件 依赖jquery -->
     <script src="{% static 'plugins/layer/layer.js' %}"></script>
@@ -230,7 +313,7 @@
     </script>
     <!-- 查询按钮事件 -->
     <script type="text/javascript">
-        function get_webside_info(url) {
+        function get_info_leak(url) {
             $.post('/webscan_backend/info_leak',{
                 url: url
             }, function(data){
@@ -262,7 +345,7 @@
                     $(this).html('请稍等<span class="spinner-border spinner-border-sm me-2" role="status"></span>');
                     $('tbody').html('<tr><td><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
                     $('.scan-result').show();
-                    get_webside_info(url);
+                    get_info_leak(url);
                 } else {
                     $('input[name=siteip]').val('');
                     layer.msg('请输入正确的URL，\n例如:http://example.cn');
@@ -271,6 +354,55 @@
                 }
             });
         });
+      </script>
+      <script>
+        function refreshScanList() {
+          $.get('/webscan_backend/get_info_leak', function(response) {
+              if (response.code === 200) {
+                  var tableBody = $('#infoleak_table tbody');
+                  tableBody.empty();
+                  $.each(response.data, function(index, scan) {
+                      // Convert UTC time to Beijing time
+                      var scanTime = new Date(scan.scan_time + 'Z');
+                      scanTime.setHours(scanTime.getHours());
+                      var beijingTime = scanTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+                      
+                      var row = '<tr>' +
+                          '<td>' + scan.id + '</td>' +
+                          '<td>' + scan.target + '</td>' +
+                          '<td>' + beijingTime + '</td>' +
+                          '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/webscan_backend/info_leak_result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +
+                          '<td>' +
+                          (scan.status === 'process' ? '<button class="abort-btn" data-scan-id="' + scan.id + '">停止扫描</button>' : '') +
+                          '<button class="delete-btn" data-scan-id="' + scan.id + '"><i class="fas fa-trash delete-icon"></i></button>' +
+                          '</td>' +
+                          '</tr>';
+                      tableBody.append(row);
+                  });
+              } else {
+                  console.error('Failed to fetch scan list:', response.message);
+              }
+          });
+      }
+
+      setInterval(refreshScanList, 5000); // Refresh
+
+      $(document).on('click', '.delete-btn', function() {
+          var scanId = $(this).data('scan-id');
+          if (confirm('确定要删除该扫描记录吗？')) {
+              $.post('/webscan_backend/delete_info_leak', {
+                  scan_id: scanId
+              }, function(response) {
+                  if (response.code === 200 && response.data.success) {
+                      refreshScanList();
+                  } else {
+                      alert('Failed to delete scan: ' + response.message);
+                  }
+              }).fail(function() {
+                  alert('Failed to delete scan: Network error');
+              });
+          }
+      });
     </script>
 
 

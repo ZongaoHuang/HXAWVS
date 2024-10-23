@@ -337,7 +337,7 @@ class ScanPort():
             pass
 
     def pool(self):
-        out = []
+        out = {}
         try:
             if (not parse.urlparse(self.ipaddr).path) and (parse.urlparse(self.ipaddr).path != '/'):
                 self.ipaddr = self.ipaddr.replace('http://', '').replace('https://', '').rstrip('/')
@@ -353,16 +353,19 @@ class ScanPort():
             self.run(ipaddr)
         except Exception as e:
             pass
+        
         for i in self.out:
-            _, port = i.split(':')
-            out.append(port)
+            service, port = i.split(':')
+            out[port] = service
+        
         for i in self.port:
             if i not in out:
-                self.out.append(get_server(i))
+                out[i] = get_server(i)
+        
         if self.num == 0:
-            return list(set(self.out))
+            return out
         else:
-            return ['Portspoof:0']
+            return {'0': 'Portspoof'}
 
 
 if __name__ == "__main__":

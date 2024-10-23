@@ -3,7 +3,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Category, Item, FingerPrint, FpCategory, PortList, Log
 from django.contrib.auth.decorators import login_required
+from webscan_backend.models import PortScan, InfoLeak
 from .utils import create_log_entry
+import webscan_backend
 # Create your views here.
 
 def welcome(request):
@@ -74,9 +76,11 @@ def fingerprint(request):
     """指纹识别"""
     cms_items = FingerPrint.objects.all()
     categories = FpCategory.objects.all()
+    scans = webscan_backend.models.FingerPrint.objects.filter(user=request.user).order_by('-scan_time')
     context = {
         'cms_items': cms_items,
         'categories': categories,
+        'scans': scans
     }
     create_log_entry(request.user, '访问指纹识别页面')
     return render(request, 'scan/scan_fingerprint.html', context)
@@ -85,15 +89,23 @@ def fingerprint(request):
 def portscan(request):
     """端口扫描"""
     portlists = PortList.objects.all()
-    context = {'portlists': portlists}
+    scans = PortScan.objects.filter(user=request.user).order_by('-scan_time')
+    context = {
+        'portlists': portlists,
+        'scans': scans
+    }
     create_log_entry(request.user, '访问端口扫描页面')
     return render(request, 'scan/scan_portscan.html', context)
 
 @login_required
 def infoleak(request):
     """信息泄露"""
+    scans = InfoLeak.objects.filter(user=request.user).order_by('-scan_time')
+    context = {
+        'scans' : scans
+    }
     create_log_entry(request.user, '访问信息泄露页面')
-    return render(request, 'scan/scan_infoleak.html')
+    return render(request, 'scan/scan_infoleak.html', context)    
 
 @login_required
 def webside(request):
