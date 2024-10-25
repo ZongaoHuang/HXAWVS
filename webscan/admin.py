@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category,Item,PortList,FpCategory,FingerPrint, Log
+from .models import Category,Item,PortList,FpCategory,FingerPrint, Log, VulnList
 from import_export.admin import ImportExportModelAdmin
 from django.db import models
 from django.forms import TextInput
@@ -93,3 +93,12 @@ class LogAdmin(ImportExportModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+    
+    
+@admin.register(VulnList)
+class VulnListAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'vuln_name', 'vuln_details', 'vuln_type')
+    search_fields = ('vuln_name', 'vuln_details', 'vuln_type' )
+    readonly_fields = ['id', 'vuln_name', 'vuln_details', 'vuln_type']
+    ordering = ('id',)
+    list_per_page = 20

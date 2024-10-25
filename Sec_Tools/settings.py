@@ -236,5 +236,10 @@ SIMPLEUI_CONFIG = {
     'icon': 'fas fa-history',
     'url': '/admin/webscan/log/'
     },
+    {
+        'name': '漏洞列表',
+        'icon': 'fas fa-bug',
+        'url': '/admin/webscan/vulnlist/'
+    }
     ]
 }
