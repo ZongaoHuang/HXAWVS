@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.html import format_html
 from django.contrib.auth.models import User
+from django.utils import timezone
+import pytz
 # Create your models here.
 
 class Category(models.Model):
@@ -81,6 +83,7 @@ class Log(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
     action = models.CharField(max_length=200, verbose_name='操作')
     action_time = models.DateTimeField(auto_now_add=True, verbose_name='操作时间')
+    # action_time = models.DateTimeField(verbose_name='操作时间')
 
     class Meta:
         verbose_name = '操作日志'
@@ -91,7 +94,11 @@ class Log(models.Model):
         return f"{self.user} - {self.action} - {self.action_time}"
 
     def formatted_action_time(self):
-        return self.action_time.strftime("%Y-%m-%d %H:%M:%S")
+        # return self.action_time.strftime("%Y-%m-%d %H:%M:%S")
+        # 直接转换为东八区时间
+        shanghai_tz = pytz.timezone('Asia/Shanghai')
+        shanghai_time = self.action_time.astimezone(shanghai_tz)
+        return shanghai_time.strftime("%Y-%m-%d %H:%M:%S")
     formatted_action_time.short_description = '操作时间'
 
 class VulnList(models.Model):

@@ -1,5 +1,6 @@
 import os
 
+import pytz
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
@@ -24,14 +25,14 @@ def dirresult(request, scan_id):
                 if url != 'time':
                     for item in details:
                         results.append({
-                            'url': url + item['path'],
+                            'path': item['path'],
                             'status': item['status'],
                             'content_length': item['content-length'],
                             'redirect': item.get('redirect', '')
                         })
             
             create_log_entry(request.user, f'查看目录识别结果: {scan.target}')
-            return render(request, "dir-result.html", {"results": results, "scan": scan, "key_list": [scan.target]})
+            return render(request, "dir-result.html", {"a": results, "scan": scan, "key_list": [scan.target]})
         else:
             error = "扫描结果未找到"
             return render(request, "dir-result.html", {"error": error, "scan": scan})
@@ -48,7 +49,8 @@ def dir_scan(request):
                 'id': scan.id,
                 'target': scan.target,
                 'status': scan.status,
-                'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+                # 'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'scan_time': (scan.scan_time.astimezone(pytz.timezone('Asia/Shanghai'))).strftime('%Y-%m-%d %H:%M:%S'),
                 'result_path': scan.result_path,
             }
             for scan in scans
