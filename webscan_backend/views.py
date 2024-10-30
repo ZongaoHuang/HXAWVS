@@ -15,8 +15,8 @@ from .models import PortScan, InfoLeak, FingerPrint
 MYLOGGER = LogHandler(time.strftime("%Y-%m-%d", time.localtime()) + 'log')
 
 
-@csrf_exempt  # 标识一个视图可以被跨域访问
-@login_required  # 用户登陆系统才可以访问
+@csrf_exempt
+@login_required
 def port_scan(request):
     """
     获取开放端口列表
@@ -29,13 +29,22 @@ def port_scan(request):
             target=ip,
             status='process'
         )
-        result = ScanPort(ip).pool()
         
-        # Save the result to a file
+        # 获取扫描结果
+        port_dict = ScanPort(ip).pool()
+        
+        # 转换结果格式为列表格式，用于实时显示
+        result = []
+        for port, service in port_dict.items():
+            if ':' in service:  # 如果服务名已经包含端口号
+                service, _ = service.split(':')
+            result.append(f"{service}:{port}")
+        
+        # 保存原始字典格式，用于结果页面显示
         result_path = f'port_scan_results/port_scan_{scan.id}.json'
         os.makedirs(os.path.dirname(result_path), exist_ok=True)
         with open(result_path, 'w') as f:
-            json.dump(result, f)
+            json.dump(port_dict, f)
         
         scan.result_path = result_path
         scan.status = 'finish'
@@ -46,6 +55,9 @@ def port_scan(request):
                 request) + ' RDATA:' + str(result))
         return success(200, result, 'ok!')
     return error(400, '请填写正确的IP地址', 'error')
+
+
+
 @csrf_exempt 
 @login_required
 def port_scan_result(request, scan_id):
@@ -280,16 +292,49 @@ def finger_print(request):
             target=url,
             status='process'
         )
+
+        # 1. 获取基本信息
+        base_info = getbaseinfo(url)
+        if base_info['code'] != 200:
+            base_info = {
+                'domain': 'error',
+                'ip': ['error'],
+                'server': 'error',
+                'language': 'error',
+                'os': 'error'
+            }
         
+        # 2. 网站权重
+        weight_info = get_web_weight(url)
+        
+        # 3. CDN检测
+        cdn_result = iscdn(url)
+        if cdn_result == '目标站点不可访问':
+            cdn_status = '网络错误'
+        else:
+            cdn_status = '存在CDN（源IP可能不正确）' if cdn_result else '无CDN'
+            
+        # 4. WAF检测
+        waf_info = getwaf(url)
+        
+        # 5. CMS指纹
+        cms_info = getwhatcms(url)
+
+        # 整合所有结果
         result = {
-            'whatcms': getwhatcms(url),
-            'waf': getwaf(url),
-            'cdn': iscdn(url),
-            'weight': get_web_weight(url),
-            'baseinfo': getbaseinfo(url)
+            'domain': base_info.get('domain', 'error'),
+            'source_ip': base_info.get('ip', ['error'])[0] if isinstance(base_info.get('ip'), list) else 'error',
+            'script_lang': base_info.get('language', 'error'),
+            'server_os': base_info.get('os', 'error'),
+            'server_middleware': base_info.get('server', 'error'),
+            'site_weight': weight_info,
+            'cdn_isexsit': cdn_status,
+            'waf': waf_info,
+            'cms_finger': cms_info,
+            'register': base_info.get('register', '')  # 添加注册信息链接
         }
         
-        # Save the result to a file
+        # 保存结果到文件
         result_path = f'finger_print_results/finger_print_{scan.id}.json'
         os.makedirs(os.path.dirname(result_path), exist_ok=True)
         with open(result_path, 'w') as f:

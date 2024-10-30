@@ -11,4 +11,5 @@ urlpatterns = [
     path('login_out/', views.login_out, name="login_out"),
     path('register/', views.register, name="register"),
     path('password-reset/', include('password_reset.urls'), name='password_reset'),
+    path('setting/', views.admin_redirect, name='setting'),  # 新增后台管理重定向
 ]

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as Login
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
 import json
 from .forms import RegisterForm
 from webscan.utils import create_log_entry
@@ -61,3 +62,16 @@ def login_out(request):
     return redirect("/index")  # 页面跳转
 
 
+def is_superuser(user):
+    """检查用户是否是超级用户"""
+    return user.is_superuser
+
+@login_required
+@user_passes_test(is_superuser)
+def admin_redirect(request):
+    """
+    重定向到Django管理后台
+    只允许超级用户访问
+    """
+    create_log_entry(request.user, '访问后台管理')
+    return redirect('/admin/')

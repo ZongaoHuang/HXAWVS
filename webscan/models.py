@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.html import format_html
 from django.contrib.auth.models import User
-# Create your models here.
+from django.utils import timezone
+import pytz
 
 class Category(models.Model):
     """安全导航条目分类"""
@@ -91,7 +92,9 @@ class Log(models.Model):
         return f"{self.user} - {self.action} - {self.action_time}"
 
     def formatted_action_time(self):
-        return self.action_time.strftime("%Y-%m-%d %H:%M:%S")
+        shanghai_tz = pytz.timezone('Asia/Shanghai')
+        shanghai_time = self.action_time.astimezone(shanghai_tz)
+        return shanghai_time.strftime("%Y-%m-%d %H:%M:%S")
     formatted_action_time.short_description = '操作时间'
     
     

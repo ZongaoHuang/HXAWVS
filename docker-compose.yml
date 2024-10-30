@@ -2,14 +2,14 @@ version: '3'
 
 services:
   hxscan-tool-beta:
-    image: sakura501/hxscan-tool:beta
+    image: sakura501/hxscan-tool:v1
     container_name: hxscan-tool-beta
     networks:
       - hxscan-network
     restart: unless-stopped
 
   hxscan-app-beta:
-    image: sakura501/hxscan-app:beta
+    image: snow7/hxscan-app:v1
     container_name: hxscan-app-beta
     ports:
       - "8000:8000"

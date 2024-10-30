@@ -71,10 +71,10 @@
                 <el-button :icon="loading?'el-icon-loading':''" @click="login()"
                            type="primary">登录</el-button>
             </div>
-            <div>
+            {% comment %} <div>
                 <a href="{% url 'register' %}" class="register" style="float: left; margin-right: 10px; " >注册</a>
 {#                <a href="{% url "password_reset_recover" %}" class="register" style="float: right; margin-right: 0px; " >忘记密码</a>#}
-            </div>
+            </div> {% endcomment %}
             <input type="hidden" name="next" value="{{ next }}"/>
         </form>
     {% endblock %}

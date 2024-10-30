@@ -1,5 +1,7 @@
 import os
 
+import pytz
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
@@ -48,7 +50,7 @@ def dir_scan(request):
                 'id': scan.id,
                 'target': scan.target,
                 'status': scan.status,
-                'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'scan_time': (scan.scan_time.astimezone(pytz.timezone('Asia/Shanghai'))).strftime('%Y-%m-%d %H:%M:%S'),
                 'result_path': scan.result_path,
             }
             for scan in scans

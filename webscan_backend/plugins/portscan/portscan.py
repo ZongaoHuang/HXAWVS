@@ -236,8 +236,8 @@ def get_server(port):
     }
     for k, v in SERVER.items():
         if v == port:
-            return '{}:{}'.format(k, port)
-    return 'Unknown:{}'.format(port)
+            return k  # 只返回服务名，不包含端口号
+    return 'Unknown'  # 只返回未知标记，不包含端口号
 
 
 PORTS = [21, 22, 23, 25, 26, 37, 47, 49, 53, 69, 70, 79, 80, 81, 82, 83, 84, 88, 89, 110, 111, 119, 123, 129, 135,

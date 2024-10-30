@@ -1,13 +1,15 @@
 import sqlite3
-from datetime import datetime
+
 
 conn = sqlite3.connect('db.sqlite3')
 c = conn.cursor()
 print("open database")
 
-# 获取当前日期和时间
-now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+# 删除表中的所有数据
+c.execute("DELETE FROM webscan_backend_infoleak")
 
-c.execute("INSERT INTO dirscan_directoryscan (target, user_id, scan_time, status) VALUES (?, ?, ?, ?)", ('s', 4, now, 'process'))
+# 重置自增主键的计数
+c.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'webscan_backend_infoleak'")
+
 conn.commit()
 conn.close()

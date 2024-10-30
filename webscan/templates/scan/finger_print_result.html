@@ -87,31 +87,38 @@
                           <td>{{ scan.scan_time }}</td>
                       </tr>
                       <tr>
-                          <td>CMS</td>
-                          <td>{{ result.whatcms.name }}</td>
-                      </tr>
+                        <td>域名</td>
+                        <td>{{ result.source_ip }}</td>
+                    </tr>
+                    <tr>
+                        <td>CDN</td>
+                        <td>{{ result.cdn_isexsit }}</td>
+                    </tr>
+                    <tr>
+                        <td>语言</td>
+                        <td>{{ result.script_lang }}</td>
+                    </tr>
+
                       <tr>
                           <td>WAF</td>
                           <td>{{ result.waf }}</td>
                       </tr>
                       <tr>
-                          <td>CDN</td>
-                          <td>{{ result.cdn }}</td>
+                        <td>操作系统</td>
+                        <td>{{ result.server_os }}</td>
+                    </tr>
+                      <tr>
+                          <td>指纹框架</td>
+                          <td>{{ result.cms_finger }}</td>
                       </tr>
                       <tr>
-                          <td>网站权重</td>
-                          <td>{{ result.weight }}</td>
-                      </tr>
-                      <tr>
-                          <td>基本信息</td>
-                          <td>
-                              <ul class="list-unstyled mb-0">
-                                  {% for key, value in result.baseinfo.items %}
-                                  <li><strong>{{ key }}:</strong> {{ value }}</li>
-                                  {% endfor %}
-                              </ul>
-                          </td>
-                      </tr>
+                        <td>Web容器</td>
+                        <td>{{ result.server_middleware }}</td>
+                    </tr>
+                    <tr>
+                        <td>网站权重</td>
+                        <td>{{ result.site_weight }}</td>
+                    </tr>
                   </tbody>
               </table>
                 

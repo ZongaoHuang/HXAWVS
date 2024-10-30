@@ -20,16 +20,23 @@ get_ip_addresses() {
 # 定义函数以执行不同的操作
 init_services() {
     echo "Initializing services..."
-    # 拉取最新镜像
-    $DOCKER_COMPOSE pull
-    echo "Latest images pulled."
+
+    # 加载 Docker 镜像
+    echo "Loading Docker images..."
+    docker load -i hxscan-tool-v1.tar
+    echo "hxscan-tool image loaded."
+    docker load -i hxscan-app-v1.tar
+    echo "hxscan-app image loaded."
 
     # 停止旧容器（如果存在）
-    $DOCKER_COMPOSE down
+    docker stop hxscan-tool-beta
+    docker rm hxscan-tool-beta
+    docker stop hxscan-app-beta
+    docker rm hxscan-app-beta
     echo "Old containers stopped and removed."
 
     # 启动 hxscan-tool 服务
-    $DOCKER_COMPOSE up -d hxscan-tool
+    $DOCKER_COMPOSE up -d hxscan-tool-beta
     echo "hxscan-tool service started."
 
     # 等待一段时间，确保 hxscan-tool 有足够时间启动
@@ -37,17 +44,18 @@ init_services() {
     sleep 20  # 可以根据实际情况调整等待时间
 
     # 启动 hxscan-app 服务
-    $DOCKER_COMPOSE up -d hxscan-app
+    $DOCKER_COMPOSE up -d hxscan-app-beta
     echo "hxscan-app service started."
+    $DOCKER_COMPOSE restart hxscan-app-beta
 
     echo "Initialization completed."
 }
 
 start_services() {
     echo "Starting services..."
-    
+
     # 启动 hxscan-tool 服务
-    $DOCKER_COMPOSE start hxscan-tool
+    $DOCKER_COMPOSE start hxscan-tool-beta
     echo "hxscan-tool service started."
 
     # 等待一段时间，确保 hxscan-tool 有足够时间启动
@@ -55,8 +63,9 @@ start_services() {
     sleep 20  # 可以根据实际情况调整等待时间
 
     # 启动 hxscan-app 服务
-    $DOCKER_COMPOSE start hxscan-app
+    $DOCKER_COMPOSE start hxscan-app-beta
     echo "hxscan-app service started."
+    $DOCKER_COMPOSE restart hxscan-app-beta
 
     echo "All services started."
 
@@ -79,11 +88,11 @@ stop_services() {
 
 restart_services() {
     echo "Restarting services..."
-    $DOCKER_COMPOSE restart hxscan-tool
+    $DOCKER_COMPOSE restart hxscan-tool-beta
     echo "hxscan-tool restarted."
     echo "Waiting for hxscan-tool to restart..."
     sleep 20
-    $DOCKER_COMPOSE restart hxscan-app
+    $DOCKER_COMPOSE restart hxscan-app-beta
     echo "hxscan-app restarted."
     echo "All services restarted."
 }
@@ -94,6 +103,24 @@ down_services() {
     echo "All services stopped and removed."
 }
 
+update_app_service(){
+    # 加载 Docker 镜像
+    docker load -i hxscan-app-beta.tar
+    echo "hxscan-app image loaded."
+
+    # 停止旧容器（如果存在）
+    docker stop hxscan-app-beta
+    docker rm hxscan-app-beta
+    echo "Old app container stopped and removed."
+
+    # 启动 hxscan-app 服务
+    $DOCKER_COMPOSE up -d hxscan-app-beta
+    $DOCKER_COMPOSE restart hxscan-app-beta
+    echo "hxscan-app service started."
+
+    echo "update app service completed."
+}
+
 # 显示菜单并获取用户选择
 echo "Please choose an option:"
 echo "1) Initialize services"
@@ -101,7 +128,8 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-read -p "Enter choice [1-5]: " choice
+echo "6) update app service "
+read -p "Enter choice [1-6]: " choice
 
 # 根据用户选择执行相应的函数
 case "$choice" in
@@ -110,6 +138,7 @@ case "$choice" in
     3) stop_services ;;
     4) restart_services ;;
     5) down_services ;;
+    6) update_app_service;;
     *) echo "Invalid choice." ;;
 esac
 
