@@ -124,7 +124,7 @@ def info_leak(request):
         MYLOGGER.info(
             'M:' + request.method + ' P:' + request.path + ' UPOST:' + str(request.POST) + ' SC:200 UIP:' + getuserip(
                 request) + ' RDATA:' + str(result))
-        return success(200, {'scan_id': scan.id}, 'ok')
+        return success(200, result, 'ok')  # 直接返回结果，而不是scan_id
     return error(400, '请填写正确的URL地址', 'error')
 
 @csrf_exempt

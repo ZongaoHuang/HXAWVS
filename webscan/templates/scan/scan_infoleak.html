@@ -164,6 +164,7 @@
                   </div>
               </div>
           </div>
+        </div>
 
         <div class="card">
             <div class="card-header">
@@ -313,24 +314,26 @@
     </script>
     <!-- 查询按钮事件 -->
     <script type="text/javascript">
-        function get_info_leak(url) {
-            $.post('/webscan_backend/info_leak',{
-                url: url
-            }, function(data){
-                if(data.code == 200){
-                    $('tbody tr:first').html("<td class='table-primary'><strong>类型</strong></td><td class='table-primary'><strong>存在信息泄漏URL</strong></td>");
-                    $.each(data.data, function(index, obj){
-                        $('tbody').append('<tr><td> ' + obj[0] + ' </td> <td><a href="' + obj[1] +'" target="_blank" title="点击跳转"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></svg>' + obj[1] + '</a></td></tr>');
-                    });
-                     layer.msg('查询成功',{icon: 1,offset: '220px',area: ['70px', '70px']});
-                } else {
-                    layer.msg(data.data);
-                    $('input[name=siteip]').val('');
-                }
-                $(".scan-btn").text('重新扫描');
-                $('.scan-btn').attr('disabled', false);
-            });
-        }
+    function get_info_leak(url) {
+        $.post('/webscan_backend/info_leak', {
+            url: url
+        }, function(response) {
+            if(response.code == 200) {
+                $('tbody tr:first').html("<td class='table-primary'><strong>类型</strong></td><td class='table-primary'><strong>存在信息泄漏URL</strong></td>");
+                $.each(response.data, function(index, item) {
+                    var type = item[0] || "未知类型";
+                    var leakUrl = item[1] || "未知URL";
+                    $('tbody').append('<tr><td>' + type + '</td><td><a href="' + leakUrl + '" target="_blank" title="点击跳转"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></svg>' + leakUrl + '</a></td></tr>');
+                });
+                layer.msg('查询成功', {icon: 1, offset: '220px', area: ['70px', '70px']});
+            } else {
+                layer.msg(response.data);
+                $('input[name=siteurl]').val('');
+            }
+            $(".scan-btn").text('重新扫描');
+            $('.scan-btn').attr('disabled', false);
+        });
+    }
         $(function () {
             $(".scan-btn").click(function () {
                 $(this).attr('disabled', true);
@@ -343,7 +346,7 @@
                     }
                     //$(this).html('请稍等 <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>');
                     $(this).html('请稍等<span class="spinner-border spinner-border-sm me-2" role="status"></span>');
-                    $('tbody').html('<tr><td><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
+                    $('.scan-result tbody').html('<tr><td><div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div></td></tr>');
                     $('.scan-result').show();
                     get_info_leak(url);
                 } else {
@@ -355,6 +358,7 @@
             });
         });
       </script>
+
       <script>
         function refreshScanList() {
           $.get('/webscan_backend/get_info_leak', function(response) {
