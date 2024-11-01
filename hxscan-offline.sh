@@ -49,6 +49,16 @@ init_services() {
     $DOCKER_COMPOSE restart hxscan-app-beta
 
     echo "Initialization completed."
+
+    # 获取IP地址
+    IPs=$(get_ip_addresses)
+
+    # 输出访问URL
+    echo "You can access the application at:"
+    echo " - http://localhost:8000"
+    for IP in $IPs; do
+        echo " - http://$IP:8000"
+    done
 }
 
 start_services() {
