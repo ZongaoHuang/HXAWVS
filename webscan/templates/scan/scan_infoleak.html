@@ -131,6 +131,7 @@
                           <thead class="table-primary">
                               <tr>
                                   <th data-sortable="true" data-field="id">ID</th>
+                                  <th data-sortable="true" data-field="user">用户</th>
                                   <th data-sortable="true" data-field="target">扫描目标</th>
                                   <th data-sortable="true" data-field="scan_time">扫描时间</th>
                                   <th data-sortable="true" data-field="result_path">扫描结果</th>
@@ -141,7 +142,9 @@
                               {% for scan in scans %}
                                   <tr>
                                       <td >{{ scan.id }}</td>
+                                      <td>{{ scan.user.username }}</td>
                                       <td >{{scan.target}}</td>
+                                      
                                       <td class="text-secondary">{{ scan.scan_time }}</td>
                                       <td>
                                           {% if scan.status == 'finish' and scan.result_path %}
@@ -373,6 +376,7 @@
                       
                       var row = '<tr>' +
                           '<td>' + scan.id + '</td>' +
+                          '<td>' + scan.user + '</td>' +
                           '<td>' + scan.target + '</td>' +
                           '<td>' + beijingTime + '</td>' +
                           '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/webscan_backend/info_leak_result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +

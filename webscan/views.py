@@ -118,4 +118,3 @@ def subdomain(request):
     """子域名扫描"""
     create_log_entry(request.user, '访问子域名扫描页面')
     return render(request, 'scan/scan_subdomain.html')
-

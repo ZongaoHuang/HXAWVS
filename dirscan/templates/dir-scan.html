@@ -1,8 +1,3 @@
-{#<style>#}
-{#    body {#}
-{#        text-align: center;#}
-{#    }#}
-{#</style>#}
 {% extends 'layout/base.html' %}
 {% load static %}
 {% block title %}目录识别{% endblock %}
@@ -23,8 +18,6 @@
             background-color: #f2f2f2;
         }
     </style>
-    <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstarp.min.css' %}">
-    <link rel="stylesheet" href="{% static 'plugins/bootstrap-select/bootstrap-select.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 {% endblock %}
 
@@ -46,11 +39,6 @@
                     <br>
                 </div>
                 <p class="text-center">通过批量扫描检查网站目录名、探针文件、后台、robots.txt、备份文件等！
-                    <!-- 提示框 -->
-                    {% comment %} <span class="form-help" data-trigger="hover" data-container="body" data-toggle="popover" data-placement="right" data-html="true"
-                          data-content="<p>端口扫描是指某些别有用心的人发送一组端口扫描消息，试图以此侵入某台计算机，并了解其提供的计算机网络服务类型。攻击者可以通过它了解到从哪里可探寻到攻击弱点。</p>
-                          <p class='mb-0'><a href='https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F/11056182?fr=aladdin'>详情</a></p>">?
-                    </span> {% endcomment %}
                 </p>
             </div>
         </div>
@@ -141,9 +129,6 @@
                             </label>
                             <!--前后缀&子目录 -->
                             <div class="explain_text text-center" style="display: none;">
-{#                                <label class="form-label text-center">前后缀&子目录&nbsp;#}
-{#                                    <span class="form-help" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" data-content="<p>非必填，想要查找配置文件或备份吗？<br>eg:admin、~、- 等，非必填，若填写请在确认扫描类别时仅勾选一个，否则时间会久到离谱</p>">?</span>#}
-{#                                </label>#}
                                 <div class="row">
                                     <!--前缀 -->
                                     <div id="InputsWrapper_prefixe" class="not_fixed_scan col-sm-4 " style="display: none">
@@ -160,7 +145,6 @@
                                     <!--子目录 -->
                                     <div id="InputsWrapper" class="not_fixed_scan col-sm-4 " style="display: none">
                                     子目录：<a href="#" id="AddMoreTextBox" class="btn btn-tabler btn-icon" aria-label="Button"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
-{#                                    <br>#}
                                 </div>
                                 </div>
                             </div>
@@ -192,6 +176,7 @@
                 </div>
             </div>
         </div>
+
         <!--扫描列表卡片-->
         <div class="container-xl">
             <div class="card card-sm">
@@ -210,13 +195,6 @@
                         目录识别列表
                     </span>
                     <!--结果表格-->
-                    <div id="toolbar" class="select">
-                        <select class="form-control">
-                          <option value="">导出当前页数据</option>
-                          <option value="all">导出所有数据</option>
-          {#                <option value="selected">导出选中数据</option>#}
-                        </select>
-                    </div>  
                     <div class="table-responsive" id="refresh">
                         <table class="table text-center" id="table"
                             data-toggle="table"
@@ -226,6 +204,7 @@
                             data-search="true"
                             data-show-refresh="true"
                             data-auto-refresh="true"
+                            data-auto-refresh-interval="5"
                             data-show-toggle="true"
                             data-show-fullscreen="true"
                             data-show-columns="true"
@@ -302,40 +281,9 @@
     <!--Bootsrap Table-->
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
-    <!--Table export-->
-    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-    <script src="//cdn.bootcss.com/bootstrap-table/1.15.3/extensions/export/bootstrap-table-export.min.js"></script>
-    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF/jspdf.min.js"></script>
-    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.23.1/extensions/auto-refresh/bootstrap-table-auto-refresh.js"></script>
 
-    <!--Table export-->
-    <script>
-        var $table = $('#table')
-        $(function() {
-    $('#toolbar').find('select').change(function () {
-      $table.bootstrapTable('destroy').bootstrapTable({
-        exportDataType: $(this).val(),
-        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
-        {#columns: [#}
-        {#  {#}
-        {#    field: 'state',#}
-        {#    checkbox: true,#}
-        {#    visible: $(this).val() === 'selected'#}
-        {#  }#}
-        {#]#}
-      })
-    }).trigger('change')
-  })
-    </script>
-    
-{#    <script>#}
-    {#        $(function () {#}
-    {#        setInterval(function () {#}
-    {#            $("#refresh").load(location.href + " #refresh")#}
-                {#$.getScript("https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js");#}
-    {#        },1000)#}
-    {#        })#}
-    {#    </script>#}
+
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
     <script type="text/javascript">
@@ -355,6 +303,15 @@
     <script src="{% static 'layer/layer.js' %}"></script>
     <!--自定义扫描选项-->
     <script>
+        $(document).ready(function() {
+            // 初始化所有的 tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+            
+            // 为动态添加的元素重新初始化 tooltip
+            $('#table').on('mouseover', '[data-bs-toggle="tooltip"]', function() {
+                $(this).tooltip();
+            });
+        });
         {#前缀-动态添加输入框#}
         $(document).ready(function () {
             var InputCount_prefixe = 0;
@@ -405,11 +362,10 @@
                         data: formData,
                         dataType: 'json',
                         success: function(response){
-                            location.reload();
                             if(response.status === 'success'){
                                 layer.msg('扫描已创建', {icon: 1, offset: '220px', area: ['200px', '70px']});
                                 startScan(response.scan_id, formData);
-                                
+                                refreshScanList();  // 替换 location.reload()
                             } else {
                                 layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
                             }
@@ -465,9 +421,9 @@
                         withCredentials: true
                     },
                     success: function (response) {
-                        location.reload();
                         if (response.code == 200) {
                             layer.msg('停止扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
+                            refreshScanList();  // 替换 location.reload()
                         } else {
                             layer.msg('停止扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
                         }
@@ -495,10 +451,9 @@
                         withCredentials: true
                     },
                     success: function (response) {
-                        location.reload();
                         if (response.code == 200) {
                             layer.msg('删除扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
-                            
+                            refreshScanList();  // 替换 location.reload()
                         } else {
                             layer.msg('删除扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
                         }
@@ -510,17 +465,45 @@
             }
 
         });
-    </script>
-    <script>
-        function startAutoRefresh() {
-            setInterval(function() {
-                
-                location.reload();
-            }, 10000); // Refresh every 5 seconds
+        function refreshScanList() {
+            $.get('/get_dir_scan', function(response) {
+                if (response.code === 200) {
+                    var tableBody = $('#table tbody');
+                    tableBody.empty();
+                    $.each(response.data, function(index, scan) {
+                        var scanTime = new Date(scan.scan_time + 'Z');
+                        scanTime.setHours(scanTime.getHours());
+                        var beijingTime = scanTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+                        
+                        var statusHtml = '';
+                        if (scan.status === 'process') {
+                            statusHtml = '<a class="btn bg-azure-lt btn-block" data-bs-toggle="tooltip" data-bs-placement="top" title="若扫描状态长时间为处理中，则扫描可能被拦截，请手动停止。"><span class="spinner-border spinner-border-sm me-2" role="status"></span>处理中</a>';
+                        } else if (scan.status === 'finish') {
+                            statusHtml = '<a class="btn bg-green-lt btn-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>已完成</a>';
+                        } else if (scan.status === 'aborted') {
+                            statusHtml = '<a class="btn bg-red-lt btn-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>已终止</a>';
+                        }
+
+                        var row = '<tr>' +
+                            '<td>' + scan.id + '</td>' +
+                            '<td>' + scan.target + '</td>' +
+                            '<td>' + statusHtml + '</td>' +
+                            '<td class="text-secondary">' + beijingTime + '</td>' +
+                            '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/dirscan/dir-result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +
+                            '<td>' +
+                            (scan.status === 'process' ? '<button class="abort-btn" data-scan-id="' + scan.id + '">停止扫描</button>' : '') +
+                            '<button class="delete-btn" data-scan-id="' + scan.id + '"><i class="fas fa-trash delete-icon"></i></button>' +
+                            '</td>' +
+                            '</tr>';
+                        tableBody.append(row);
+                    });
+                } else {
+                    console.error('Failed to fetch scan list:', response.message);
+                }
+            });
         }
 
-        $(document).ready(function() {
-            startAutoRefresh();
-        });
+        // 设置自动刷新间隔
+        setInterval(refreshScanList, 5000);
     </script>
 {% endblock %}

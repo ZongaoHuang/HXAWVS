@@ -45,7 +45,7 @@ class Target(Base):
             self.logger.error('Search Target Failed......', exc_info=True)
             return None
 
-    def add(self, address, description=None):
+    def add(self, address, description):
         if not description:
             description = f'{address} 站点测试'
         data = {

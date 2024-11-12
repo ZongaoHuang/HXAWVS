@@ -191,6 +191,7 @@
                     <thead class="table-primary">
                         <tr>
                             <th data-sortable="true" data-field="id">ID</th>
+                            <th data-sortable="true" data-field="user">用户</th>
                             <th data-sortable="true" data-field="target">扫描目标</th>
                             <th data-sortable="true" data-field="scan_time">扫描时间</th>
                             <th data-sortable="true" data-field="result_path">扫描结果</th>
@@ -201,6 +202,7 @@
                         {% for scan in scans %}
                             <tr>
                                 <td >{{ scan.id }}</td>
+                                <td >{{scan.user.username}}</td>
                                 <td >{{scan.target}}</td>
                                 <td class="text-secondary">{{ scan.scan_time }}</td>
                                 <td>
@@ -753,6 +755,7 @@
                     
                     var row = '<tr>' +
                         '<td>' + scan.id + '</td>' +
+                        '<td>' + scan.user + '</td>' +
                         '<td>' + scan.target + '</td>' +
                         '<td>' + beijingTime + '</td>' +
                         '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/webscan_backend/finger_print_result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +
@@ -792,25 +795,53 @@
     $(".scan-btn").click(function () {
         let url = $('input[name=siteurl]').val();
         if(url){
-            $.post('/webscan_backend/finger_print', {
-                url: url
-            }, function(response) {
-                if (response.code === 200) {
-                    refreshScanList();
-                } else {
-                    alert(response.message);
+            // 禁用按钮并显示加载状态
+            $(this).attr('disabled', true);
+            $(this).text('扫描中...');
+            
+            // 显示进度条
+            $('.scan-result').show();
+            
+            $.ajax({
+                url: '/webscan_backend/finger_print',
+                type: 'POST',
+                data: {
+                    url: url
+                },
+                success: function(response) {
+                    if (response.code === 200) {
+                        // 扫描开始成功
+                        layer.msg('扫描任务已提交', {icon: 1});
+                        
+                        // 开始轮询扫描结果
+                        var checkStatus = setInterval(function() {
+                            $.get('/webscan_backend/get_finger_print', function(statusResponse) {
+                                if (statusResponse.code === 200) {
+                                    var scan = statusResponse.data.find(s => s.target === url);
+                                    if (scan && scan.status === 'finish') {
+                                        clearInterval(checkStatus);
+                                        refreshScanList();
+                                        layer.msg('扫描完成', {icon: 1});
+                                    }
+                                }
+                            });
+                        }, 2000);
+                        
+                    } else {
+                        layer.msg(response.message || '扫描失败', {icon: 2});
+                    }
+                },
+                error: function() {
+                    layer.msg('网络请求失败', {icon: 2});
+                },
+                complete: function() {
+                    // 恢复按钮状态
+                    $(".scan-btn").text('指纹查询');
+                    $(".scan-btn").attr('disabled', false);
                 }
-                $(".scan-btn").text('指纹查询');
-                $(".scan-btn").attr('disabled', false);
-            }).fail(function() {
-                alert('Failed to start scan: Network error');
-                $(".scan-btn").text('指纹查询');
-                $(".scan-btn").attr('disabled', false);
             });
         } else {
-            alert('请填写正确的URL地址');
-            $(".scan-btn").text('指纹查询');
-            $(".scan-btn").attr('disabled', false);
+            layer.msg('请填写正确的URL地址', {icon: 2});
         }
     });
 });

@@ -15,7 +15,7 @@
 		  <td style="text-align:center;">林～</td>
       </tr>
     <tr>
-		<td style="text-align:center;" ><img class="inverted" width="200" src="https://jwt1399.top/medias/avatar.png"></td>    
+		<td style="text-align:center;" ><img class="inverted" width="200" src=" medias/avatar.png"></td>    
 		<td style="text-align:center;"><img class="inverted" width="200" src="https://upload.jianshu.io/users/upload_avatars/16052738/fffbc8fc-a9c3-4a1c-ad56-157c32f57f79?imageMogr2/auto-orient/strip|imageView2/1/w/240/h/240"></td>  
 		<td style="text-align:center;" ><img class="inverted" width="200" src="https://pic3.zhimg.com/v2-6fb8dc878b496af2ec012c1f001865b2_xl.jpg"></td>
 		<td style="text-align:center;"><img class="inverted" width="200" src="https://tse2-mm.cn.bing.net/th/id/OIP.84TQxrsYyNGXAkgvPHEtyQAAAA?w=165&h=180&c=7&o=5&dpr=1.25&pid=1.7"></td>  
@@ -259,7 +259,7 @@
          <td style="text-align:center;">微信支付</td>
      </tr>
    <tr>
-    <td style="text-align:center;" ><img width="200" src="https://jwt1399.top/medias/reward/alipay.png"></td>    
-      <td style="text-align:center;"><img width="200" src="https://jwt1399.top/medias/reward/wechat.png"></td>     
+    <td style="text-align:center;" ><img width="200" src=" medias/reward/alipay.png"></td>    
+      <td style="text-align:center;"><img width="200" src=" medias/reward/wechat.png"></td>     
   </tr>
 </tbody></table>

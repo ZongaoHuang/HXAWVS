@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  hxscan-tool-beta:
+    image: sakura501/hxscan-tool:v1
+    container_name: hxscan-tool-beta
+    networks:
+      - hxscan-network
+    restart: unless-stopped
+
+  hxscan-app-beta:
+    image: sakura501/hxscan-app:v1
+    container_name: hxscan-app-beta
+    ports:
+      - "8000:8000"
+    environment:
+      - API_URL=https://hxscan-tool-beta:3443
+    depends_on:
+      - hxscan-tool-beta
+    networks:
+      - hxscan-network
+    restart: unless-stopped
+
+networks:
+  hxscan-network:
+    name: hxscan-network

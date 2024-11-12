@@ -7,11 +7,23 @@ from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
 import json
+from reports.views import success
 from webscan.utils import create_log_entry
 from .models import DirectoryScan
 from django.views.decorators.csrf import csrf_exempt
 
 base_file_path = 'dirscan/dirsearch/reports/target.json'
+
+@login_required
+def dir_scan(request):
+    """端口扫描"""
+    portlists = DirectoryScan.objects.all()
+    scans = DirectoryScan.objects.filter(user=request.user).order_by('-scan_time')
+    context = {
+        'scans': scans
+    }
+    create_log_entry(request.user, '访问目录扫描页面')
+    return render(request, 'dir-scan.html', context)
 
 @login_required
 def dirresult(request, scan_id):
@@ -41,22 +53,7 @@ def dirresult(request, scan_id):
         error = "扫描记录未找到"
         return render(request, "dir-result.html", {"error": error})
 
-@login_required
-def dir_scan(request):
-    scans = DirectoryScan.objects.filter(user=request.user).order_by('-scan_time')
-    context = {
-        'scans': [
-            {
-                'id': scan.id,
-                'target': scan.target,
-                'status': scan.status,
-                'scan_time': (scan.scan_time.astimezone(pytz.timezone('Asia/Shanghai'))).strftime('%Y-%m-%d %H:%M:%S'),
-                'result_path': scan.result_path,
-            }
-            for scan in scans
-        ]
-    }
-    return render(request, "dir-scan.html", context)
+
 
 @csrf_exempt
 @login_required
@@ -90,3 +87,19 @@ def delete_dirscan(request):
             return JsonResponse({'code': 404, 'message': 'Scan not found'})
     return JsonResponse({'code': 405, 'message': 'Method not allowed'})
 
+@csrf_exempt
+@login_required
+def get_dir_scan(request):
+    scans = DirectoryScan.objects.filter(user=request.user).order_by('-scan_time')
+    
+    scan_data = []
+    for scan in scans:
+        scan_data.append({
+            'id': scan.id,
+            'target': scan.target,
+            'scan_time': scan.scan_time.astimezone(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S'),
+            'status': scan.status,
+            'result_path': scan.result_path
+        })
+    
+    return success(200, scan_data, 'ok')

@@ -15,7 +15,7 @@ urlpatterns = [
     path("generate_report",views.generate_report, name="generate_report"),
     path("abort_scan",views.abort_scan, name="abort_scan"),
     path("delete_scan",views.delete_scan, name="delete_scan"),
-
+    path('get_vuln_scans', views.get_vuln_scans, name='get_vuln_scans'),
 ]
 
 target_ids = views.get_target_id()

@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+from urllib.parse import urlparse
 from django.http import HttpResponse
 import json
 import re
@@ -150,24 +151,30 @@ def check_ip(ipaddr=''):
 def check_url(url=''):
     """
     校验URL合法性
-    :param url:
+    :param url: 输入的URL
     :return: 合法的URL | False
     """
-    url = (str(url)).strip().replace('"', '').replace("'", '').replace('<', '').replace('>', '').replace(';', '')\
-        .replace('\\', '/')
-    if (10 < len(url)) and (len(url) < 40):
-        # 链接长度(10, 40)，否则认为不合法 http://a.cn
-        if re.search(FORBIDDEN_DOMAIN, url):
-            # 判断是否在禁止域名/IP
+    # 基本清理，只保留最基础的特殊字符过滤
+    url = str(url).strip().replace('"', '').replace("'", '')
+    
+    # 检查最小长度
+    if len(url) < 7:  # 最短的合法URL至少是 http://
+        return False
+        
+    # 检查URL协议
+    if not (url.startswith('http://') or url.startswith('https://')):
+        return False
+        
+    try:
+        # 使用 urllib.parse 简单验证URL结构
+        parsed = urlparse(url)
+        if not parsed.netloc:  # 只确保有主机名
             return False
-        if url.startswith('http://') or url.startswith('https://'):
-            # URL是否以http://或https://开头
-            url_params = url.split('/')
-            domain = url_params[2]
-            if domain.find('.') >= 0:
-                # URL中的域名是否至少含有一个‘.’，返回全小写URL
-                return url.lower()
-    return False
+            
+        return url  # 返回原始URL，不进行小写转换
+        
+    except Exception:
+        return False
 
 
 if __name__ == '__main__':

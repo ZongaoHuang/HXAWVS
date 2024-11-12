@@ -1,0 +1,35 @@
+{% load i18n static simpletags %}
+
+<div id="home">
+
+
+
+
+    {% if "SIMPLEUI_HOME_ACTION"|get_config != False %}
+    
+    {% endif %}
+</div>
+
+<el-dialog
+        title="Upgrade Simpleui"
+        :visible.sync="upgrade.dialogVisible"
+        width="50%">
+    <el-alert
+            :title="'You can upgrade to '+upgrade.version"
+            type="success">
+    </el-alert>
+    <div style="padding: 10px">
+        <div>
+            <h3>
+            Run Command:
+            </h3>
+            <el-alert
+                title="pip install django-simpleui -U"
+                type="info">
+              </el-alert>
+
+        </div>
+        <div><h3>Change logs:</h3></div>
+        <div v-text="upgrade.body"></div>
+    </div>
+</el-dialog>

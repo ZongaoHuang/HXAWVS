@@ -11,4 +11,5 @@ urlpatterns = [
     path('get-target/', target.get_target, name="get-target"),
     path('abort_dirscan/', views.abort_dirscan, name="abort_dirscan"),
     path('delete_dirscan/', views.delete_dirscan, name="delete_dirscan"),
+    path('get_dir_scan', views.get_dir_scan, name='get_dir_scan'),
 ]

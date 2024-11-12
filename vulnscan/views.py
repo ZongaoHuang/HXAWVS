@@ -25,6 +25,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
 from webscan.utils import create_log_entry
 
+
+
 @csrf_exempt
 @login_required
 def delete_scan(request):
@@ -89,6 +91,7 @@ def vulnscan(request):
             'status': msg['current_session']['status'],
             'target_id': msg['target_id'],
             'target': msg['target']['address'],
+            'description': msg['target']['description'],
             'scan_type': msg["profile_name"],
             'vuln': msg['current_session']['severity_counts'],
             'plan': re.sub(r'T|\..*$', " ", msg['current_session']['start_date']),
@@ -102,6 +105,58 @@ def vulnscan(request):
     create_log_entry(request.user, '访问漏洞扫描页面')
     return render(request, "vulnscan.html", {"data": data })
 
+@csrf_exempt
+@login_required
+def get_vuln_scans(request):
+    try:
+        s = Scan(API_URL, API_KEY)
+        data = s.get_all()
+        count = 0
+        s_list = []
+        
+        # 获取中间件数据
+        Middleware_datas = Middleware_vuln.objects.all()[::-1]
+        for Middleware in Middleware_datas:
+            result = 1 if Middleware.result=="True" else 0
+            Middleware_data = {
+                'id': count + 1,
+                'status': Middleware.status,
+                'target_id': None,
+                'target': Middleware.url,
+                'scan_type': Middleware.CVE_id,
+                'vuln': {'critical': result, 'high': 0, 'medium': 0, 'low': 0},
+                'plan': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(float(Middleware.time)))
+            }
+            s_list.append(Middleware_data)
+            count += 1
+
+        # 获取扫描数据
+        for msg in data:
+            scan_data = {
+                'id': count + 1,
+                'status': msg['current_session']['status'],
+                'target_id': msg['target_id'],
+                'target': msg['target']['address'],
+                'description': msg['target']['description'],
+                'scan_type': msg["profile_name"],
+                'vuln': msg['current_session']['severity_counts'],
+                'plan': re.sub(r'T|\..*$', " ", msg['current_session']['start_date']),
+                "scan_session_id":msg["current_session"]["scan_session_id"],
+                "scan_id":msg["scan_id"]
+            }
+            s_list.append(scan_data)
+            count += 1
+            
+        return JsonResponse({
+            'code': 200,
+            'data': s_list,
+            'message': 'success'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'code': 500,
+            'message': str(e)
+        })
 
 @csrf_exempt
 @login_required
@@ -109,6 +164,7 @@ def vuln_scan(request):
     t = Target(API_URL, API_KEY)
     s = Scan(API_URL, API_KEY)
     url = request.POST.get('ip')
+    description = request.POST.get('description')
     scan_type = request.POST.get('scan_type')
     username = request.POST.get('username')
     password = request.POST.get('password')
@@ -116,7 +172,7 @@ def vuln_scan(request):
     # print(cookie_header)
 
     # 先添加target目标
-    target_id = t.add(url)
+    target_id = t.add(url, description)
     if target_id:
         # 1. 设置账号密码
         if username and password:
