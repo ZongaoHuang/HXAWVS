@@ -35,6 +35,7 @@ urlpatterns = [
     path('fingerprint', views.fingerprint, name='fingerprint'),
     #子域名探测
     path('subdomain', views.subdomain, name='subdomain'),
+    
 
 ]
 

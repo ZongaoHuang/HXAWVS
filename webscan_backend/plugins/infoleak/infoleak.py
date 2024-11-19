@@ -83,4 +83,4 @@ def get_infoleak(url=''):
 
 
 if __name__ == '__main__':
-    print(get_infoleak(' '))
+    print(get_infoleak('127.0.0.1'))

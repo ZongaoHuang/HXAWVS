@@ -1,22 +1,20 @@
+{#<style>#}
+{#    body {#}
+{#        text-align: center;#}
+{#    }#}
+{#</style>#}
 {% extends 'layout/base.html' %}
 {% load static %}
 {% block title %}目录识别{% endblock %}
-
 {% block css %}
-    <style>
-        .abort-btn, .delete-btn {
-            background-color: transparent;
-            color: #000000;
-            border: 1px solid #cccccc;
-            padding: 4px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        <style>
+        #toolbar {
+          margin: 0;
         }
-        .abort-btn:hover, .delete-btn:hover {
-            background-color: #f2f2f2;
-        }
+        /*修复分页next按钮布局*/
+       .page-item.page-next, .page-item.page-prev{
+           flex: 0 0 auto;
+       }
     </style>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}">
 {% endblock %}
@@ -39,6 +37,11 @@
                     <br>
                 </div>
                 <p class="text-center">通过批量扫描检查网站目录名、探针文件、后台、robots.txt、备份文件等！
+                    <!-- 提示框 -->
+                    <span class="form-help" data-trigger="hover" data-container="body" data-toggle="popover" data-placement="right" data-html="true"
+                          data-content="<p>端口扫描是指某些别有用心的人发送一组端口扫描消息，试图以此侵入某台计算机，并了解其提供的计算机网络服务类型。攻击者可以通过它了解到从哪里可探寻到攻击弱点。</p>
+                          <p class='mb-0'><a href='https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F/11056182?fr=aladdin'>详情</a></p>">?
+                    </span>
                 </p>
             </div>
         </div>
@@ -53,16 +56,16 @@
                       <line x1="21" y1="21" x2="15" y2="15" />
                     </svg>
                 </div>
-                <form id="scan-form" action="{% url 'dir-create' %}" method="post">
+                <form id="scan-form">
                     {% csrf_token %}
                     <!-- 输入框&提交按钮 -->
                     <div class="fixed_scan input-icon mb-3 float-left" style="width: 80%">
                        <span class="input-icon-addon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></svg>
                         </span>
-                        <input type="text" name="url" placeholder="请输入正确的URL" minlength="11" maxlength="100" required=""  autocomplete="off" class="form-control  form-control-lg">
+                        <input type="text" name="url" placeholder="请输入正确的URL" minlength="11" maxlength="100000" required=""  autocomplete="off" class="form-control  form-control-lg">
                     </div>
-                    <button type="submit" class="scan-btn btn btn-lg btn-indigo float-left" id="py1"  name="app" value="提交">目录识别</button>
+                    <button  class="scan-btn btn btn-lg btn-indigo float-left" id="py1"  name="app" value="提交">目录识别</button>
                     <br><br><br><br>
                     <!--扫描选项 -->
                     <div class="hr-text">扫描选项</div>
@@ -117,6 +120,9 @@
                                     <input class="form-check-input" type="radio" name="r_check" value="r_no" checked>
                                     <span class="form-check-label">否</span>
                                 </label>
+{#                            <!--查看结果 -->#}
+{#                            <br>#}
+{#                            <a href="{% url 'dir-result' %}" target="_blank" class="btn btn-pink btn-pill">查看扫描结果</a>#}
                         </div>
                         <!--自定义扫描选项 -->
                         <div class="col-md-4 text-center " >
@@ -129,6 +135,9 @@
                             </label>
                             <!--前后缀&子目录 -->
                             <div class="explain_text text-center" style="display: none;">
+{#                                <label class="form-label text-center">前后缀&子目录&nbsp;#}
+{#                                    <span class="form-help" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" data-content="<p>非必填，想要查找配置文件或备份吗？<br>eg:admin、~、- 等，非必填，若填写请在确认扫描类别时仅勾选一个，否则时间会久到离谱</p>">?</span>#}
+{#                                </label>#}
                                 <div class="row">
                                     <!--前缀 -->
                                     <div id="InputsWrapper_prefixe" class="not_fixed_scan col-sm-4 " style="display: none">
@@ -145,6 +154,7 @@
                                     <!--子目录 -->
                                     <div id="InputsWrapper" class="not_fixed_scan col-sm-4 " style="display: none">
                                     子目录：<a href="#" id="AddMoreTextBox" class="btn btn-tabler btn-icon" aria-label="Button"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+{#                                    <br>#}
                                 </div>
                                 </div>
                             </div>
@@ -153,109 +163,64 @@
                 </form>
             </div>
         </div>
-        <!--扫描进程卡片-->
-        <div class="card card-sm jincheng" style="display: none">
-                <div class="card-body">
-                    <!-- 卡片边缘缎带 -->
-                    <div class="ribbon ribbon-top ribbon-left  bg-azure">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-comet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                          <path d="M15.5 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5z" />
-                          <line x1="4" y1="4" x2="11" y2="11" />
-                          <line x1="9" y1="4" x2="12.5" y2="7.5" />
-                          <line x1="4" y1="9" x2="7.5" y2="12.5" />
-                        </svg>
-                    </div>
-                        <table class="table table-bordered">
-                            <tbody style="text-align: center;">
-                            <tr style="text-align: center;">
-                                <div class="hr-text">正在扫描，请耐心等待 </div><div class="progress progress-lg progress-bar-striped active"><div class="progress-bar progress-bar-indeterminate"></div></div>
-                            </tr>
-                            </tbody>
-                        </table>
-                </div>
-            </div>
-        </div>
 
-        <!--扫描列表卡片-->
-        <div class="container-xl">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <!-- 卡片边缘缎带 -->
-                    <div class="ribbon ribbon-top ribbon-left bg-azure">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-comet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M15.5 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5z" />
-                            <line x1="4" y1="4" x2="11" y2="11" />
-                            <line x1="9" y1="4" x2="12.5" y2="7.5" />
-                            <line x1="4" y1="9" x2="7.5" y2="12.5" />
-                        </svg>
-                    </div>
-                    <span class="card-title text-center">
-                        目录识别列表
-                    </span>
-                    <!--结果表格-->
-                    <div class="table-responsive" id="refresh">
-                        <table class="table text-center" id="table"
-                            data-toggle="table"
-                            data-show-export="true"
-                            data-click-to-select="true"
-                            data-toolbar="#toolbar"
-                            data-search="true"
-                            data-show-refresh="true"
-                            data-auto-refresh="true"
-                            data-auto-refresh-interval="5"
-                            data-show-toggle="true"
-                            data-show-fullscreen="true"
-                            data-show-columns="true"
-                            data-show-columns-toggle-all="true"
-                            data-minimum-count-columns="2"
-                            data-show-pagination-switch="true"
-                            data-pagination="true"
-                            data-id-field="id"
-                            data-page-list="[10, 25, 50, 100, all]"
-                            data-response-handler="responseHandler">
-                            <thead class="table-primary">
+    <!-- 扫描列表清单卡片 -->
+    <div class="container-xl" >
+        <div class="card card-sm">
+            <div class="card-body">
+                <!-- 卡片边缘缎带 -->
+                <div class="ribbon ribbon-top ribbon-left  bg-azure">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-comet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                      <path d="M15.5 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5z" />
+                      <line x1="4" y1="4" x2="11" y2="11" />
+                      <line x1="9" y1="4" x2="12.5" y2="7.5" />
+                      <line x1="4" y1="9" x2="7.5" y2="12.5" />
+                    </svg>
+                </div>
+                <span class="card-title text-center">
+                  扫描列表
+                </span>
+                <!--结果表格-->
+                <div class="table-responsive" id="refresh">
+                    <table class="table text-center" id="dirscan_table"
+                      data-toggle="table"
+                      data-show-export="true"
+                      data-click-to-select="true"
+                      data-toolbar="#toolbar"
+                      data-search="true"
+                      data-show-refresh="true"
+                      data-auto-refresh="true"
+                      data-show-toggle="true"
+                      data-show-fullscreen="true"
+                      data-show-columns="true"
+                      data-show-columns-toggle-all="true"
+                      data-minimum-count-columns="2"
+                      data-show-pagination-switch="true"
+                      data-pagination="true"
+                      data-id-field="id"
+                      data-page-list="[10, 25, 50, 100, all]"
+                      data-response-handler="responseHandler">
+                        <thead class="table-primary">
+                            <tr>
+                                <th data-sortable="true" data-field="id">ID</th>
+                                <th data-sortable="true" data-field="user">用户</th>
+                                <th data-sortable="true" data-field="target">扫描目标</th>
+                                <th data-sortable="true" data-field="scan_time">扫描时间</th>
+                                <th data-sortable="true" data-field="result_path">扫描结果</th>
+                                <th data-sortable="true" data-field="delete">删除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in scans %}
                                 <tr>
-                                    <th data-sortable="true" data-field="id">ID</th>
-                                    <th data-sortable="true" data-field="target">扫描目标</th>
-                                    <th data-sortable="true" data-field="status">扫描状态</th>
-                                    <th data-sortable="true" data-field="scan_time">扫描时间</th>
-                                    <th data-sortable="true" data-field="result_path">识别结果</th>
-                                    <th data-sortable="true" data-field="operations">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for scan in scans %}
-                                <tr>
-                                    <td>{{ scan.id }}</td>
-                                    <td>{{ scan.target }}</td>
-                                    <td>
-                                        {% if scan.status == 'process' %}
-                                            <a class="btn bg-azure-lt btn-block">
-                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                                处理中
-                                            </a>
-                                        {% elif scan.status == 'finish' %}
-                                            <a class="btn bg-green-lt btn-block">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>
-                                                已完成
-                                            </a>
-                                            {% elif scan.status == 'aborted' %}
-                                            <a class="btn bg-red-lt btn-block">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <circle cx="12" cy="12" r="9" />
-                                                    <path d="M10 10l4 4m0 -4l-4 4" />
-                                                </svg>
-                                                已终止
-                                            </a>
-                                        {% endif %}
-                                    </td>
+                                    <td >{{ scan.id }}</td>
+                                    <td>{{ scan.user.username }}</td>
+                                    <td >{{scan.target}}</td>
                                     <td class="text-secondary">{{ scan.scan_time }}</td>
                                     <td>
                                         {% if scan.status == 'finish' and scan.result_path %}
-                                        <a href="{% url 'dir-result' scan_id=scan.id %}">查看结果</a>
+                                        <a href="{% url 'dir_scan_result' scan_id=scan.id %}">查看结果</a>
                                         {% else %}
                                         -
                                         {% endif %}
@@ -266,25 +231,25 @@
                                         {% endif %}
                                         <button class="delete-btn" data-scan-id="{{ scan.id }}"><i class="fas fa-trash delete-icon"></i></button>
                                     </td>
+    
                                 </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
+      </div>
 {% endblock %}
 
 {% block js %}
     <!--Bootsrap Table-->
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table-zh-CN.js' %}"></script>
-    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.23.1/extensions/auto-refresh/bootstrap-table-auto-refresh.js"></script>
-
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
+        <!-- 消息弹层组件 依赖jquery -->
+        <script src="{% static 'plugins/layer/layer.js' %}"></script>
     <!-- 点击查询按钮页面向下滑到底部 依赖jquery -->
     <script type="text/javascript">
         jQuery(document).ready(function($){
@@ -300,18 +265,9 @@
             });
     </script>
     <!-- 消息弹层组件 依赖jquery -->
-    <script src="{% static 'layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/layer/layer.js' %}"></script>
     <!--自定义扫描选项-->
     <script>
-        $(document).ready(function() {
-            // 初始化所有的 tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
-            
-            // 为动态添加的元素重新初始化 tooltip
-            $('#table').on('mouseover', '[data-bs-toggle="tooltip"]', function() {
-                $(this).tooltip();
-            });
-        });
         {#前缀-动态添加输入框#}
         $(document).ready(function () {
             var InputCount_prefixe = 0;
@@ -349,161 +305,95 @@
     </script>
     <!--按钮点击事件-->
     <script>
-        $(document).ready(function(){
-            $('#scan-form').on('submit', function(e) {
-                e.preventDefault();
-                var formData = $(this).serialize();
-                var url = $('input[name="url"]').val();
-                if (url) {
-                    
-                    $.ajax({
-                        url: "{% url 'dir-create' %}",
-                        type: 'POST',
-                        data: formData,
-                        dataType: 'json',
-                        success: function(response){
-                            if(response.status === 'success'){
-                                layer.msg('扫描已创建', {icon: 1, offset: '220px', area: ['200px', '70px']});
-                                startScan(response.scan_id, formData);
-                                refreshScanList();  // 替换 location.reload()
-                            } else {
-                                layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
-                            }
-                        },
-                        error: function(){
-                            layer.msg('请求失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
-                        }
-                    });
-                    location.reload();
-                } else {
-                    layer.msg('请输入URL', {icon: 2, offset: '220px', area: ['200px', '70px']});
-                }
-            });
+$(document).ready(function(){
+    $(".scan-btn").click(function(){
+        var url = $('input[name=siteurl]').val();
 
-            function startScan(scanId, formData) {
-                $.ajax({
-                    url: "{% url 'dir-search' %}",
-                    type: 'POST',
-                    data: formData + '&scan_id=' + scanId,
-                    dataType: 'json',
-                    success: function(response){
-                        if(response.status === 'success'){
-                            layer.msg('扫描已开始', {icon: 1, offset: '220px', area: ['200px', '70px']});
-                        } else {
-                            // Change the status to aborted
-                            abort_scan(scanId);
-                            layer.msg(response.message, {icon: 2, offset: '220px', area: ['200px', '70px']});
-                        }
-                    },
-                    error: function(){
-                        // Change the status to aborted
-                        abort_scan(scanId);
-                        layer.msg('开始扫描失败', {icon: 2, offset: '220px', area: ['200px', '70px']});
-                    }
-                });
+        
+        // 发送扫描请求
+        $.post("{% url 'dir-search' %}", $('#scan-form').serialize(), function(response) {
+            layer.msg('正在扫描，请稍后...', {icon: 1, offset: '220px', area: ['200px', '70px']});
+            $('.jincheng').show();
+            if(response.code === 200) {
+                // 扫描完成后跳转到结果页面
+                window.location.href = `/dirscan/dir-scan-result/${response.data.scan_id}/`;
+            } else {
+                layer.msg('扫描失败: ' + response.message);
             }
-
-            // Existing abort and delete functions
-            $('#table').on('click', '.abort-btn', function() {
-                var confirmAbort = confirm('确定要停止该扫描吗?');
-                if (confirmAbort) {
-                    var scan_id = $(this).data("scan-id");
-                    abort_scan(scan_id);
-                }
-            });
-
-            function abort_scan(scan_id) {
-                $.ajax({
-                    url: "{% url 'abort_dirscan' %}",
-                    type: "POST",
-                    data: {scan_id: scan_id},
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    success: function (response) {
-                        if (response.code == 200) {
-                            layer.msg('停止扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
-                            refreshScanList();  // 替换 location.reload()
-                        } else {
-                            layer.msg('停止扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
-                        }
-                    },
-                    error: function () {
-                        layer.msg('请求失败', {icon: 2, offset: '100px', area: ['120px', '70px']});
-                    }
-                });
-            }
-
-            $('#table').on('click', '.delete-btn', function() {
-                var confirmDelete = confirm('确定要删除该扫描记录吗?');
-                if (confirmDelete) {
-                    var scan_id = $(this).data("scan-id");
-                    delete_scan(scan_id);
-                }
-            });
-
-            function delete_scan(scan_id) {
-                $.ajax({
-                    url: "{% url 'delete_dirscan' %}",
-                    type: "POST",
-                    data: {scan_id: scan_id},
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    success: function (response) {
-                        if (response.code == 200) {
-                            layer.msg('删除扫描成功', {icon: 1, offset: '100px', area: ['150px', '70px']});
-                            refreshScanList();  // 替换 location.reload()
-                        } else {
-                            layer.msg('删除扫描失败', {icon: 2, offset: '100px', area: ['150px', '70px']});
-                        }
-                    },
-                    error: function () {
-                        layer.msg('请求失败', {icon: 2, offset: '100px', area: ['120px', '70px']});
-                    }
-                });
-            }
-
+        }).fail(function() {
+            layer.msg('请求失败，请重试');
         });
-        function refreshScanList() {
-            $.get('/get_dir_scan', function(response) {
-                if (response.code === 200) {
-                    var tableBody = $('#table tbody');
-                    tableBody.empty();
-                    $.each(response.data, function(index, scan) {
-                        var scanTime = new Date(scan.scan_time + 'Z');
-                        scanTime.setHours(scanTime.getHours());
-                        var beijingTime = scanTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
-                        
-                        var statusHtml = '';
-                        if (scan.status === 'process') {
-                            statusHtml = '<a class="btn bg-azure-lt btn-block" data-bs-toggle="tooltip" data-bs-placement="top" title="若扫描状态长时间为处理中，则扫描可能被拦截，请手动停止。"><span class="spinner-border spinner-border-sm me-2" role="status"></span>处理中</a>';
-                        } else if (scan.status === 'finish') {
-                            statusHtml = '<a class="btn bg-green-lt btn-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2l4 -4" /></svg>已完成</a>';
-                        } else if (scan.status === 'aborted') {
-                            statusHtml = '<a class="btn bg-red-lt btn-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>已终止</a>';
-                        }
+    });
+});
+    </script>
 
-                        var row = '<tr>' +
-                            '<td>' + scan.id + '</td>' +
-                            '<td>' + scan.target + '</td>' +
-                            '<td>' + statusHtml + '</td>' +
-                            '<td class="text-secondary">' + beijingTime + '</td>' +
-                            '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/dirscan/dir-result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +
-                            '<td>' +
-                            (scan.status === 'process' ? '<button class="abort-btn" data-scan-id="' + scan.id + '">停止扫描</button>' : '') +
-                            '<button class="delete-btn" data-scan-id="' + scan.id + '"><i class="fas fa-trash delete-icon"></i></button>' +
-                            '</td>' +
-                            '</tr>';
-                        tableBody.append(row);
-                    });
+<script>
+    function refreshDirScanList() {
+        $.get('/get_dir_scans', function(response) {
+            if (response.code === 200) {
+                var tableBody = $('#dirscan_table tbody');
+                tableBody.empty();
+                $.each(response.data, function(index, scan) {
+                    // Convert UTC time to Beijing time
+                    var scanTime = new Date(scan.scan_time + 'Z');
+                    scanTime.setHours(scanTime.getHours());
+                    var beijingTime = scanTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+                    
+                    var row = '<tr>' +
+                        '<td>' + scan.id + '</td>' +
+                        '<td>' + scan.user + '</td>' +
+                        '<td>' + scan.target + '</td>' +
+                        '<td>' + beijingTime + '</td>' +
+                        '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="{% url "dir-result" %}">查看结果</a>' : '-') + '</td>' +
+                        '<td>' +
+                        (scan.status === 'process' ? '<button class="abort-btn" data-scan-id="' + scan.id + '">停止扫描</button>' : '') +
+                        '<button class="delete-btn" data-scan-id="' + scan.id + '"><i class="fas fa-trash delete-icon"></i></button>' +
+                        '</td>' +
+                        '</tr>';
+                    tableBody.append(row);
+                });
+            } else {
+                console.error('Failed to fetch scan list:', response.message);
+            }
+        });
+    }
+
+    // 每5秒刷新一次列表
+    setInterval(refreshDirScanList, 5000);
+
+    // 删除按钮事件处理
+    $(document).on('click', '.delete-btn', function() {
+        var scanId = $(this).data('scan-id');
+        if (confirm('确定要删除该扫描记录吗？')) {
+            $.post('/delete_dir_scan/', {
+                scan_id: scanId
+            }, function(response) {
+                if (response.code === 200 && response.data.success) {
+                    refreshDirScanList();
                 } else {
-                    console.error('Failed to fetch scan list:', response.message);
+                    alert('Failed to delete scan: ' + response.message);
                 }
+            }).fail(function() {
+                alert('Failed to delete scan: Network error');
             });
         }
+    });
 
-        // 设置自动刷新间隔
-        setInterval(refreshScanList, 5000);
-    </script>
+    $(document).on('click', '.abort-btn', function() {
+        var scanId = $(this).data('scan-id');
+        if (confirm('确定要终止该扫描记录吗？')) {
+            $.post('/delete_dir_scan/', {
+                scan_id: scanId
+            }, function(response) {
+                if (response.code === 200 && response.data.success) {
+                    refreshDirScanList();
+                } else {
+                    alert('Failed to delete scan: ' + response.message);
+                }
+            }).fail(function() {
+                alert('Failed to delete scan: Network error');
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -376,6 +376,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                         <thead class="table-primary">
                             <tr>
                                 <th data-sortable="true" data-field="id">ID</th>
+                                <!-- <th data-sortable="true" data-field="user">用户</th> -->
                                 <th data-field="description">任务名称</th>
                                 <th data-sortable="true" data-field="target">扫描目标</th>
                                 <th data-sortable="true" data-field="scan_type">扫描类型</th>
@@ -383,13 +384,14 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                                 <th data-sortable="true" data-field="plan">添加时间</th>
                                 <th data-sortable="true" data-field="status">扫描状态</th>
                                 <th data-sortable="true" data-field="report_generate">报告生成</th>
-                                <th data-sortable="true" data-field="operations"">操作</th>
+                                <th data-sortable="true" data-field="operations">操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in data %}
                                 <tr>
                                     <td >{{ i.id }}</td>
+                                    <!-- <td >{{ i.user }}</td> -->
                                     <td >{{i.description }}</td>
                                 {% if i.target_id == None %}
                                     <td><a href="#"> {{ i.target }}</a></td>
@@ -398,16 +400,18 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                                 {% endif %}
                                 <td>
                                     <span class="badge bg-azure">
-                                        {% if i.scan_type == 'full_scan' %}
+                                        {% if i.scan_type == 'Full Scan' %}
                                             全扫描
-                                        {% elif i.scan_type == 'xss_vuln' %}
+                                        {% elif i.scan_type == 'Cross-site Scripting' %}
                                             XSS漏洞扫描
-                                        {% elif i.scan_type == 'sqli_vuln' %}
+                                        {% elif i.scan_type == 'SQL Injection' %}
                                             SQL注入漏洞扫描
-                                        {% elif i.scan_type == 'weak_passwords' %}
+                                        {% elif i.scan_type == 'Weak Passwords' %}
                                             弱口令扫描
+                                        {% elif i.scan_type == 'Crawl Only' %}    
+                                            仅爬取
                                         {% else %}
-                                            中间件漏洞
+                                            中间件扫描
                                         {% endif %}
                                     </span>
                                 </td>
@@ -913,6 +917,7 @@ $(function() {
                 $.each(response.data, function(index, scan) {
                     var row = '<tr>' +
                         '<td>' + scan.id + '</td>' +
+                        // '<td>' + (scan.username || '{{ user.username }}') + '</td>' +  
                         '<td>' + (scan.description || '-') + '</td>' +
                         '<td>' + (scan.target_id ? '<a href="vuln_result/' + scan.target_id + '">' + scan.target + '</a>' : '<a href="#">' + scan.target + '</a>') + '</td>' +
                         '<td><span class="badge bg-azure">' + getScanTypeText(scan.scan_type) + '</span></td>' +
@@ -932,11 +937,12 @@ $(function() {
 
     function getScanTypeText(type) {
         switch(type) {
-            case 'full_scan': return '全扫描';
-            case 'xss_vuln': return 'XSS漏洞扫描';
-            case 'sqli_vuln': return 'SQL注入漏洞扫描';
-            case 'weak_passwords': return '弱口令扫描';
-            default: return '中间件漏洞';
+            case 'Full Scan': return '全扫描';
+            case 'Cross-site Scripting': return 'XSS漏洞扫描';
+            case 'SQL Injection': return 'SQL注入漏洞扫描';
+            case 'Weak Passwords': return '弱口令扫描';
+            case 'Crawl Only' : return '仅爬取';
+            default: return '中间件扫描';
         }
     }
 

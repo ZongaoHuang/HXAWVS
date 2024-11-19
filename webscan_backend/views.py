@@ -74,7 +74,7 @@ def get_port_scans(request):
     for scan in scans:
         scan_data.append({
             'id': scan.id,
-            'user': scan.user,
+            'user': scan.user.username,
             'target': scan.target,
             'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
             'status': scan.status,
@@ -144,7 +144,7 @@ def get_info_leak(request):
     for scan in scans:
         scan_data.append({
             'id': scan.id,
-            'user':scan.user,
+            'user':scan.user.username,
             'target': scan.target,
             'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
             'status': scan.status,
@@ -380,7 +380,7 @@ def get_finger_print(request):
     for scan in scans:
         scan_data.append({
             'id': scan.id,
-            'user': scan.user,
+            'user': scan.user.username,
             'target': scan.target,
             'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
             'status': scan.status,

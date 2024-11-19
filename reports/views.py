@@ -30,6 +30,7 @@ def reports(request):
         if target["status"] == "completed":
             item = {
                 "id": id,
+                # 'user': request.user.username, 
                 "report_id": target["report_id"],
                 "target": target["source"]["description"].split(";")[0],
                 "time": re.sub(r'T|\..*$', " ", target["generation_date"]),
@@ -41,6 +42,7 @@ def reports(request):
         else:
             item = {
                 "id": id,
+                # 'user': request.user.username, 
                 "report_id": target["report_id"],
                 "target":target["source"]["description"].split(";")[0],
                 "time":re.sub(r'T|\..*$', " ", target["generation_date"]),

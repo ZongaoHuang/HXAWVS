@@ -1,15 +1,14 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from dirscan import views, search2, target
+from dirscan import views
 
 urlpatterns = [
-    path('dir-result/<int:scan_id>/', views.dirresult, name="dir-result"),
+    path('dir-result/', views.dirresult, name="dir-result"),
+    path('dir-search/', views.search_post, name="dir-search"),
+    path('get-target/', views.get_target, name="get-target"),
     path('dir-scan/', views.dir_scan, name="dir-scan"),
-    path('dir-create/', search2.dir_create, name="dir-create"),
-    path('dir-search/', search2.dir_search, name="dir-search"),
-    path('get-target/', target.get_target, name="get-target"),
-    path('abort_dirscan/', views.abort_dirscan, name="abort_dirscan"),
-    path('delete_dirscan/', views.delete_dirscan, name="delete_dirscan"),
-    path('get_dir_scan', views.get_dir_scan, name='get_dir_scan'),
+    path('get_dir_scans/', views.get_dir_scans, name='get_dir_scans'),
+    path('delete_dir_scan/', views.delete_dir_scan, name='delete_dir_scan'),
+    path('dir-scan-result/<int:scan_id>/', views.dir_scan_result, name='dir_scan_result'),
 ]

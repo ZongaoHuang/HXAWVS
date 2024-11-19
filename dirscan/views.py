@@ -1,105 +1,219 @@
 import os
 
-import pytz
-
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
 import json
-from reports.views import success
-from webscan.utils import create_log_entry
-from .models import DirectoryScan
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators import csrf
+from webscan.utils import create_log_entry
+from .models import Directoryscan
 base_file_path = 'dirscan/dirsearch/reports/target.json'
 
 @login_required
 def dir_scan(request):
     """端口扫描"""
-    portlists = DirectoryScan.objects.all()
-    scans = DirectoryScan.objects.filter(user=request.user).order_by('-scan_time')
+    scans = Directoryscan.objects.filter(user=request.user).order_by('-scan_time')
     context = {
         'scans': scans
     }
-    create_log_entry(request.user, '访问目录扫描页面')
+    create_log_entry(request.user, '访问端口扫描页面')
     return render(request, 'dir-scan.html', context)
 
 @login_required
-def dirresult(request, scan_id):
-    try:
-        scan = DirectoryScan.objects.get(id=scan_id, user=request.user)
-        if scan.result_path and os.path.exists(scan.result_path):
-            with open(scan.result_path, 'r') as f:
-                data = json.load(f)
-            
-            results = []
-            for url, details in data.items():
-                if url != 'time':
-                    for item in details:
-                        results.append({
-                            'path': item['path'],
-                            'status': item['status'],
-                            'content_length': item['content-length'],
-                            'redirect': item.get('redirect', '')
-                        })
-            
-            create_log_entry(request.user, f'查看目录识别结果: {scan.target}')
-            return render(request, "dir-result.html", {"a": results, "scan": scan, "key_list": [scan.target]})
-        else:
-            error = "扫描结果未找到"
-            return render(request, "dir-result.html", {"error": error, "scan": scan})
-    except DirectoryScan.DoesNotExist:
-        error = "扫描记录未找到"
+def dirresult(request):
+    if os.access(base_file_path, os.F_OK):
+        f = open(base_file_path)
+        data = json.load(f)  # json被转换为python字典
+
+        # 获取扫描url的端口等信息，将字典的键转为集合
+        k = set(data)
+        # 移除集合中的time
+        # k.remove('time')
+        # 安全移除time
+        k.discard('time')
+        # 键值集合转为列表
+        key_list = list(k)
+
+        # 计数
+        n = 0
+        for key in data:
+            n = n + 1
+        # 列表合一
+        a = []
+        num = 0
+        for key in data:
+            num = num + 1
+            if num < n:
+                a = a + data[key]
+        print({"a": a, "key_list": key_list})
+        return render(request, "dir-result.html", {"a": a, "key_list": key_list})
+    else:
+        error = "暂无结果"
         return render(request, "dir-result.html", {"error": error})
 
 
+# -*- coding: utf-8 -*-
 
-@csrf_exempt
+
+
 @login_required
-def abort_dirscan(request):
-    if request.method == 'POST':
-        scan_id = request.POST.get('scan_id')
+def search_post(request):
+    if request.POST:
+        url = request.POST.get('url')
+        
+        # 创建扫描记录
+        scan = Directoryscan.objects.create(
+            user=request.user,
+            target=url,
+            status='process'
+        )
+
         try:
-            scan = DirectoryScan.objects.get(id=scan_id, user=request.user)
-            if scan.status == 'process':
-                scan.status = 'aborted'
-                scan.save()
-                create_log_entry(request.user, '中止目录扫描任务')
-                return JsonResponse({'code': 200, 'message': 'Scan aborted successfully'})
-            else:
-                return JsonResponse({'code': 400, 'message': 'Scan is not in progress'})
-        except DirectoryScan.DoesNotExist:
-            return JsonResponse({'code': 404, 'message': 'Scan not found'})
-    return JsonResponse({'code': 405, 'message': 'Method not allowed'})
+            parm = []  # 勾选参数列表
+            result_path = f'dirscan/dirsearch/reports/dirscan_{scan.id}.json'  # 为每个扫描创建唯一的结果文件
+            
+            # 获取用户选择的参数，存入列表
+            extensions = ['php', 'asp', 'jsp', 'txt', 'zip', 'html', 'js']
+            for ext in extensions:
+                if request.POST.get(ext):
+                    parm.append(request.POST.get(ext))
 
-@csrf_exempt
-@login_required
-def delete_dirscan(request):
-    if request.method == 'POST':
-        scan_id = request.POST.get('scan_id')
-        try:
-            scan = DirectoryScan.objects.get(id=scan_id, user=request.user)
-            scan.delete()
-            create_log_entry(request.user, '删除目录扫描任务')
-            return JsonResponse({'code': 200, 'message': 'Scan deleted successfully'})
-        except DirectoryScan.DoesNotExist:
-            return JsonResponse({'code': 404, 'message': 'Scan not found'})
-    return JsonResponse({'code': 405, 'message': 'Method not allowed'})
+            # 构建扫描参数
+            options = ' -e ' + ','.join(parm) if parm else ''
+            recursive = '-r ' if request.POST.get('r_check') == "r_yes" else ''
+            
+            # 处理前缀
+            prefixes = []
+            pre_num = 1
+            while request.POST.get(f'prefixe_{pre_num}'):
+                prefixes.append(request.POST.get(f'prefixe_{pre_num}'))
+                pre_num += 1
+            prefix_opt = f'--prefixes {",".join(prefixes)} ' if prefixes else ''
 
-@csrf_exempt
+            # 处理后缀
+            suffixes = []
+            suf_num = 1
+            while request.POST.get(f'suffixe_{suf_num}'):
+                suffixes.append(request.POST.get(f'suffixe_{suf_num}'))
+                suf_num += 1
+            suffix_opt = f'--suffixes {",".join(suffixes)} ' if suffixes else ''
+
+            # 处理子目录
+            subdirs = []
+            s_num = 1
+            while request.POST.get(f'subdirs_{s_num}'):
+                subdirs.append(request.POST.get(f'subdirs_{s_num}'))
+                s_num += 1
+            subdir_opt = f'--subdirs {",".join(subdirs)} ' if subdirs else ''
+
+            # 构建完整的扫描命令
+            cmd = f'python dirscan/dirsearch/dirsearch.py -u {url} {options} {recursive} {prefix_opt} {suffix_opt} {subdir_opt} --json-report {result_path}'
+            
+            # 执行扫描
+            os.system(cmd)
+
+            # 更新扫描状态和结果路径
+            scan.status = 'finish'
+            scan.result_path = result_path
+            scan.save()
+
+            return JsonResponse({
+                'code': 200,
+                'data': {'scan_id': scan.id},
+                'message': 'Scan completed successfully'
+            })
+
+        except Exception as e:
+            scan.status = 'error'
+            scan.save()
+            return JsonResponse({
+                'code': 500,
+                'message': str(e)
+            })
+
+    return JsonResponse({
+        'code': 400,
+        'message': 'Invalid request'
+    })
+
 @login_required
-def get_dir_scan(request):
-    scans = DirectoryScan.objects.filter(user=request.user).order_by('-scan_time')
+def dir_scan_result(request, scan_id):
+    """查看扫描结果"""
+    scan = get_object_or_404(Directoryscan, id=scan_id, user=request.user)
     
-    scan_data = []
+    if os.path.exists(scan.result_path):
+        with open(scan.result_path) as f:
+            data = json.load(f)
+            
+        # 处理数据
+        k = set(data)
+        k.discard('time')
+        key_list = list(k)
+        
+        # 合并结果列表
+        results = []
+        for key in data:
+            if key != 'time':
+                results.extend(data[key])
+                
+        context = {
+            'scan': scan,
+            'results': results,
+            'key_list': key_list
+        }
+        return render(request, "dir-result.html", context)
+    else:
+        return render(request, "dir-result.html", {"error": "暂无结果"})
+
+
+
+def get_target(request):
+    try:
+        file = open('reports/target.json', 'rb')
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="target.json"'
+    except:
+        response = HttpResponse("对不起，文件未生成")
+
+    return response
+
+
+@login_required
+def get_dir_scans(request):
+    """获取目录扫描列表"""
+    scans = Directoryscan.objects.filter(user=request.user).order_by('-scan_time')
+    scan_list = []
     for scan in scans:
-        scan_data.append({
+        scan_list.append({
             'id': scan.id,
+            'user': scan.user.username,
             'target': scan.target,
-            'scan_time': scan.scan_time.astimezone(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S'),
+            'scan_time': scan.scan_time.strftime('%Y-%m-%d %H:%M:%S'),
             'status': scan.status,
             'result_path': scan.result_path
         })
-    
-    return success(200, scan_data, 'ok')
+    return JsonResponse({
+        'code': 200,
+        'data': scan_list
+    })
+
+@csrf_exempt
+@login_required 
+def delete_dir_scan(request):
+    """删除扫描记录"""
+    scan_id = request.POST.get('scan_id') 
+    try:
+        scan = Directoryscan.objects.get(id=scan_id, user=request.user)
+        scan.delete()
+        return JsonResponse({
+            'code': 200,
+            'data': {'success': True}
+        })
+    except Directoryscan.DoesNotExist:
+        return JsonResponse({
+            'code': 404,
+            'message': 'Scan not found'
+        })

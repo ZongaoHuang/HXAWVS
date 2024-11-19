@@ -62,6 +62,7 @@
                         <thead class="table-primary">
                             <tr>
                                 <th data-sortable="true" data-field="id">ID</th>
+                                <!-- <th data-sortable="true" data-field="user">用户</th> -->
 {#                                <th data-sortable="true" data-field="report_id">report_id</th>#}
 {#                                <th data-sortable="true" data-field="status">等级</th>#}
                                 <th data-sortable="true" data-field="target">扫描目标</th>
@@ -77,10 +78,19 @@
                             {% for item in data %}
                                 <tr>
                                     <td >{{ item.id }}</td>
+                                    <!-- <td >{{ item.user }}</td> -->
 {#                                    <td style="display: none">{{ item.report_id }}</td>#}
                                     <td ><a class="btn bg-blue-lt btn-block">{{ item.target }}</a></td>
                                     <td ><span class="text-muted" >{{ item.time }}</span></td>
-                                    <td >{{ item.status }}</td>
+                                    <td>
+                                        {% if item.status == "completed" %}
+                                            已完成
+                                        {% elif item.status == "processing" %}
+                                            处理中
+                                        {% else %}
+                                            {{ item.status }}
+                                        {% endif %}
+                                    </td>
                                     {% if item.status == "completed" %}
                                         {% comment %} <td ><a href="{{ api_url }}{{ item.download_pdf }}">PDF</a></td> {% endcomment %}
                                         <td><a href="{% url 'download_modified_report' item.report_id %}">PDF</a></td>

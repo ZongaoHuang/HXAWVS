@@ -16,6 +16,8 @@ c.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'webscan_backend_info
 c.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'webscan_backend_fingerprint'")
 c.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'webscan_backend_portscan'")
 c.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'dirscan_directoryscan'")
-
+# c.execute("DELETE FROM dirscan_directoryscan WHERE id >= 14")
+# c.execute("delete from django_migrations where app='dirscan'")
 conn.commit()
+
 conn.close()

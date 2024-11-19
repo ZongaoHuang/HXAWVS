@@ -76,6 +76,7 @@ def vulnscan(request):
         result = 1 if Middleware.result=="True" else 0
         Middleware_data = {
             'id': count + 1,
+            'user': request.user.username, 
             'status': Middleware.status,
             'target_id': None,
             'target': Middleware.url,
@@ -88,6 +89,7 @@ def vulnscan(request):
     for msg in data:
         table_data = {
             'id': count + 1,
+            'user': request.user.username,
             'status': msg['current_session']['status'],
             'target_id': msg['target_id'],
             'target': msg['target']['address'],
@@ -120,6 +122,7 @@ def get_vuln_scans(request):
             result = 1 if Middleware.result=="True" else 0
             Middleware_data = {
                 'id': count + 1,
+                # 'user': request.user.username,
                 'status': Middleware.status,
                 'target_id': None,
                 'target': Middleware.url,
@@ -134,6 +137,7 @@ def get_vuln_scans(request):
         for msg in data:
             scan_data = {
                 'id': count + 1,
+                # 'user': request.user.username,
                 'status': msg['current_session']['status'],
                 'target_id': msg['target_id'],
                 'target': msg['target']['address'],
