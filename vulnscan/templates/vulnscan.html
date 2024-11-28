@@ -106,23 +106,41 @@
                     </svg>
                 </div>
 <!-- 输入框容器 -->
-<div class="d-flex align-items-center mb-3" style="width: 100%">
-        <!-- 任务描述输入框 -->
-        <div class="input-icon" style="width: 50%">
-            <span class="input-icon-addon">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2m4 3v12m7-12v12" /></svg>
-            </span>
-            <input type="text" name="scan_description" maxlength="200" placeholder="请填写任务名称" autocomplete="off" class="form-control form-control-lg">
-        </div>
-    <!-- URL输入框 -->
-    <div class="input-icon me-3" style="width: 40%">
+<div class="d-flex align-items-center mb-3" style="width: 80%;margin:0 auto;">
+    <!-- 任务描述输入框 -->
+    <div class="input-icon" style="width:60%;">
         <span class="input-icon-addon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2m4 3v12m7-12v12" />
+            </svg>
         </span>
-        <input type="text" name="scan_url" minlength="11" maxlength="100" required="" placeholder="请填写正确的URL" autocomplete="off" class="form-control form-control-lg">
+        <input type="text" id="taskName" maxlength="200" placeholder="请填写任务名称" autocomplete="off" class="form-control form-control-lg">
     </div>
 
+    <!-- 任务人输入框 -->
+<!-- 任务人输入框 -->
+<div class="input-icon" style="width: calc(40% - 10px); margin-left:10px">
+    <span class="input-icon-addon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2m4 3v12m7-12v12" />
+        </svg>
+    </span>
+    <input type="text" id="taskPerson" maxlength="100" placeholder="请填写任务人" value="任务人：{{ request.user.username }}" autocomplete="off" class="form-control form-control-lg" readonly>
+</div>
+</div>
 
+<!-- URL输入框 -->
+<div class="input-icon me-3" style="width: 80%;margin:0 auto;">
+    <span class="input-icon-addon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path>
+            <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path>
+        </svg>
+    </span>
+    <input type="text" name="scan_url" minlength="11" maxlength="100" required="" placeholder="请填写正确的URL" autocomplete="off" class="form-control form-control-lg">
 </div>
 
 <!-- 按钮容器 -->
@@ -249,7 +267,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                 <div class="col-lg-12">
                  <div class="hr-text text-blue">扫描类型</div>
                  <div class="form-selectgroup " style="width: 100%">
-                    <label class="col-sm-2 form-selectgroup-item">
+                    <label class="col-sm-3 form-selectgroup-item">
                       <input type="radio" name="scan_type" value="full_scan" class="form-selectgroup-input" checked="">
                       <span class="form-selectgroup-label">全扫描</span>
                     </label>
@@ -265,33 +283,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                       <input type="radio" name="scan_type" value="weak_passwords" class="form-selectgroup-input">
                       <span class="form-selectgroup-label">弱口令扫描</span>
                     </label>
-                    <label class="col-sm-2 form-selectgroup-item">
-                        <select id="Middleware" class="form-control selectpicker" data-live-search="true">
-                            <option value="" selected disabled>中间件漏洞</option>
-                            <optgroup label="WebLogic">
-                                <option value="CVE-2018-2628">CVE-2018-2628</option>
-                                <option value="CVE-2018-2894">CVE-2018-2894</option>
-                                <option value="CVE-2020-2551">CVE-2020-2551</option>
-                            </optgroup>
-                            <optgroup label="structs2">
-                                <option value="Struts2_009">Struts2_009</option>
-                                <option value="Struts2-032">Struts2-032</option>
-                            </optgroup>
-                            <optgroup label="Tomcat">
-                                <option value="CVE_2018_7600">CVE-2018-7600</option>
-                            </optgroup>
-                            <optgroup label="jBoss">
-                                <option value="CVE_2017_12149">CVE-2017-12149</option>
-                            </optgroup>
-                            <optgroup label="Drupal">
-                                <option value="CVE_2018_7600">CVE-2018-7600</option>
-                            </optgroup>
-                            <optgroup label="nexus">
-                                <option value="CVE_2020_10199">CVE-2020-10199</option>
-                            </optgroup>
-                        </select>
-                     </label>
-                     <label class="col-sm-1 form-selectgroup-item">
+                     <label class="col-sm-2 form-selectgroup-item">
                       <input type="radio" name="scan_type" value="crawl_only" class="form-selectgroup-input">
                       <span class="form-selectgroup-label">仅爬取</span>
                     </label>
@@ -310,7 +302,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                   </h3>
                 </div>
                 <div class="card-body">
-                    <div id="piechart" style="height: 300px;"></div>
+                    <div id="piechart" style="height: 500px;"></div>
                 </div>
               </div>
             </div>
@@ -322,7 +314,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
               </h3>
             </div>
             <div class="card-body">
-                <div id="linechart" style="height: 300px;"></div>
+                <div id="linechart" style="height: 500px;"></div>
             </div>
           </div>
         </div>
@@ -377,7 +369,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                             <tr>
                                 <th data-sortable="true" data-field="id">ID</th>
                                 <!-- <th data-sortable="true" data-field="user">用户</th> -->
-                                <th data-field="description">任务名称</th>
+                                <th data-field="description">任务名称(任务人)</th>
                                 <th data-sortable="true" data-field="target">扫描目标</th>
                                 <th data-sortable="true" data-field="scan_type">扫描类型</th>
                                 <th data-sortable="true" data-field="vuln">漏洞</th>
@@ -425,7 +417,7 @@ function enableAllScanTypes(scanTypeRadios, middlewareSelect) {
                                             {{ i.status }}
                                         </a>
                                     </td>
-                                    <td>失败/终止</td>
+                                    
                                 {% elif i.status == 'completed' %}
                                     <td>
                                         <a class="btn bg-green-lt btn-block">
@@ -755,7 +747,10 @@ $(function() {
 
     $(".scan-btn").click(function () {
         var domain = $('input[name=scan_url]').val();
-        var description = $('input[name=scan_description]').val();
+        var taskName = $('#taskName').val(); // 获取任务名称
+        var taskPerson = $('#taskPerson').val(); // 获取任务人
+        var description = taskName + '(' + taskPerson + ')'; // 组合成“任务名称-任务人”
+
         var scan_type = $('input[name=scan_type]:checked').val();
         var CVE_id = $('#Middleware option:selected').val();
         var loginEnabled = $('#enableLoginSettings').is(':checked');

@@ -344,7 +344,7 @@ $(document).ready(function(){
                         '<td>' + scan.user + '</td>' +
                         '<td>' + scan.target + '</td>' +
                         '<td>' + beijingTime + '</td>' +
-                        '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="{% url "dir-result" %}">查看结果</a>' : '-') + '</td>' +
+                        '<td>' + (scan.status === 'finish' && scan.result_path ? '<a href="/dir-scan-result/' + scan.id + '/">查看结果</a>' : '-') + '</td>' +
                         '<td>' +
                         (scan.status === 'process' ? '<button class="abort-btn" data-scan-id="' + scan.id + '">停止扫描</button>' : '') +
                         '<button class="delete-btn" data-scan-id="' + scan.id + '"><i class="fas fa-trash delete-icon"></i></button>' +

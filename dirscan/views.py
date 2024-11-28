@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -14,12 +15,49 @@ base_file_path = 'dirscan/dirsearch/reports/target.json'
 @login_required
 def dir_scan(request):
     """端口扫描"""
-    scans = Directoryscan.objects.filter(user=request.user).order_by('-scan_time')
+    scans = Directoryscan.objects.order_by('-scan_time')
     context = {
         'scans': scans
     }
     create_log_entry(request.user, '访问端口扫描页面')
     return render(request, 'dir-scan.html', context)
+@login_required
+def dir_scan_result(request, scan_id):
+    """查看扫描结果"""
+    scan = get_object_or_404(Directoryscan, id=scan_id)
+    
+    if os.path.exists(scan.result_path):
+        with open(scan.result_path) as f:
+            data = json.load(f)
+            
+        # 处理数据
+        k = set(data)
+        k.discard('time')
+        key_list = list(k)
+        
+        # 计数
+        n = 0
+        for key in data:
+            n = n + 1
+        # 列表合一
+        a = []
+        num = 0
+        for key in data:
+            num = num + 1
+            if num < n:
+                a = a + data[key]
+        print({"a": a, "key_list": key_list})
+                
+        context = {
+            'scan': scan,
+            'a': a,
+            'key_list': key_list
+        }
+        print(context)
+        return render(request, "dir-result.html", context)
+    else:
+        return render(request, "dir-result.html", {"error": "暂无结果"})
+
 
 @login_required
 def dirresult(request):
@@ -112,7 +150,8 @@ def search_post(request):
             cmd = f'python dirscan/dirsearch/dirsearch.py -u {url} {options} {recursive} {prefix_opt} {suffix_opt} {subdir_opt} --json-report {result_path}'
             
             # 执行扫描
-            os.system(cmd)
+            process = subprocess.Popen(cmd, shell = True)
+            process.communicate()
 
             # 更新扫描状态和结果路径
             scan.status = 'finish'
@@ -138,34 +177,6 @@ def search_post(request):
         'message': 'Invalid request'
     })
 
-@login_required
-def dir_scan_result(request, scan_id):
-    """查看扫描结果"""
-    scan = get_object_or_404(Directoryscan, id=scan_id, user=request.user)
-    
-    if os.path.exists(scan.result_path):
-        with open(scan.result_path) as f:
-            data = json.load(f)
-            
-        # 处理数据
-        k = set(data)
-        k.discard('time')
-        key_list = list(k)
-        
-        # 合并结果列表
-        results = []
-        for key in data:
-            if key != 'time':
-                results.extend(data[key])
-                
-        context = {
-            'scan': scan,
-            'results': results,
-            'key_list': key_list
-        }
-        return render(request, "dir-result.html", context)
-    else:
-        return render(request, "dir-result.html", {"error": "暂无结果"})
 
 
 
@@ -184,7 +195,7 @@ def get_target(request):
 @login_required
 def get_dir_scans(request):
     """获取目录扫描列表"""
-    scans = Directoryscan.objects.filter(user=request.user).order_by('-scan_time')
+    scans = Directoryscan.objects.order_by('-scan_time')
     scan_list = []
     for scan in scans:
         scan_list.append({

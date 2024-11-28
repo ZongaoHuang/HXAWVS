@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from vulnscan.models import Middleware_vuln
 from Sec_Tools.settings import API_KEY, API_URL
+from vulnscan.views import POC_Check
 from webscan.utils import create_log_entry
 import time
 
@@ -33,6 +34,7 @@ def reports(request):
                 # 'user': request.user.username, 
                 "report_id": target["report_id"],
                 "target": target["source"]["description"].split(";")[0],
+                "description": target["source"]["description"].split(";")[1],
                 "time": re.sub(r'T|\..*$', " ", target["generation_date"]),
                 "status": target["status"],
                 "download_html": target["download"][0],
@@ -45,6 +47,7 @@ def reports(request):
                 # 'user': request.user.username, 
                 "report_id": target["report_id"],
                 "target":target["source"]["description"].split(";")[0],
+                "description": target["source"]["description"].split(";")[1],
                 "time":re.sub(r'T|\..*$', " ", target["generation_date"]),
                 "status":target["status"],
                 "download_html":None,

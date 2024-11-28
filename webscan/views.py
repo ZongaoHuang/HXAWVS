@@ -76,7 +76,7 @@ def fingerprint(request):
     """指纹识别"""
     cms_items = FingerPrint.objects.all()
     categories = FpCategory.objects.all()
-    scans = webscan_backend.models.FingerPrint.objects.filter(user=request.user).order_by('-scan_time')
+    scans = webscan_backend.models.FingerPrint.objects.order_by('-scan_time')
     context = {
         'cms_items': cms_items,
         'categories': categories,
@@ -89,7 +89,7 @@ def fingerprint(request):
 def portscan(request):
     """端口扫描"""
     portlists = PortList.objects.all()
-    scans = PortScan.objects.filter(user=request.user).order_by('-scan_time')
+    scans = PortScan.objects.order_by('-scan_time')
     context = {
         'portlists': portlists,
         'scans': scans
@@ -100,7 +100,7 @@ def portscan(request):
 @login_required
 def infoleak(request):
     """信息泄露"""
-    scans = InfoLeak.objects.filter(user=request.user).order_by('-scan_time')
+    scans = InfoLeak.objects.order_by('-scan_time')
     context = {
         'scans' : scans
     }

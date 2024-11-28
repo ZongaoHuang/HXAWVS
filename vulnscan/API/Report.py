@@ -21,6 +21,7 @@ class Report(Base):
     def get_all(self):
         try:
             response = requests.get(self.report_api, headers=self.auth_headers, verify=False)
+            # print(response.text)
             return response.json()
         except Exception:
             self.logger.error('Get All Reports Failed......', exc_info=True)

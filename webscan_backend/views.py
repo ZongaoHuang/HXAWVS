@@ -61,7 +61,7 @@ def port_scan(request):
 @csrf_exempt 
 @login_required
 def port_scan_result(request, scan_id):
-    scan = get_object_or_404(PortScan, id=scan_id, user=request.user)
+    scan = get_object_or_404(PortScan, id=scan_id)
     with open(scan.result_path, 'r') as f:
         result = json.load(f)
     return render(request, 'scan/port_scan_result.html', {'scan': scan, 'result': result})
@@ -69,7 +69,7 @@ def port_scan_result(request, scan_id):
 @csrf_exempt
 @login_required
 def get_port_scans(request):
-    scans = PortScan.objects.filter(user=request.user).order_by('-scan_time')
+    scans = PortScan.objects.order_by('-scan_time')
     scan_data = []
     for scan in scans:
         scan_data.append({
@@ -131,7 +131,7 @@ def info_leak(request):
 @csrf_exempt
 @login_required
 def info_leak_result(request, scan_id):
-    scan = get_object_or_404(InfoLeak, id=scan_id, user=request.user)
+    scan = get_object_or_404(InfoLeak, id=scan_id)
     with open(scan.result_path, 'r') as f:
         result = json.load(f)
     return render(request, 'scan/info_leak_result.html', {'scan': scan, 'result': result})
@@ -139,7 +139,7 @@ def info_leak_result(request, scan_id):
 @csrf_exempt
 @login_required
 def get_info_leak(request):
-    scans = InfoLeak.objects.filter(user=request.user).order_by('-scan_time')
+    scans = InfoLeak.objects.order_by('-scan_time')
     scan_data = []
     for scan in scans:
         scan_data.append({
@@ -367,7 +367,7 @@ def run_finger_print_scan(scan, url):
 @csrf_exempt
 @login_required
 def finger_print_result(request, scan_id):
-    scan = get_object_or_404(FingerPrint, id=scan_id, user=request.user)
+    scan = get_object_or_404(FingerPrint, id=scan_id)
     with open(scan.result_path, 'r') as f:
         result = json.load(f)
     return render(request, 'scan/finger_print_result.html', {'scan': scan, 'result': result})
@@ -375,7 +375,7 @@ def finger_print_result(request, scan_id):
 @csrf_exempt
 @login_required
 def get_finger_print(request):
-    scans = FingerPrint.objects.filter(user=request.user).order_by('-scan_time')
+    scans = FingerPrint.objects.order_by('-scan_time')
     scan_data = []
     for scan in scans:
         scan_data.append({

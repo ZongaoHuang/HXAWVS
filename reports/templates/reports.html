@@ -65,6 +65,7 @@
                                 <!-- <th data-sortable="true" data-field="user">用户</th> -->
 {#                                <th data-sortable="true" data-field="report_id">report_id</th>#}
 {#                                <th data-sortable="true" data-field="status">等级</th>#}
+                                <th data-sortable="true" data-field="description">任务名称-任务人</th>
                                 <th data-sortable="true" data-field="target">扫描目标</th>
 {#                                <th data-sortable="true" data-field="vuln_name">漏洞类型</th>#}
                                 <th data-sortable="true" data-field="time">创建时间</th>
@@ -80,6 +81,7 @@
                                     <td >{{ item.id }}</td>
                                     <!-- <td >{{ item.user }}</td> -->
 {#                                    <td style="display: none">{{ item.report_id }}</td>#}
+                                    <td ><a class="btn bg-blue-lt btn-block">{{ item.description }}</a></td>
                                     <td ><a class="btn bg-blue-lt btn-block">{{ item.target }}</a></td>
                                     <td ><span class="text-muted" >{{ item.time }}</span></td>
                                     <td>
