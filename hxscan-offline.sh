@@ -113,23 +113,6 @@ down_services() {
     echo "All services stopped and removed."
 }
 
-update_app_service(){
-    # 加载 Docker 镜像
-    docker load -i hxscan-app-beta.tar
-    echo "hxscan-app image loaded."
-
-    # 停止旧容器（如果存在）
-    docker stop hxscan-app-beta
-    docker rm hxscan-app-beta
-    echo "Old app container stopped and removed."
-
-    # 启动 hxscan-app 服务
-    $DOCKER_COMPOSE up -d hxscan-app-beta
-    $DOCKER_COMPOSE restart hxscan-app-beta
-    echo "hxscan-app service started."
-
-    echo "update app service completed."
-}
 
 # 显示菜单并获取用户选择
 echo "Please choose an option:"
@@ -138,8 +121,7 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-echo "6) update app service "
-read -p "Enter choice [1-6]: " choice
+read -p "Enter choice [1-5]: " choice
 
 # 根据用户选择执行相应的函数
 case "$choice" in
@@ -148,7 +130,6 @@ case "$choice" in
     3) stop_services ;;
     4) restart_services ;;
     5) down_services ;;
-    6) update_app_service;;
     *) echo "Invalid choice." ;;
 esac
 

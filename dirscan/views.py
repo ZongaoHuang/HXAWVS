@@ -28,24 +28,29 @@ def dir_scan_result(request, scan_id):
     
     if os.path.exists(scan.result_path):
         with open(scan.result_path) as f:
-            data = json.load(f)
-            
+            # 检查文件是否为空
+            if os.stat(scan.result_path).st_size == 0:
+                return render(request, "dir-result.html", {"error": "扫描结果为空"})
+
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                return render(request, "dir-result.html", {"error": "扫描结果格式错误"})
+
         # 处理数据
         k = set(data)
         k.discard('time')
         key_list = list(k)
         
         # 计数
-        n = 0
-        for key in data:
-            n = n + 1
+        n = len(data)  # 使用len()函数简化计数
         # 列表合一
         a = []
         num = 0
         for key in data:
-            num = num + 1
+            num += 1
             if num < n:
-                a = a + data[key]
+                a += data[key]
         print({"a": a, "key_list": key_list})
                 
         context = {

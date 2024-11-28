@@ -329,7 +329,7 @@ $(document).ready(function(){
 
 <script>
     function refreshDirScanList() {
-        $.get('/get_dir_scans', function(response) {
+        $.get('/get_dir_scans/', function(response) {
             if (response.code === 200) {
                 var tableBody = $('#dirscan_table tbody');
                 tableBody.empty();

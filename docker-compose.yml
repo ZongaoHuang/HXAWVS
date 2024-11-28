@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
 
   hxscan-app-beta:
-    image: snow7/hxscan-app:v1
+    image: snow7/hxscan-app:v1.2
     container_name: hxscan-app-beta
     ports:
       - "8000:8000"

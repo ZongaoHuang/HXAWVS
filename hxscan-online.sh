@@ -126,8 +126,7 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-echo "6) Update app service"
-read -p "Enter choice [1-6]: " choice
+read -p "Enter choice [1-5]: " choice
 
 case "$choice" in
     1) init_services ;;
@@ -135,7 +134,6 @@ case "$choice" in
     3) stop_services ;;
     4) restart_services ;;
     5) down_services ;;
-    6) update_app_service ;;
     *) echo "Invalid choice." ;;
 esac
 
