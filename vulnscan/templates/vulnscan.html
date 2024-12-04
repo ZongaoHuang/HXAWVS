@@ -169,6 +169,9 @@
         <div class="col-sm-4">
             <input type="password" class="form-control" id="loginPassword" placeholder="密码" disabled>
         </div>
+        <div class="col-sm-1">
+            <button class="btn btn-primary" id="validateLoginBtn" disabled>验证</button>
+        </div>
     </div>
         <p></p>
     <div class="form-group row">
@@ -181,8 +184,13 @@
         <div class="col-sm-4">
             <input type="text" class="form-control" id="headerValue" placeholder="Header值，例如Cookie: xxxxx" disabled>
         </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" id="validateHeaderBtn" disabled>验证Header</button>
+        </div>
     </div>
 </div>
+
+
 
 <script>
 function toggleSettings(checkbox, type) {
@@ -200,6 +208,7 @@ function toggleSettings(checkbox, type) {
             headerCheckbox.checked = false;
             loginUsername.disabled = false;
             loginPassword.disabled = false;
+            validateLoginBtn.disabled = false;
             headerValue.disabled = true;
             
             // Set full_scan and disable other options
@@ -207,6 +216,7 @@ function toggleSettings(checkbox, type) {
         } else {
             loginUsername.disabled = true;
             loginPassword.disabled = true;
+            validateLoginBtn.disabled = true;
             // Enable all scan types if header is also not checked
             if (!headerCheckbox.checked) {
                 enableAllScanTypes(scanTypeRadios, middlewareSelect);
@@ -219,11 +229,12 @@ function toggleSettings(checkbox, type) {
             headerValue.disabled = false;
             loginUsername.disabled = true;
             loginPassword.disabled = true;
-            
+            validateHeaderBtn.disabled = false;
             // Set full_scan and disable other options
             setFullScanOnly(scanTypeRadios, middlewareSelect);
         } else {
             headerValue.disabled = true;
+            validateHeaderBtn.disabled = true;
             // Enable all scan types if login is also not checked
             if (!loginCheckbox.checked) {
                 enableAllScanTypes(scanTypeRadios, middlewareSelect);
@@ -735,15 +746,6 @@ $.post('/get_vuln_value', function (data) {
             });
         }
 $(function() {
-    $('#enableLoginSettings').change(function() {
-        if ($(this).is(':checked')) {
-            $('#loginUsername').prop('disabled', false);
-            $('#loginPassword').prop('disabled', false);
-        } else {
-            $('#loginUsername').prop('disabled', true);
-            $('#loginPassword').prop('disabled', true);
-        }
-    });
 
     $(".scan-btn").click(function () {
         var domain = $('input[name=scan_url]').val();
@@ -971,4 +973,68 @@ $(function() {
 
         setInterval(refreshScanList, 5000);
 </script>
+
+<script>
+    $(function() {
+        // 监听复选框的变化
+        $('#enableLoginSettings').change(function() {
+            if ($(this).is(':checked')) {
+                // 启用输入框和验证按钮
+                $('#loginUsername').prop('disabled', false);
+                $('#loginPassword').prop('disabled', false);
+                $('#validateLoginBtn').prop('disabled', false);
+            } else {
+                // 禁用输入框和验证按钮
+                $('#loginUsername').prop('disabled', true);
+                $('#loginPassword').prop('disabled', true);
+                $('#validateLoginBtn').prop('disabled', true);
+            }
+        });
+
+        // 监听验证按钮的点击事件
+        $('#validateLoginBtn').click(function() {
+            // 获取输入框的值
+            var username = $('#loginUsername').val(); // 获取用户名
+            var password = $('#loginPassword').val(); // 获取密码
+            var url = $('input[name="scan_url"]').val(); // 获取URL
+
+            // 确保在发送请求之前检查这些值
+            console.log("Username:", username);
+            console.log("Password:", password);
+            console.log("URL:", url);
+
+            // 发送POST请求
+            $.post('/validate_login', { username: username, password: password, url: url })
+                .done(function(response) {
+                    // 请求成功，直接显示响应内容
+                    alert("响应内容:\n" + response); // 直接显示响应内容
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    // 请求失败，处理错误
+                    console.error("请求失败: " + textStatus, errorThrown);
+                    // 显示完整的响应内容
+                    alert("请求失败: " + textStatus + "\n响应内容:\n" + jqXHR.responseText);
+                });
+        });
+
+        // 监听Header验证按钮的点击事件
+        $('#validateHeaderBtn').click(function() {
+            // 获取Header值
+            var headerValue = $('#headerValue').val(); // 获取Header值
+            var url = $('input[name="scan_url"]').val(); // 获取URL
+
+            // 发送POST请求进行Header验证
+            $.post('/validate_header', { header: headerValue, url: url })
+                .done(function(response) {
+                    alert("响应内容:\n" + response); // 直接显示响应内容
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    alert("请求失败: " + textStatus + "\n响应内容:\n" + jqXHR.responseText);
+                });
+        });
+    });
+</script>
+
+
+
 {% endblock %}

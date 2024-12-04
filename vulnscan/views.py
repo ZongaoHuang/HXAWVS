@@ -2,6 +2,7 @@ from tempfile import template
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render
 from vulnscan.API.Scan import *
 from vulnscan.API.Target import *
@@ -24,8 +25,62 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .API.TargetOption import TargetOption
 from webscan.utils import create_log_entry
+import requests
+
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+import requests
+
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+import requests
 
 
+@csrf_exempt
+@login_required
+def validate_header(request):
+    if request.method == 'POST':
+        header_value = request.POST.get('header')
+        url = request.POST.get('url')
+
+        # 发送请求到指定的 URL 进行Header验证
+        try:
+            # 发送 POST 请求，包含Header
+            headers = {'Authorization': header_value}  # 假设使用Authorization头
+            response = requests.post(url, headers=headers)
+
+            # 直接返回响应的内容
+            return HttpResponse(response.content, content_type=response.headers.get('Content-Type'), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            # 捕获请求相关的异常
+            return HttpResponse(f'Error: {str(e)}', status=500)
+
+    return HttpResponse('Invalid request method', status=400)
+
+@csrf_exempt
+@login_required
+def validate_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        url = request.POST.get('url')
+
+        # 发送请求到指定的 URL 进行登录测试
+        try:
+            # 发送 POST 请求，包含用户名和密码
+            response = requests.post(url, data={'username': username, 'password': password})
+
+            # 直接返回响应的内容
+            return HttpResponse(response.content, content_type=response.headers.get('Content-Type'), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            # 捕获请求相关的异常
+            return HttpResponse(f'Error: {str(e)}', status=500)
+
+    return HttpResponse('Invalid request method', status=400)
 
 @csrf_exempt
 @login_required

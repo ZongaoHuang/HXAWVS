@@ -23,6 +23,8 @@ def port_scan(request):
     """
     from .plugins.portscan.portscan import ScanPort
     ip = request.POST.get('ip')
+    start_port = int(request.POST.get('start_port', 0))  # 获取起始端口
+    end_port = int(request.POST.get('end_port', 65535))  # 获取结束端口
     if check_ip(ip):
         scan = PortScan.objects.create(
             user=request.user,
@@ -31,7 +33,7 @@ def port_scan(request):
         )
         
         # 获取扫描结果
-        port_dict = ScanPort(ip).pool()
+        port_dict = ScanPort(ip, start_port, end_port).pool()  # 传递端口范围
         
         # 转换结果格式为列表格式，用于实时显示
         result = []
@@ -272,7 +274,7 @@ def what_cms(request):
         MYLOGGER.info('M:' + request.method + ' P:' + request.path + ' UPOST:' + str(
             request.POST) + ' SC:200 UIP:' + getuserip(request) + ' RDATA:' + str(result))
         return success(200, result, 'ok')
-    return error(400, '请填写正确的URL地址', 'error')
+    return error(400, '请填写���确的URL地址', 'error')
 
 @csrf_exempt
 @login_required

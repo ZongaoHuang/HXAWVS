@@ -59,6 +59,14 @@
                     <input type="text" name="siteip" minlength="7" maxlength="15" required="" {#  lay-verify="required" lay-vertype="tips"#} placeholder="请填写正确的IP地址" autocomplete="off" class="form-control  form-control-lg">
                 </div>
                 <!-- 按钮 -->
+                <div class="input-icon mb-3 float-left" style="width: 40%">
+                    <input type="number" name="start_port" min="0" max="65535" required="" placeholder="起始端口" class="form-control form-control-lg">
+                </div>
+                <!-- 结束端口输入框 -->
+                <div class="input-icon mb-3 float-left" style="width: 40%">
+                    <input type="number" name="end_port" min="0" max="65535" required="" placeholder="结束端口" class="form-control form-control-lg">
+                </div>
+                <!-- 按钮 -->
                 <button class="scan-btn btn btn-lg btn-indigo float-left">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>
                     扫描端口
@@ -290,25 +298,31 @@
     <script type="text/javascript">
             //获取端口信息
             function get_port_info(ip) {
-                $.post('/webscan_backend/port_scan', {
-                    ip: ip
-                }, function (data) {
-                    if (data.code !== 200) {
-                        $('.scan-result').hide();
-                        layer.msg(data.data);
-                    } else {
-                        $('tbody tr:first').html("<td class='table-primary'><strong>端口</strong></td><td class='table-primary'><strong>协议/服务</strong></td>");
-                        var tr_html = '';
-                        $.each(data.data, function (index, obj) {   {#遍历对象输出到页面中#}
-                            let obj_arr = obj.split(':');
-                            $('tbody:first').append("<tr><td><span class='btn bg-green-lt btn-block' style='width: 200px'>"+ obj_arr[1] + "</span></td><td><span class='btn bg-azure-lt btn-block' style='width: 200px'>" + obj_arr[0] + "</span></td></tr>");
-                        });
-                        layer.msg('查询成功',{icon: 1,offset: '220px',area: ['70px', '70px']});//查询成功提示框 options:图标，相对位置，宽高
-                    }
-                    $(".scan-btn").html('<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>'+'重新扫描');
-                    $('.scan-btn').attr('disabled', false);
+        // 获取用户输入的起始和结束端口
+        var start_port = parseInt($('input[name="start_port"]').val()) || 0; // 默认值为0
+        var end_port = parseInt($('input[name="end_port"]').val()) || 65535; // 默认值为65535
+
+        $.post('/webscan_backend/port_scan', {
+            ip: ip,
+            start_port: start_port,
+            end_port: end_port // 添加结束端口
+        }, function (data) {
+            if (data.code !== 200) {
+                $('.scan-result').hide();
+                layer.msg(data.data);
+            } else {
+                $('tbody tr:first').html("<td class='table-primary'><strong>端口</strong></td><td class='table-primary'><strong>协议/服务</strong></td>");
+                var tr_html = '';
+                $.each(data.data, function (index, obj) {   // 遍历对象输出到页面中
+                    let obj_arr = obj.split(':');
+                    $('tbody:first').append("<tr><td><span class='btn bg-green-lt btn-block' style='width: 200px'>" + obj_arr[1] + "</span></td><td><span class='btn bg-azure-lt btn-block' style='width: 200px'>" + obj_arr[0] + "</span></td></tr>");
                 });
+                layer.msg('查询成功', {icon: 1, offset: '220px', area: ['70px', '70px']}); // 查询成功提示框
             }
+            $(".scan-btn").html('<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>' + '重新扫描');
+            $('.scan-btn').attr('disabled', false);
+        });
+    }
             //查询按钮点击触发功能
             $(function () {
                 $(".scan-btn").click(function () {
@@ -368,6 +382,22 @@
             $(document).on('click', '.delete-btn', function() {
                 var scanId = $(this).data('scan-id');
                 if (confirm('确定要删除该扫描记录吗？')) {
+                    $.post('/webscan_backend/delete_port_scan', {
+                        scan_id: scanId
+                    }, function(response) {
+                        if (response.code === 200 && response.data.success) {
+                            refreshScanList();
+                        } else {
+                            alert('Failed to delete scan: ' + response.message);
+                        }
+                    }).fail(function() {
+                        alert('Failed to delete scan: Network error');
+                    });
+                }
+            });
+            $(document).on('click', '.abort-btn', function() {
+                var scanId = $(this).data('scan-id');
+                if (confirm('确定要停止该扫描记录吗？')) {
                     $.post('/webscan_backend/delete_port_scan', {
                         scan_id: scanId
                     }, function(response) {

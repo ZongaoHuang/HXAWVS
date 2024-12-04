@@ -11,7 +11,7 @@ from urllib import parse
 
 sys.path.append(os.getcwd())
 
-THREADNUM = 64  # 线程数
+THREADNUM = 128  # 线程数
 
 SIGNS = (
     # 协议 | 版本 | 关键字
@@ -240,27 +240,7 @@ def get_server(port):
     return 'Unknown'  # 只返回未知标记，不包含端口号
 
 
-# 修改扫描端口范围，分为三类：常用端口、系统端口和高位端口
-PORTS = [
-    # 常用服务端口
-    21, 22, 23, 25, 53, 69, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 110, 111, 135, 139, 143, 
-    161, 389, 443, 445, 465, 489, 512, 513, 514, 873, 993, 995, 1080, 1158, 1433, 1434, 1521, 
-    1723, 2082, 2083, 2181, 2222, 2375, 2604, 3000, 3128, 3306, 3312, 3389, 3690, 4440, 4848,
-    5000, 5432, 5632, 5900, 5938, 5984, 6082, 6379, 6800, 7001, 7002, 7778, 8000, 8001, 8002,
-    8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8069, 8080, 8081, 8082, 8083, 8084, 8085,
-    8086, 8087, 8088, 8089, 8090, 8888, 9000, 9001, 9002, 9003, 9004, 9005, 9090, 9200, 9300,
-    10000, 10050, 10051, 11211, 27017, 27018, 27019, 50000, 50070, 29002, 29004, 29000, 29001,
-    29003, 29004, 29005, 29006, 29007, 
-    
-    # 系统端口(1-1024)
-    *range(1, 1025),
-    
-    # 高位常用端口
-    *range(8000, 8090),  # 8000-8089
-    *range(8440, 8450),  # 常见 Web 服务端口
-    *range(9000, 9010),  # 常见 Web 服务端口
-    *range(9090, 9100),  # 常见 Web 服务端口
-]
+PORTS = list(range(0, 65536))  # 包括所有端口从0到65535
 
 
 PROBE = {
@@ -269,12 +249,14 @@ PROBE = {
 
 
 class ScanPort():
-    def __init__(self, ipaddr):
+    def __init__(self, ipaddr, start_port=0, end_port=65535):
         self.ipaddr = ipaddr
         self.port = []
         self.out = []
         self.num = 0
         self.timeout = 2  # 增加超时时间到2秒
+        self.start_port = start_port
+        self.end_port = end_port
 
     def socket_scan(self, hosts):
         global PROBE
@@ -309,9 +291,9 @@ class ScanPort():
 
     def run(self, ip):
         hosts = []
-        global PORTS, THREADNUM
+        global THREADNUM
         # 使用set去重端口号
-        unique_ports = list(set(PORTS))
+        unique_ports = list(range(self.start_port, self.end_port + 1))  # 根据用户输入的端口范围
         for i in unique_ports:
             hosts.append('{}:{}'.format(ip, i))
         try:

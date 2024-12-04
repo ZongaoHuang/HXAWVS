@@ -16,6 +16,9 @@ urlpatterns = [
     path("abort_scan",views.abort_scan, name="abort_scan"),
     path("delete_scan",views.delete_scan, name="delete_scan"),
     path('get_vuln_scans', views.get_vuln_scans, name='get_vuln_scans'),
+    
+    path('validate_login', views.validate_login, name='validate_login'),
+    path('validate_header', views.validate_header, name='validate_header'),
 ]
 
 target_ids = views.get_target_id()
