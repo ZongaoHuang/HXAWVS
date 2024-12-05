@@ -90,6 +90,33 @@ start_services() {
     done
 }
 
+# 新增的离线更新服务函数
+update_services() {
+    echo "Updating hxscan-app service..."
+
+    # 停止 hxscan-app-beta 容器
+    docker stop hxscan-app-beta
+    docker rm hxscan-app-beta
+
+    # 加载新的 hxscan-app 镜像
+    docker load -i hxscan-app-new.tar
+    echo "hxscan-app image updated."
+
+    # 启动 hxscan-app 服务
+    $DOCKER_COMPOSE up -d hxscan-app-beta
+    echo "hxscan-app service restarted."
+
+    # 获取IP地址
+    IPs=$(get_ip_addresses)
+
+    # 输出访问URL
+    echo "You can access the application at:"
+    echo " - http://localhost:8000"
+    for IP in $IPs; do
+        echo " - http://$IP:8000"
+    done
+}
+
 stop_services() {
     echo "Stopping services..."
     $DOCKER_COMPOSE stop
@@ -121,7 +148,8 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-read -p "Enter choice [1-5]: " choice
+echo "6) update services"
+read -p "Enter choice [1-6]: " choice
 
 # 根据用户选择执行相应的函数
 case "$choice" in
@@ -130,6 +158,7 @@ case "$choice" in
     3) stop_services ;;
     4) restart_services ;;
     5) down_services ;;
+    6) update_services ;;
     *) echo "Invalid choice." ;;
 esac
 

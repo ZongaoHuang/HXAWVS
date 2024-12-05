@@ -57,22 +57,15 @@ init_services() {
     done
 }
 
-update_app_service(){
-    # 拉取最新的 app 镜像
-    docker pull snow7/hxscan-app:v1
-    echo "hxscan-app image pulled."
+# 新增的更新服务函数
+update_services() {
+    echo "Updating hxscan-app service..."
 
-    # 停止旧容器
-    docker stop hxscan-app-beta
-    docker rm hxscan-app-beta
-    echo "Old app container stopped and removed."
-
-    # 启动新服务
+    # 更新 hxscan-app 容器
+    $DOCKER_COMPOSE pull hxscan-app-beta
     $DOCKER_COMPOSE up -d hxscan-app-beta
-    $DOCKER_COMPOSE restart hxscan-app-beta
-    echo "hxscan-app service started."
 
-    echo "Update app service completed."
+    echo "hxscan-app service updated."
 }
 
 # ... 其他函数保持不变 ...
@@ -126,7 +119,8 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-read -p "Enter choice [1-5]: " choice
+echo "6) update services"
+read -p "Enter choice [1-6]: " choice
 
 case "$choice" in
     1) init_services ;;
@@ -134,6 +128,7 @@ case "$choice" in
     3) stop_services ;;
     4) restart_services ;;
     5) down_services ;;
+    6) update_services ;;
     *) echo "Invalid choice." ;;
 esac
 

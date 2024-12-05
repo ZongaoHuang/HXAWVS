@@ -20,6 +20,13 @@ services:
     networks:
       - hxscan-network
     restart: unless-stopped
+    volumes:
+      - ./dirscan_results:/app/dirscan_results
+      - ./info_leak_results:/app/info_leak_results
+      - ./port_scan_results:/app/port_scan_results
+      - ./finger_print_results:/app/finger_print_results
+      - ./media:/app/media
+      - ./db.sqlite3:/app/db.sqlite3  # 持久化数据库
 
 networks:
   hxscan-network:

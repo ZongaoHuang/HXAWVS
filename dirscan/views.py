@@ -115,7 +115,7 @@ def search_post(request):
 
         try:
             parm = []  # 勾选参数列表
-            result_path = f'dirscan/dirsearch/reports/dirscan_{scan.id}.json'  # 为每个扫描创建唯一的结果文件
+            result_path = f'dirscan_results/dirscan_{scan.id}.json'  # 为每个扫描创建唯一的结果文件
             
             # 获取用户选择的参数，存入列表
             extensions = ['php', 'asp', 'jsp', 'txt', 'zip', 'html', 'js']
