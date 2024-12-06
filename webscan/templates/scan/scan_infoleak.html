@@ -410,6 +410,22 @@
               });
           }
       });
+      $(document).on('click', '.abort-btn', function() {
+        var scanId = $(this).data('scan-id');
+        if (confirm('确定要终止该扫描吗？')) {
+            $.post('/webscan_backend/delete_info_leak', {
+                scan_id: scanId
+            }, function(response) {
+                if (response.code === 200 && response.data.success) {
+                    refreshScanList();
+                } else {
+                    alert('Failed to delete scan: ' + response.message);
+                }
+            }).fail(function() {
+                alert('Failed to delete scan: Network error');
+            });
+        }
+    });
     </script>
 
 
