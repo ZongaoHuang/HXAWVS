@@ -37,18 +37,79 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import requests
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+@csrf_exempt
+@login_required
+def validate_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        url = request.POST.get('url')
+
+        # 设置 Chrome 选项
+        chrome_options = Options()
+        # chrome_options.add_argument("--headless")  # 无头模式，不显示浏览器窗口
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        # 启动 Chrome 浏览器
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+        try:
+            # 打开登录页面
+            driver.get(url)
+
+            # 等待用户名输入框出现
+
+            username_input = driver.find_element(By.XPATH, '//input[@type="text"]')
+            password_input = driver.find_element(By.XPATH, '//input[@type="password"]')  # 根据实际情况修改
+
+            # 输入用户名和密码
+            username_input.send_keys(username)
+            password_input.send_keys(password)
+
+            # 提交表单
+            password_input.submit()  # 或者找到提交按钮并点击
+
+            # 等待页面加载
+            time.sleep(3)  # 根据需要调整等待时间
+
+            # 获取登录后的页面内容
+            response_content = driver.page_source
+
+            # 返回响应内容
+            return HttpResponse(response_content, content_type='text/html')
+
+        except Exception as e:
+            return HttpResponse(f'Error: {str(e)}', status=500)
+
+        finally:
+            driver.quit()  # 关闭浏览器
+
+    return HttpResponse('Invalid request method', status=400)
 
 @csrf_exempt
 @login_required
 def validate_header(request):
     if request.method == 'POST':
-        header_value = request.POST.get('header')
+        cookie_value = request.POST.get('header')  # 假设这里是前端填入的 cookie
         url = request.POST.get('url')
 
-        # 发送请求到指定的 URL 进行Header验证
+        # 发送请求到指定的 URL 进行 Header 验证
         try:
-            # 发送 POST 请求，包含Header
-            headers = {'Authorization': header_value}  # 假设使用Authorization头
+            # 发送 POST 请求，包含 Cookie 和 User-Agent
+            headers = {
+                'Cookie': cookie_value,  # 使用 Cookie 头
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'  # 添加 User-Agent
+            }
             response = requests.post(url, headers=headers)
 
             # 直接返回响应的内容
@@ -60,27 +121,6 @@ def validate_header(request):
 
     return HttpResponse('Invalid request method', status=400)
 
-@csrf_exempt
-@login_required
-def validate_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        url = request.POST.get('url')
-
-        # 发送请求到指定的 URL 进行登录测试
-        try:
-            # 发送 POST 请求，包含用户名和密码
-            response = requests.post(url, data={'username': username, 'password': password})
-
-            # 直接返回响应的内容
-            return HttpResponse(response.content, content_type=response.headers.get('Content-Type'), status=response.status_code)
-
-        except requests.exceptions.RequestException as e:
-            # 捕获请求相关的异常
-            return HttpResponse(f'Error: {str(e)}', status=500)
-
-    return HttpResponse('Invalid request method', status=400)
 
 @csrf_exempt
 @login_required
