@@ -56,7 +56,7 @@ def validate_login(request):
 
         # 设置 Chrome 选项
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")  # 无头模式，不显示浏览器窗口
+        chrome_options.add_argument("--headless")  # 无头模式，不显示浏览器窗口
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -102,7 +102,6 @@ def validate_header(request):
     if request.method == 'POST':
         cookie_value = request.POST.get('header')  # 假设这里是前端填入的 cookie
         url = request.POST.get('url')
-
         # 发送请求到指定的 URL 进行 Header 验证
         try:
             # 发送 POST 请求，包含 Cookie 和 User-Agent
@@ -110,7 +109,7 @@ def validate_header(request):
                 'Cookie': cookie_value,  # 使用 Cookie 头
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'  # 添加 User-Agent
             }
-            response = requests.post(url, headers=headers)
+            response = requests.get(url, headers=headers)
 
             # 直接返回响应的内容
             return HttpResponse(response.content, content_type=response.headers.get('Content-Type'), status=response.status_code)
