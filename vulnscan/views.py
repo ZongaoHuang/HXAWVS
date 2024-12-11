@@ -44,6 +44,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+
 import time
 
 @csrf_exempt
@@ -61,14 +62,13 @@ def validate_login(request):
         chrome_options.add_argument("--disable-dev-shm-usage")
 
         # 启动 Chrome 浏览器
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        driver = webdriver.Chrome(service=Service(), options=chrome_options)
 
         try:
             # 打开登录页面
             driver.get(url)
 
             # 等待用户名输入框出现
-
             username_input = driver.find_element(By.XPATH, '//input[@type="text"]')
             password_input = driver.find_element(By.XPATH, '//input[@type="password"]')  # 根据实际情况修改
 
