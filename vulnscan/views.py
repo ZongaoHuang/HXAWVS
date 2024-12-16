@@ -60,7 +60,7 @@ def validate_login(request):
         # 用户名和密码关键字列表
         username_keyword_list = [
             "user", "name", "zhanghao", "yonghu", 
-            "email", "account", "username", "login"
+            "email", "account", "username", "login", "text"
         ]
         password_keyword_list = [
             "pass", "pw", "mima", "password", "pwd"
@@ -170,15 +170,22 @@ def validate_login(request):
 @login_required
 def validate_header(request):
     if request.method == 'POST':
-        cookie_value = request.POST.get('header')  # 假设这里是前端填入的 cookie
+        header_value = request.POST.get('header')  # 假设这里是前端填入的 header
         url = request.POST.get('url')
+        
         # 发送请求到指定的 URL 进行 Header 验证
         try:
-            # 发送 POST 请求，包含 Cookie 和 User-Agent
-            headers = {
-                'Cookie': cookie_value,  # 使用 Cookie 头
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'  # 添加 User-Agent
-            }
+            # 判断 header 的类型并构建请求头
+            headers = {}
+            if header_value.startswith('Cookie:'):
+                headers['Cookie'] = header_value[len('Cookie:'):].strip()  # 去掉前缀并清理空格
+            elif header_value.startswith('Authorization:'):
+                headers['Authorization'] = header_value[len('Authorization:'):].strip()  # 去掉前缀并清理空格
+            
+            # 添加 User-Agent
+            headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+            
+            # 发送 GET 请求
             response = requests.get(url, headers=headers)
 
             # 直接返回响应的内容

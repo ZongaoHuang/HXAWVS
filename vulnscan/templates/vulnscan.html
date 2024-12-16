@@ -185,7 +185,7 @@
             <input type="text" class="form-control" id="headerValue" placeholder="Cookie值" disabled>
         </div>
         <div class="col-sm-2">
-            <button class="btn btn-primary" id="validateHeaderBtn" disabled>验证Header</button>
+            <button class="btn btn-primary" id="validateHeaderBtn" disabled>Header值，例如Cookie: xxxxx</button>
         </div>
     </div>
 </div>
@@ -759,7 +759,7 @@ $(function() {
         var username = $('#loginUsername').val();
         var password = $('#loginPassword').val();
         var cookieEnabled = $('#enableHeaderSettings').is(":checked")
-        var cookie_header = 'Cookie: ' + $('#headerValue').val();
+        var cookie_header = $('#headerValue').val();
 
         if (loginEnabled || cookieEnabled) {
             // If login is enabled, force scan_type to 'full_scan'
