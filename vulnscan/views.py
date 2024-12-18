@@ -49,26 +49,18 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import time
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 @csrf_exempt
 @login_required
 def validate_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
         url = request.POST.get('url')
-
-        # 用户名和密码关键字列表
-        username_keyword_list = [
-            "user", "name", "zhanghao", "yonghu", 
-            "email", "account", "username", "login", "text"
-        ]
-        password_keyword_list = [
-            "pass", "pw", "mima", "password", "pwd"
-        ]
-        login_keyword_list = [
-            "用户名", "密码", "login", "denglu", "登录", 
-            "user", "pass", "yonghu", "mima", "admin"
-        ]
+        print(f"Attempting to log in to URL: {url}")
 
         # 设置 Chrome 选项
         chrome_options = Options()
@@ -81,88 +73,92 @@ def validate_login(request):
 
         try:
             # 打开登录页面
+            print("Opening the login page...")
             driver.get(url)
             
             # 等待页面加载
             time.sleep(5)
+            print("Page loaded, searching for input fields...")
 
-            # 尝试查找用户名输入框
-            username_input = None
-            for keyword in username_keyword_list:
-                try:
-                    username_input = driver.find_element(By.NAME, keyword)
-                    break
-                except NoSuchElementException:
-                    try:
-                        username_input = driver.find_element(By.ID, keyword)
-                        break
-                    except NoSuchElementException:
-                        continue
+            # 直接查找页面中的所有输入框
+            input_fields = driver.find_elements(By.XPATH, '//input')
+            if len(input_fields) < 2:
+                print("Error: Less than 2 input fields found.")
+                return HttpResponse('Unable to find enough input fields', status=400)
 
-            # 尝试查找密码输入框
-            password_input = None
-            for keyword in password_keyword_list:
-                try:
-                    password_input = driver.find_element(By.NAME, keyword)
-                    break
-                except NoSuchElementException:
-                    try:
-                        password_input = driver.find_element(By.ID, keyword)
-                        break
-                    except NoSuchElementException:
-                        continue
+            # 尝试使用 input0 和 input1
+            try:
+                username_input = input_fields[0]  # 第一个输入框
+                password_input = input_fields[1]  # 第二个输入框
 
-            # 尝试查找登录按钮或表单
-            login_button = None
-            for keyword in login_keyword_list:
-                try:
-                    # 尝试查找按钮（使用更简单的 XPath）
-                    login_button = driver.find_element(By.XPATH, f'//button[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
-                    break
-                except NoSuchElementException:
-                    try:
-                        # 尝试查找输入框
-                        login_button = driver.find_element(By.XPATH, f'//input[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
-                    except NoSuchElementException:
-                        try:
-                            # 尝试查找按钮文本
-                            login_button = driver.find_element(By.XPATH, f'//button[contains(text(), "{keyword}")]')
-                            break
-                        except NoSuchElementException:
-                            continue
+                # 等待输入框可交互
 
-            # 如果找不到输入框，返回错误
-            if username_input is None or password_input is None:
-                return HttpResponse('Unable to find login input fields', status=400)
+                # 输入用户名和密码
+                username_input.clear()
+                username_input.send_keys(request.POST.get('username'))  # 从请求中获取用户名
+                print(f"Entered username: {request.POST.get('username')}")
+                password_input.clear()
+                password_input.send_keys(request.POST.get('password'))  # 从请求中获取密码
+                print("Entered password.")
 
-            # 输入用户名和密码
-            username_input.clear()
-            username_input.send_keys(username)
-            password_input.clear()
-            password_input.send_keys(password)
+                # 提交方式
+                password_input.submit()  # 使用表单提交
+                print("Submitting the form...")
 
-            # 提交方式
-            if login_button:
-                # 如果找到登录按钮，点击按钮
-                login_button.click()
-            else:
-                # 如果没有找到登录按钮，使用表单提交
-                password_input.submit()
+                # 等待页面加载
+                time.sleep(3)
+                print("Waiting for the response...")
 
-            # 等待页面加载
-            time.sleep(3)
+                # 获取登录后的页面内容
+                response_content = driver.page_source
+                print("Login successful, retrieving response content.")
 
-            # 获取登录后的页面内容
-            response_content = driver.page_source
+                # 返回响应内容
+                return HttpResponse(response_content, content_type='text/html')
 
-            # 返回响应内容
-            return HttpResponse(response_content, content_type='text/html')
+            except Exception as e:
+                print(f"Error with input0 and input1: {str(e)}")
+                print("Trying input1 and input2...")
+
+                # 尝试使用 input1 和 input2
+                if len(input_fields) < 3:
+                    print("Error: Less than 3 input fields found.")
+                    return HttpResponse('Unable to find enough input fields', status=400)
+
+                username_input = input_fields[1]  # 第二个输入框
+                password_input = input_fields[2]  # 第三个输入框
+
+
+                # 输入用户名和密码
+                username_input.clear()
+                username_input.send_keys(request.POST.get('username'))  # 从请求中获取用户名
+                print(f"Entered username: {request.POST.get('username')}")
+                password_input.clear()
+                password_input.send_keys(request.POST.get('password'))  # 从请求中获取密码
+                print("Entered password.")
+
+                # 提交方式
+                password_input.submit()  # 使用表单提交
+                print("Submitting the form...")
+
+                # 等待页面加载
+                time.sleep(3)
+                print("Waiting for the response...")
+
+                # 获取登录后的页面内容
+                response_content = driver.page_source
+                print("Login successful, retrieving response content.")
+
+                # 返回响应内容
+                return HttpResponse(response_content, content_type='text/html')
 
         except Exception as e:
+            print(f'Error: {str(e)}')  # 打印错误信息到控制台
             return HttpResponse(f'Error: {str(e)}', status=500)
 
         finally:
             driver.quit()  # 关闭浏览器
+            print("Browser closed.")
 
     return HttpResponse('Invalid request method', status=400)
 
