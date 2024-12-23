@@ -64,8 +64,7 @@ def validate_login(request):
         username = request.POST.get('username')
         print(f"Entered username: {request.POST.get('username')}")
         password = request.POST.get('password')
-        password_input.send_keys(request.POST.get('password'))  # 从请求中获取密码
-        url = request.POST.get('url')
+        print(f"Entered username: {request.POST.get('password')}")
         login_keyword_list = [
                     "用户名", "密码", "login", "denglu", "登录", 
                     "user", "pass", "yonghu", "mima", "admin"
