@@ -4,13 +4,19 @@ FROM python:3.9
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的系统依赖
+# 安装必要的系统依赖和常用工具
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
     gnupg2 \
     software-properties-common \
+    vim \       
+    netcat \     
+    git \        
+    nano \       
+    htop \       
+    tree \       
     && apt-get clean
 
 # 安装 Google Chrome
