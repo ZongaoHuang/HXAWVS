@@ -62,13 +62,12 @@ def validate_login(request):
         url = request.POST.get('url')
         print(f"Attempting to log in to URL: {url}")
         username = request.POST.get('username')
-        print(f"Entered username: {request.POST.get('username')}")
+        print(f"Entered username: {username}")
         password = request.POST.get('password')
-        print(f"Entered username: {request.POST.get('password')}")
-        login_keyword_list = [
-                    "用户名", "密码", "login", "denglu", "登录", 
-                    "user", "pass", "yonghu", "mima", "admin"
-        ]
+        print(f"Entered password: {password}")
+        
+        login_keyword_list = ["用户名", "密码", "login", "denglu", "登录", "user", "pass", "yonghu", "mima", "admin", "登陆"]
+        
         # 设置 Chrome 选项
         chrome_options = Options()
         chrome_options.add_argument("--headless")
@@ -97,41 +96,36 @@ def validate_login(request):
             try:
                 username_input = input_fields[0]  # 第一个输入框
                 password_input = input_fields[1]  # 第二个输入框
-
-                # 尝试查找登录按钮或表单
                 login_button = None
+
                 for keyword in login_keyword_list:
                     try:
                         # 尝试查找按钮（使用更简单的 XPath）
-                        login_button = driver.find_element(By.XPATH, f'//button[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
+                        print(f"1: Found login button with value: {keyword}")
+                        login_button = driver.find_element(By.XPATH, f"//button[contains(@value, {keyword})]")
                         break
                     except NoSuchElementException:
                         try:
-                            # 尝试查找输入框
-                            login_button = driver.find_element(By.XPATH, f'//input[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
+                            # 尝试查找按钮文本
+                            print(f"1: Found login button with text: {keyword}")
+                            login_button = driver.find_element(By.XPATH, f"//button[contains(text(), {keyword})]")
+                            break
                         except NoSuchElementException:
-                            try:
-                                # 尝试查找按钮文本
-                                login_button = driver.find_element(By.XPATH, f'//button[contains(text(), "{keyword}")]')
-                                break
-                            except NoSuchElementException:
-                                continue
-
-                # 如果找不到输入框，返回错误
-                if username_input is None or password_input is None:
-                    return HttpResponse('Unable to find login input fields', status=400)
+                            print(f"1: Unable to find button for keyword: {keyword}")
+                            continue
 
                 # 输入用户名和密码
                 username_input.clear()
                 username_input.send_keys(username)
                 password_input.clear()
                 password_input.send_keys(password)
+
                 # 提交方式
                 if login_button:
-                    # 如果找到登录按钮，点击按钮
+                    print("1: Found login button, clicking it.")
                     login_button.click()
                 else:
-                    # 如果没有找到登录按钮，使用表单提交
+                    print("1: No login button found, submitting the form.")
                     password_input.submit()
 
                 # 等待页面加载
@@ -141,14 +135,14 @@ def validate_login(request):
                 # 获取登录后的页面内容
                 response_content = driver.page_source
                 print("Login successful, retrieving response content.")
-
-                # 返回响应内容
                 return HttpResponse(response_content, content_type='text/html')
 
             except Exception as e:
                 print(f"Error with input0 and input1: {str(e)}")
                 print("Trying input1 and input2...")
 
+            # Move this try block outside the previous one
+            try:
                 # 尝试使用 input1 和 input2
                 if len(input_fields) < 3:
                     print("Error: Less than 3 input fields found.")
@@ -156,30 +150,22 @@ def validate_login(request):
 
                 username_input = input_fields[1]  # 第二个输入框
                 password_input = input_fields[2]  # 第三个输入框
-
-
-                # 尝试查找登录按钮或表单
                 login_button = None
+
                 for keyword in login_keyword_list:
                     try:
-                        # 尝试查找按钮（使用更简单的 XPath）
-                        login_button = driver.find_element(By.XPATH, f'//button[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
+                        print(f"2: Found login button with value: {keyword}")
+                        login_button = driver.find_element(By.XPATH, f"//button[contains(@value, {keyword})]")
                         break
                     except NoSuchElementException:
                         try:
-                            # 尝试查找输入框
-                            login_button = driver.find_element(By.XPATH, f'//input[contains(@value, "{keyword}") or contains(translate(@value, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "{keyword}")]')
+                            print(f"2: Found login button with text: {keyword}")
+                            login_button = driver.find_element(By.XPATH, f"//button[contains(text(), {keyword})]")
+                            break
                         except NoSuchElementException:
-                            try:
-                                # 尝试查找按钮文本
-                                login_button = driver.find_element(By.XPATH, f'//button[contains(text(), "{keyword}")]')
-                                break
-                            except NoSuchElementException:
-                                continue
+                            print(f"2: Unable to find button for keyword: {keyword}")
+                            continue
 
-                # 如果找不到输入框，返回错误
-                if username_input is None or password_input is None:
-                    return HttpResponse('Unable to find login input fields', status=400)
                 # 输入用户名和密码
                 username_input.clear()
                 username_input.send_keys(username)
@@ -188,10 +174,10 @@ def validate_login(request):
 
                 # 提交方式
                 if login_button:
-                    # 如果找到登录按钮，点击按钮
+                    print("2: Found login button, clicking it.")
                     login_button.click()
                 else:
-                    # 如果没有找到登录按钮，使用表单提交
+                    print("2: No login button found, submitting the form.")
                     password_input.submit()
 
                 # 等待页面加载
@@ -201,8 +187,56 @@ def validate_login(request):
                 # 获取登录后的页面内容
                 response_content = driver.page_source
                 print("Login successful, retrieving response content.")
+                return HttpResponse(response_content, content_type='text/html')
 
-                # 返回响应内容
+            except Exception as e:
+                print(f"Error with input1 and input2: {str(e)}")
+                print("Trying input2 and input3...")
+
+                # 尝试使用 input2 和 input3
+                if len(input_fields) < 4:
+                    print("Error: Less than 4 input fields found.")
+                    return HttpResponse('Unable to find enough input fields', status=400)
+
+                username_input = input_fields[2]  # 第三���输入框
+                password_input = input_fields[3]  # 第四个输入框
+                login_button = None
+
+                for keyword in login_keyword_list:
+                    try:
+                        print(f"3: Found login button with value: {keyword}")
+                        login_button = driver.find_element(By.XPATH, f"//button[contains(@value, {keyword})]")
+                        break
+                    except NoSuchElementException:
+                        try:
+                            print(f"3: Found login button with text: {keyword}")
+                            login_button = driver.find_element(By.XPATH, f"//button[contains(text(), {keyword})]")
+                            break
+                        except NoSuchElementException:
+                            print(f"3: Unable to find button for keyword: {keyword}")
+                            continue
+
+                # 输入用户名和密码
+                username_input.clear()
+                username_input.send_keys(username)
+                password_input.clear()
+                password_input.send_keys(password)
+
+                # 提交方式
+                if login_button:
+                    print("3: Found login button, clicking it.")
+                    login_button.click()
+                else:
+                    print("3: No login button found, submitting the form.")
+                    password_input.submit()
+
+                # 等待页面加载
+                time.sleep(3)
+                print("Waiting for the response...")
+
+                # 获取登录后的页面内容
+                response_content = driver.page_source
+                print("Login successful, retrieving response content.")
                 return HttpResponse(response_content, content_type='text/html')
 
         except Exception as e:
