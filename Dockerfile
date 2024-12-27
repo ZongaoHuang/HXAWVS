@@ -11,9 +11,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
     software-properties-common \
-    vim \       
-    netcat \     
-    git \        
+    vim \               
     nano \       
     htop \       
     tree \       

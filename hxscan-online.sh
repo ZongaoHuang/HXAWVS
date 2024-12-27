@@ -119,7 +119,7 @@ echo "2) Start services"
 echo "3) Stop services"
 echo "4) Restart services"
 echo "5) Stop and remove services"
-echo "6) update services"
+echo "6) update app services"
 read -p "Enter choice [1-6]: " choice
 
 case "$choice" in
