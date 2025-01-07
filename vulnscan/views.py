@@ -36,8 +36,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import requests
-
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -54,7 +53,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from seleniumwire.utils import decode
 @csrf_exempt
 @login_required
 def validate_login(request):
@@ -122,27 +121,61 @@ def validate_login(request):
                 # 输入用户名和密码
                 username_input.clear()
                 username_input.send_keys(username)
+                username = username_input.get_attribute('value')
+                print(f"username:{username}")
                 password_input.clear()
                 password_input.send_keys(password)
+                password = password_input.get_attribute('value')
+                print(f"password:{password}")
+                # 提交方式
+                all_responses = []
                 # 提交方式
                 if login_button:
                     # 如果找到登录按钮，点击按钮
                     login_button.click()
-                    print(f"1.4 login_button.")
+                    print(f"2.4 login_button.")                
+                    for request in driver.requests:
+                        if request.response:
+                            print(
+                                request.url,
+                                request.response.status_code,
+                                request.response.headers['Content-Type'],
+                                request.response.body
+                            )
+                            response_content = {
+                            'url': request.url,
+                            'status_code': request.response.status_code,
+                            'content_type': request.response.headers.get('Content-Type', ''),
+                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
+                            }
+                            all_responses.append(response_content)
+                        
+
                 else:
                     # 如果没有找到登录按钮，使用表单提交
                     password_input.submit()
-                    print(f"1.5 password_input.")
+                    print(f"2.5 password_input.")
+                    for request in driver.requests:
+                        if request.response:
+                            print(
+                                request.url,
+                                request.response.status_code,
+                                request.response.headers['Content-Type'],
+                                request.response.body
+                            )
+                            response_content = {
+                            'url': request.url,
+                            'status_code': request.response.status_code,
+                            'content_type': request.response.headers.get('Content-Type', ''),
+                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
+                            }
+                            all_responses.append(response_content)
+
                 # 等待页面加载
                 time.sleep(3)
                 print("Waiting for the response...")
-
-                # 获取登录后的页面内容
-                response_content = driver.page_source
-                print("Login successful, retrieving response content.")
-
                 # 返回响应内容
-                return HttpResponse(response_content, content_type='text/html')
+                return JsonResponse({'code': 200, 'data': all_responses}, safe=False)  # 返回JSON格式的响应
 
             except Exception as e:
                 print(f"Error with input0 and input1: {str(e)}")
@@ -181,42 +214,74 @@ def validate_login(request):
                             except NoSuchElementException:
                                 continue
 
-                # 输入用户名和密码
                 username_input.clear()
                 username_input.send_keys(username)
+                username = username_input.get_attribute('value')
+                print(f"username:{username}")
                 password_input.clear()
                 password_input.send_keys(password)
-
+                password = password_input.get_attribute('value')
+                print(f"password:{password}")
+                all_responses = []
                 # 提交方式
                 if login_button:
                     # 如果找到登录按钮，点击按钮
                     login_button.click()
-                    print(f"2.4 login_button.")
+                    print(f"2.4 login_button.")                
+                    for request in driver.requests:
+                        if request.response:
+                            print(
+                                request.url,
+                                request.response.status_code,
+                                request.response.headers['Content-Type'],
+                                request.response.body
+                            )
+                            response_content = {
+                            'url': request.url,
+                            'status_code': request.response.status_code,
+                            'content_type': request.response.headers.get('Content-Type', ''),
+                            'body': request.response.body.decode('utf-8', errors='replace') 
+                            }
+                            all_responses.append(response_content)
+
+                        
+
                 else:
                     # 如果没有找到登录按钮，使用表单提交
                     password_input.submit()
                     print(f"2.5 password_input.")
+                    for request in driver.requests:
+                        if request.response:
+                            print(
+                                request.url,
+                                request.response.status_code,
+                                request.response.headers['Content-Type'],
+                                request.response.body
+                            )
+                            response_content = {
+                            'url': request.url,
+                            'status_code': request.response.status_code,
+                            'content_type': request.response.headers.get('Content-Type', ''),
+                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
+                            }
+                            all_responses.append(response_content)
+                        
 
                 # 等待页面加载
                 time.sleep(3)
-                print("Waiting for the response...")
-
-                # 获取登录后的页面内容
-                response_content = driver.page_source
-                print("Login successful, retrieving response content.")
-
+                print("All responses")
                 # 返回响应内容
-                return HttpResponse(response_content, content_type='text/html')
-
+                return JsonResponse({'code': 200, 'data': all_responses}, safe=False)  # 返回JSON格式的响应
+            
         except Exception as e:
             print(f'Error: {str(e)}')  # 打印错误信息到控制台
-            return HttpResponse(f'Error: {str(e)}', status=500)
+            return JsonResponse({'code': 500, 'message': str(e)}, status=500)
 
         finally:
             # driver.quit()  # 关闭浏览器
             print("Browser closed.")
 
-    return HttpResponse('Invalid request method', status=400)
+    return JsonResponse({'code': 400, 'message': 'Invalid request method'}, status=400)
 
 
 @csrf_exempt

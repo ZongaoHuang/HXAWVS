@@ -1007,7 +1007,7 @@ $(function() {
             $.post('/validate_login', { username: username, password: password, url: url })
                 .done(function(response) {
                     // 请求成功，直接显示响应内容
-                    alert("响应内容:\n" + response); // 直接显示响应内容
+                    alert("响应内容:\n" + JSON.stringify(response.data, null, 2)); // 直接显示响应内容
                 })
                 .fail(function(jqXHR, textStatus, errorThrown) {
                     // 请求失败，处理错误

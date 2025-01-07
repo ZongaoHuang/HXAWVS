@@ -4,7 +4,6 @@ from . import views
 
 urlpatterns = [
     path('vulnscan', views.vulnscan, name="vulnscan"),
-    # path('vulnscantest', views.vulnscantest, name="vulnscantest"),
     path('vuln_scan', views.vuln_scan, name='vuln_scan'),
     path('test1', views.get_vuln_rank, name='test1'),
     path('get_vuln_rank',views.get_vuln_rank, name='get_vuln_rank'),
@@ -16,7 +15,6 @@ urlpatterns = [
     path("abort_scan",views.abort_scan, name="abort_scan"),
     path("delete_scan",views.delete_scan, name="delete_scan"),
     path('get_vuln_scans', views.get_vuln_scans, name='get_vuln_scans'),
-    
     path('validate_login', views.validate_login, name='validate_login'),
     path('validate_header', views.validate_header, name='validate_header'),
 ]
