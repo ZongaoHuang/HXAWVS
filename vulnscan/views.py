@@ -1,3 +1,5 @@
+import gzip
+import io
 from tempfile import template
 
 from django.contrib.auth.decorators import login_required
@@ -70,9 +72,12 @@ def validate_login(request):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-
+        chrome_options.add_argument("disable_encoding")
+        seleniumwire_options = {
+            'disable_encoding': True  # Ask the server not to compress the response
+        }
         # 启动 Chrome 浏览器
-        driver = webdriver.Chrome(service=Service(), options=chrome_options)
+        driver = webdriver.Chrome(service=Service(), options=chrome_options, seleniumwire_options=seleniumwire_options)
 
         try:
             # 打开登录页面
@@ -135,20 +140,28 @@ def validate_login(request):
                     webdriver.ActionChains(driver).move_to_element(login_button).click(login_button).perform()
                     print(f"2.4 login_button.")                
                     for request in driver.requests:
-                        if request.response:
-                            print(
-                                request.url,
-                                request.response.status_code,
-                                request.response.headers['Content-Type'],
-                                request.response.body
-                            )
-                            response_content = {
-                            'url': request.url,
-                            'status_code': request.response.status_code,
-                            'content_type': request.response.headers.get('Content-Type', ''),
-                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
-                            }
-                            all_responses.append(response_content)
+                        if 'login' in request.url:
+                            if request.response:
+                                print(
+                                    request.url,
+                                    request.response.status_code,
+                                    request.response.headers['Content-Encoding'],
+                                    request.response.headers['Content-Type'],
+                                    request.response.body.decode('utf-8', errors='replace') 
+                                )
+                                if request.response.headers['Content-Encoding']=='gzip':
+                                    decompressed_data = gzip.decompress(request.response.body)
+                                    print(decompressed_data.decode('utf-8', errors='replace') )
+                                    
+                                response_content = {
+                                'url': request.url,
+                                'status_code': request.response.status_code,
+                                'Content-Encoding': request.response.headers['Content-Encoding'],
+                                'content_type': request.response.headers['Content-Type'],
+                                'body_len': len(request.response.body)
+                                }
+                                all_responses.append(response_content)
+
                         
 
                 else:
@@ -156,20 +169,28 @@ def validate_login(request):
                     password_input.submit()
                     print(f"2.5 password_input.")
                     for request in driver.requests:
-                        if request.response:
-                            print(
-                                request.url,
-                                request.response.status_code,
-                                request.response.headers['Content-Type'],
-                                request.response.body
-                            )
-                            response_content = {
-                            'url': request.url,
-                            'status_code': request.response.status_code,
-                            'content_type': request.response.headers.get('Content-Type', ''),
-                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
-                            }
-                            all_responses.append(response_content)
+                        if 'login' in request.url:
+                            if request.response:
+                                print(
+                                    request.url,
+                                    request.response.status_code,
+                                    request.response.headers['Content-Encoding'],
+                                    request.response.headers['Content-Type'],
+                                    request.response.body.decode('utf-8', errors='replace') 
+                                )
+                                if request.response.headers['Content-Encoding']=='gzip':
+                                    decompressed_data = gzip.decompress(request.response.body)
+                                    print(decompressed_data.decode('utf-8', errors='replace') )
+                                    
+                                response_content = {
+                                'url': request.url,
+                                'status_code': request.response.status_code,
+                                'Content-Encoding': request.response.headers['Content-Encoding'],
+                                'content_type': request.response.headers['Content-Type'],
+                                'body_len': len(request.response.body)
+                                }
+                                all_responses.append(response_content)
+
 
                 # 等待页面加载
                 time.sleep(3)
@@ -229,20 +250,27 @@ def validate_login(request):
                     webdriver.ActionChains(driver).move_to_element(login_button).click(login_button).perform()
                     print(f"2.4 login_button.")                
                     for request in driver.requests:
-                        if request.response:
-                            print(
-                                request.url,
-                                request.response.status_code,
-                                request.response.headers['Content-Type'],
-                                request.response.body
-                            )
-                            response_content = {
-                            'url': request.url,
-                            'status_code': request.response.status_code,
-                            'content_type': request.response.headers.get('Content-Type', ''),
-                            'body': request.response.body.decode('utf-8', errors='replace') 
-                            }
-                            all_responses.append(response_content)
+                        if 'login' in request.url:
+                            if request.response:
+                                print(
+                                    request.url,
+                                    request.response.status_code,
+                                    request.response.headers['Content-Encoding'],
+                                    request.response.headers['Content-Type'],
+                                    request.response.body.decode('utf-8', errors='replace') 
+                                )
+                                if request.response.headers['Content-Encoding']=='gzip':
+                                    decompressed_data = gzip.decompress(request.response.body)
+                                    print(decompressed_data.decode('utf-8', errors='replace') )
+                                    
+                                response_content = {
+                                'url': request.url,
+                                'status_code': request.response.status_code,
+                                'Content-Encoding': request.response.headers['Content-Encoding'],
+                                'content_type': request.response.headers['Content-Type'],
+                                'body_len': len(request.response.body)
+                                }
+                                all_responses.append(response_content)
 
                         
 
@@ -251,20 +279,28 @@ def validate_login(request):
                     password_input.submit()
                     print(f"2.5 password_input.")
                     for request in driver.requests:
-                        if request.response:
-                            print(
-                                request.url,
-                                request.response.status_code,
-                                request.response.headers['Content-Type'],
-                                request.response.body
-                            )
-                            response_content = {
-                            'url': request.url,
-                            'status_code': request.response.status_code,
-                            'content_type': request.response.headers.get('Content-Type', ''),
-                            'body': request.response.body.decode('utf-8', errors='replace')  # 解码为字符串，处理可能的错误
-                            }
-                            all_responses.append(response_content)
+                        if 'login' in request.url:
+                            if request.response:
+                                print(
+                                    request.url,
+                                    request.response.status_code,
+                                    request.response.headers['Content-Encoding'],
+                                    request.response.headers['Content-Type'],
+                                    request.response.body.decode('utf-8', errors='replace') 
+                                )
+                                if request.response.headers['Content-Encoding']=='gzip':
+                                    decompressed_data = gzip.decompress(request.response.body)
+                                    print(decompressed_data.decode('utf-8', errors='replace') )
+                                    
+                                response_content = {
+                                'url': request.url,
+                                'status_code': request.response.status_code,
+                                'Content-Encoding': request.response.headers['Content-Encoding'],
+                                'content_type': request.response.headers['Content-Type'],
+                                'body_len': len(request.response.body)
+                                }
+                                all_responses.append(response_content)
+
                         
 
                 # 等待页面加载
