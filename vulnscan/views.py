@@ -132,7 +132,7 @@ def validate_login(request):
                 # 提交方式
                 if login_button:
                     # 如果找到登录按钮，点击按钮
-                    login_button.click()
+                    webdriver.ActionChains(driver).move_to_element(login_button).click(login_button).perform()
                     print(f"2.4 login_button.")                
                     for request in driver.requests:
                         if request.response:
@@ -226,7 +226,7 @@ def validate_login(request):
                 # 提交方式
                 if login_button:
                     # 如果找到登录按钮，点击按钮
-                    login_button.click()
+                    webdriver.ActionChains(driver).move_to_element(login_button).click(login_button).perform()
                     print(f"2.4 login_button.")                
                     for request in driver.requests:
                         if request.response:
