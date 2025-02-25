@@ -25,7 +25,7 @@ init_services() {
     echo "Pulling Docker images..."
     docker pull sakura501/hxscan-tool:v1
     echo "hxscan-tool image pulled."
-    docker pull snow7/hxscan-app:v1
+    docker pull snow7/hxscan-app:v1.3
     echo "hxscan-app image pulled."
 
     # 停止旧容器（如果存在）
