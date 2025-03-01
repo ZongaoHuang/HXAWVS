@@ -103,7 +103,7 @@ class Base(object):
 #### 目录识别
 
 调用dirsearch工具：[dirsearch](https://github.com/maurosoria/dirsearch)
-使用SQLite对每一次目录识别任务进行记录，展示在下方的列表，同时保存每次的目录识别记录。
+对每一次目录识别任务进行记录，展示在下方的列表，同时保存每次的目录识别记录。
 
 #### 端口扫描
 
